@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+exclude=["*alembic*"]
+
+[project]
+name = "mapcat"
+version = "0.0.1a1"
+requires-python = ">=3.11"
+dependencies = [
+    "sqlmodel",
+    "sqlalchemy[asyncio]",
+    "aiosqlite",
+    "alembic",
+    "pydantic_settings"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "ruff",
+    "testcontainers",
+    "coverage",
+    "pytest-cov",
+    "pytest-asyncio",
+    "pre-commit",
+]
+
+[tool.ruff.lint]
+preview = true
+extend-select = ["I", "DOC501"]
+# ignore = ["D417", "D400", "D200", "D103", "D102", "D101", "D100"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = [
+    "mapcat"
+]
+concurrency = ["gevent", "thread"]

@@ -17,6 +17,9 @@ dependencies = [
     "pydantic_settings"
 ]
 
+[project.scripts]
+actingest = "mapcat.toolkit.act:main"
+
 [project.optional-dependencies]
 dev = [
     "pytest",

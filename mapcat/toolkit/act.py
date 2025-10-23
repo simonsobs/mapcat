@@ -74,19 +74,27 @@ def create_objects(base: str, relative_to: Path) -> DepthOneMapTable:
 
     return depth_one_map
 
-def glob(input_glob: str, relative_to: Path):
+def glob(input_glob: str, relative_to: Path) -> list[DepthOneMapTable]:
+    maps = []
+
     for map_file in relative_to.glob(input_glob):
         base = str(map_file).replace("_map.fits", "")
         depth_one_map = create_objects(
             base=base, relative_to=relative_to
         )
-        print(depth_one_map)
+        maps.append(depth_one_map)
+
+    return maps
 
 
-if __name__ == "__main__":
+def main():
     import sys
-    glob(sys.argv[1], Path(sys.argv[2]))
+    from mapcat.helper import settings
 
+    with settings.session() as session:
+        maps = glob(sys.argv[1], Path(sys.argv[2]))
+        session.add_all(maps)
+        session.commit()
 
 
     

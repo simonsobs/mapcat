@@ -25,6 +25,7 @@ def upgrade() -> None:
         "depth_one_maps",
         sa.Column("map_id", sa.Integer, primary_key=True),
         sa.Column("map_name", sa.String, unique=True, nullable=False),
+        sa.Column("map_path", sa.String, unique=True, nullable=False),
         sa.Column("ivar_path", sa.String, nullable=True),
         sa.Column("time_path", sa.String, nullable=True),
         sa.Column(

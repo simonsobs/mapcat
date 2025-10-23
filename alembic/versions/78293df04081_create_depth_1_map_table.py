@@ -9,9 +9,9 @@ Create Date: 2025-08-12 11:39:10.066048
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "78293df04081"
@@ -109,7 +109,10 @@ def upgrade() -> None:
     op.create_table(
         "link_tod_to_depth_one_map",
         sa.Column(
-            "tod_id", sa.Integer, sa.ForeignKey("tod_depth_one.tod_id"), primary_key=True
+            "tod_id",
+            sa.Integer,
+            sa.ForeignKey("tod_depth_one.tod_id"),
+            primary_key=True,
         ),
         sa.Column(
             "map_id",

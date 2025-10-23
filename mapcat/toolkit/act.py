@@ -2,15 +2,19 @@
 Create objects from an ACT depth 1 map file.
 """
 
+from pathlib import Path
+
 import h5py
 
-from pathlib import Path
 from mapcat.database import DepthOneMapTable, TODDepthOneTable
+
 # from astropy import units as u
 # from astropy.coordinates import SkyCoord
 
+
 def extract_string(input) -> str:
     return str(input).replace("b'", "").replace("'", "")
+
 
 def parse_info_file(path: Path) -> dict:
     with h5py.File(path, "r") as f:
@@ -21,9 +25,9 @@ def parse_info_file(path: Path) -> dict:
             "start_time": f["period"][0],
             "stop_time": f["period"][1],
             "ctime": float(f["t"][...]),
-            "box": f["box"][...]
+            "box": f["box"][...],
         }
-    
+
 
 def parse_filenames(base: str, relative_to: Path) -> dict[str, str]:
     """
@@ -38,9 +42,7 @@ def parse_filenames(base: str, relative_to: Path) -> dict[str, str]:
         "time": Path(base + "_time.fits"),
     }
 
-    return {
-        x: str(y.relative_to(relative_to)) for x, y in paths.items() if y.exists()
-    }
+    return {x: str(y.relative_to(relative_to)) for x, y in paths.items() if y.exists()}
 
 
 def create_objects(base: str, relative_to: Path) -> DepthOneMapTable:
@@ -69,19 +71,18 @@ def create_objects(base: str, relative_to: Path) -> DepthOneMapTable:
         ctime=file_info["ctime"],
         start_time=file_info["start_time"],
         stop_time=file_info["stop_time"],
-        tods=tods
+        tods=tods,
     )
 
     return depth_one_map
+
 
 def glob(input_glob: str, relative_to: Path) -> list[DepthOneMapTable]:
     maps = []
 
     for map_file in relative_to.glob(input_glob):
         base = str(map_file).replace("_map.fits", "")
-        depth_one_map = create_objects(
-            base=base, relative_to=relative_to
-        )
+        depth_one_map = create_objects(base=base, relative_to=relative_to)
         maps.append(depth_one_map)
 
     return maps
@@ -89,14 +90,10 @@ def glob(input_glob: str, relative_to: Path) -> list[DepthOneMapTable]:
 
 def main():
     import sys
+
     from mapcat.helper import settings
 
     with settings.session() as session:
         maps = glob(sys.argv[1], Path(sys.argv[2]))
         session.add_all(maps)
         session.commit()
-
-
-    
-
-

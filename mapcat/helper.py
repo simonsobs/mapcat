@@ -2,14 +2,14 @@
 Helper for mapcat database.
 """
 
+from pathlib import Path
 from typing import Literal
 
 from pydantic import PrivateAttr
-from sqlmodel import create_engine
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Engine
-from pathlib import Path
+from sqlalchemy.orm import sessionmaker
+from sqlmodel import create_engine
 
 
 class Settings(BaseSettings):  # pragma: no cover
@@ -41,7 +41,7 @@ class Settings(BaseSettings):  # pragma: no cover
             return f"sqlite:///{self.database_name}"
         if self.database_type == "postgresql":
             return f"postgresql://{self.database_name}"
-    
+
     @property
     def engine(self) -> Engine:
         """Create a synchronous engine."""
@@ -49,7 +49,7 @@ class Settings(BaseSettings):  # pragma: no cover
             return self._engine
         self._engine = create_engine(self.sync_database_url, echo=self.echo)
         return self._engine
-    
+
     @property
     def session(self) -> sessionmaker:
         """Create a synchronous session maker."""

@@ -3,7 +3,8 @@ Core database tables storing information about depth one maps.
 """
 
 from typing import Any
-from sqlmodel import  Field, SQLModel, Relationship, JSON
+
+from sqlmodel import JSON, Field, Relationship, SQLModel
 
 
 class TODToMapTable(SQLModel, table=True):
@@ -294,7 +295,7 @@ class TODDepthOneTable(SQLModel, table=True):
     telescope_flavor: str | None = Field()
     tube_slot: str = Field()
     tube_flavor: str | None = Field()
-    frequency: str  = Field(index=True, nullable=False)
+    frequency: str = Field(index=True, nullable=False)
     scan_type: str = Field()
     subtype: str = Field()
     wafer_count: int = Field(index=True, nullable=False)

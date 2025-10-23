@@ -25,6 +25,7 @@ target_metadata = None
 # ... etc.
 if config.get_main_option("sqlalchemy.url") == "SET_IN_ENVIRONMENT_VARIABLE":
     from mapcat.helper import settings
+
     # Need to do this test as in the test environment the database URL is set
     # in the configuration manually.
     config.set_main_option("sqlalchemy.url", settings.sync_database_url)

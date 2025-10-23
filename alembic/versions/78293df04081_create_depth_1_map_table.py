@@ -25,7 +25,8 @@ def upgrade() -> None:
         "depth_one_maps",
         sa.Column("map_id", sa.Integer, primary_key=True),
         sa.Column("map_name", sa.String, unique=True, nullable=False),
-        sa.Column("map_path", sa.String, nullable=False),
+        sa.Column("ivar_path", sa.String, nullable=True),
+        sa.Column("time_path", sa.String, nullable=True),
         sa.Column(
             "tube_slot", sa.String, nullable=False
         ),  # TODO: Maybe make this a literal?
@@ -79,10 +80,10 @@ def upgrade() -> None:
             "ctime", sa.Float, nullable=False
         ),  # TODO: should this be sa.Datetime?
         sa.Column(
-            "start_time", sa.Float, nullable=False
+            "start_time", sa.Float, nullable=True
         ),  # TODO: should this be sa.Datetime?
         sa.Column(
-            "stop_time", sa.Float, nullable=False
+            "stop_time", sa.Float, nullable=True
         ),  # TODO: should this be sa.Datetime?
         sa.Column("nsamples", sa.Integer),
         sa.Column("telescope", sa.String),

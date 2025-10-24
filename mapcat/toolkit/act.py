@@ -124,11 +124,29 @@ def main():
 
     parser = ap.ArgumentParser(prog="actingest", usage=USAGE, description=HELP_TEXT)
 
-    parser.add_argument("-r", "--relative-to", type=Path, required=True)
+    parser.add_argument(
+        "-r",
+        "--relative-to",
+        type=Path,
+        required=True,
+        help="Base path that maps are relative to",
+    )
 
-    parser.add_argument("-g", "--glob", type=str, required=True)
+    parser.add_argument(
+        "-g",
+        "--glob",
+        type=str,
+        required=True,
+        help="Glob pattern below relative-to that lists the _map.fits files",
+    )
 
-    parser.add_argument("-t", "--telescope", type=str, default="act")
+    parser.add_argument(
+        "-t",
+        "--telescope",
+        type=str,
+        default="act",
+        help="Telescope label to use (e.g. lat, act)",
+    )
 
     args = parser.parse_args()
 

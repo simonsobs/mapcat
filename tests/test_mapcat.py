@@ -3,19 +3,17 @@ Test the core functions
 """
 
 import pytest
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from mapcat.database import (
     DepthOneMapTable,
-    ProcessingStatusTable,
-    TODDepthOneTable,
-    PointingResidualTable,
     PipelineInformationTable,
+    PointingResidualTable,
+    ProcessingStatusTable,
     SkyCoverageTable,
+    TODDepthOneTable,
 )
-
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 
 def run_migration(database_path: str):
@@ -55,7 +53,6 @@ def database_sessionmaker(tmp_path_factory):
 
     # Clean up the database (don't do this in case we want to inspect)
     database_path.unlink()
-
 
 
 def test_database_exists(database_sessionmaker):
@@ -98,13 +95,11 @@ def test_create_depth_one(database_sessionmaker):
             processing_start=1756787524.0,
             processing_end=1756797524.0,
             processing_status="done",
-            map=dmap
+            map=dmap,
         )
 
         pointing_residual = PointingResidualTable(
-            ra_offset=1.2,
-            dec_offset=-0.8,
-            map=dmap
+            ra_offset=1.2, dec_offset=-0.8, map=dmap
         )
 
         tod = TODDepthOneTable(
@@ -131,14 +126,14 @@ def test_create_depth_one(database_sessionmaker):
             roll_throw=0.0,
             wafer_slots_list="ws0,ws1,ws2",
             stream_ids_list="ufm_mv25,ufm_mv26,ufm_mv11",
-            maps=[dmap]
+            maps=[dmap],
         )
 
         pipeline_info = PipelineInformationTable(
             sotodlib_version="1.2.3",
             map_maker="minkasi",
             preprocess_info={"config": "test"},
-            map=dmap
+            map=dmap,
         )
 
         sky_coverage = SkyCoverageTable(
@@ -209,8 +204,8 @@ def test_create_depth_one(database_sessionmaker):
     assert pipe.preprocess_info == {"config": "test"}
 
     assert sky.patch_id == sky_id
-    assert sky.x == '5'
-    assert sky.y == '2'
+    assert sky.x == "5"
+    assert sky.y == "2"
 
     # Check bad map ID raises ValueError
     with pytest.raises(ValueError):
@@ -237,17 +232,15 @@ def test_add_remove_child_tables(database_sessionmaker):
             processing_start=1756787524.0,
             processing_end=1756797524.0,
             processing_status="done",
-            map=dmap
+            map=dmap,
         )
 
         pointing_residual = PointingResidualTable(
-            ra_offset=1.2,
-            dec_offset=-0.8,
-            map=dmap
+            ra_offset=1.2, dec_offset=-0.8, map=dmap
         )
 
         tod = TODDepthOneTable(
-        obs_id="obs_1753486724_lati6_111",
+            obs_id="obs_1753486724_lati6_111",
             pwv=0.7,
             ctime=1755787524.0,
             start_time=1755687524.0,
@@ -270,14 +263,14 @@ def test_add_remove_child_tables(database_sessionmaker):
             roll_throw=0.0,
             wafer_slots_list="ws0,ws1,ws2",
             stream_ids_list="ufm_mv25,ufm_mv26,ufm_mv11",
-            maps=[dmap]
+            maps=[dmap],
         )
 
         pipeline_info = PipelineInformationTable(
             sotodlib_version="1.2.3",
             map_maker="minkasi",
             preprocess_info={"config": "test"},
-            map=dmap
+            map=dmap,
         )
 
         sky_coverage = SkyCoverageTable(
@@ -287,10 +280,17 @@ def test_add_remove_child_tables(database_sessionmaker):
         )
 
         session.add_all(
-            [dmap, processing_status, pointing_residual, tod, pipeline_info, sky_coverage]
+            [
+                dmap,
+                processing_status,
+                pointing_residual,
+                tod,
+                pipeline_info,
+                sky_coverage,
+            ]
         )
         session.commit()
-        
+
         dmap_id = dmap.map_id
         proc_id = processing_status.processing_status_id
         point_id = pointing_residual.pointing_residual_id
@@ -319,7 +319,7 @@ def test_add_remove_child_tables(database_sessionmaker):
     with database_sessionmaker() as session:
         tod = session.get(TODDepthOneTable, tod_id)
         assert tod is not None
-    
+
     with pytest.raises(ValueError):
         with database_sessionmaker() as session:
             x = session.get(PipelineInformationTable, pipe_id)

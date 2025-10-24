@@ -9,9 +9,9 @@ Create Date: 2025-08-12 11:39:10.066048
 
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "78293df04081"
@@ -25,7 +25,9 @@ def upgrade() -> None:
         "depth_one_maps",
         sa.Column("map_id", sa.Integer, primary_key=True),
         sa.Column("map_name", sa.String, unique=True, nullable=False),
-        sa.Column("map_path", sa.String, nullable=False),
+        sa.Column("map_path", sa.String, unique=True, nullable=False),
+        sa.Column("ivar_path", sa.String, nullable=True),
+        sa.Column("time_path", sa.String, nullable=True),
         sa.Column(
             "tube_slot", sa.String, nullable=False
         ),  # TODO: Maybe make this a literal?
@@ -79,10 +81,10 @@ def upgrade() -> None:
             "ctime", sa.Float, nullable=False
         ),  # TODO: should this be sa.Datetime?
         sa.Column(
-            "start_time", sa.Float, nullable=False
+            "start_time", sa.Float, nullable=True
         ),  # TODO: should this be sa.Datetime?
         sa.Column(
-            "stop_time", sa.Float, nullable=False
+            "stop_time", sa.Float, nullable=True
         ),  # TODO: should this be sa.Datetime?
         sa.Column("nsamples", sa.Integer),
         sa.Column("telescope", sa.String),
@@ -107,7 +109,10 @@ def upgrade() -> None:
     op.create_table(
         "link_tod_to_depth_one_map",
         sa.Column(
-            "tod_id", sa.Integer, sa.ForeignKey("tod_depth_one.tod_id"), primary_key=True
+            "tod_id",
+            sa.Integer,
+            sa.ForeignKey("tod_depth_one.tod_id"),
+            primary_key=True,
         ),
         sa.Column(
             "map_id",

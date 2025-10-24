@@ -3,7 +3,8 @@ Core database tables storing information about depth one maps.
 """
 
 from typing import Any
-from sqlmodel import  Field, SQLModel, Relationship, JSON
+
+from sqlmodel import JSON, Field, Relationship, SQLModel
 
 
 class TODToMapTable(SQLModel, table=True):
@@ -115,7 +116,11 @@ class DepthOneMapTable(SQLModel, table=True):
 
     map_id: int = Field(primary_key=True)
     map_name: str = Field(index=True, unique=True, nullable=False)
+
     map_path: str
+    ivar_path: str | None
+    time_path: str | None
+
     tube_slot: str = Field(index=True, nullable=False)
     frequency: str = Field(index=True, nullable=False)
     ctime: float = Field(index=True, nullable=False)
@@ -281,15 +286,15 @@ class TODDepthOneTable(SQLModel, table=True):
     __tablename__ = "tod_depth_one"
     tod_id: int = Field(primary_key=True)
     obs_id: str = Field(nullable=False)
-    pwv: float = Field(index=True, nullable=True)
+    pwv: float | None = Field(index=True, nullable=True)
     ctime: float = Field(index=True, nullable=False)
-    start_time: float = Field(index=True, nullable=False)
-    stop_time: float = Field(index=True, nullable=False)
-    nsamples: int = Field()
+    start_time: float | None = Field(index=True, nullable=True)
+    stop_time: float | None = Field(index=True, nullable=True)
+    nsamples: int | None = Field()
     telescope: str = Field(index=True, nullable=False)
-    telescope_flavor: str = Field()
+    telescope_flavor: str | None = Field()
     tube_slot: str = Field()
-    tube_flavor: str = Field()
+    tube_flavor: str | None = Field()
     frequency: str = Field(index=True, nullable=False)
     scan_type: str = Field()
     subtype: str = Field()

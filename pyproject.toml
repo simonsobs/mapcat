@@ -2,8 +2,8 @@
 requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-exclude=["*alembic*"]
+[tool.setuptools.package-data]
+mapcat = ["alembic/*", "alembic.ini", "alembic/versions/*"]
 
 [project]
 name = "mapcat"
@@ -19,6 +19,7 @@ dependencies = [
 
 [project.scripts]
 actingest = "mapcat.toolkit.act:main"
+mapcatmigrate = "mapcat.helper:migrate"
 
 [project.optional-dependencies]
 dev = [

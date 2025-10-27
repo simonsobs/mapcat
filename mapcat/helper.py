@@ -73,10 +73,6 @@ def migrate():
 
     location = __file__.replace("helper.py", "alembic.ini")
 
-    subprocess.call(
-        ["alembic", "-c", location, "upgrade", "head"]
-    )
+    subprocess.call(["alembic", "-c", location, "upgrade", "head"])
 
     return
-
-    

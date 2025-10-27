@@ -50,3 +50,44 @@ are not entirely metadata-complete. The command-line script is:
 actingest --relative-to=/path/to/maps --glob=*/*_map.fits --telescope=act
 ```
 More information on the parameters is available through `actingest -h`.
+
+Registering new Maps
+--------------------
+
+New maps can easily be added to the catalog through the SQLAlchemy interface.
+It is also wise to include the TOD information used for creating the map,
+so that we can later track individual TODs' contributions to various maps.
+Note that there does not need to be a one-to-one relationship between
+maps and TODs.
+```python3
+from mapcat.helper import settings
+from mapcat.database import DepthOneMapTable, TODDepthOneTable
+
+with settings.session() as session:
+  tods = [
+    TODDepthOneTable(
+      obs_id="obs_...",
+      pwv=2.3,
+      ...
+    ),
+    ...
+  ]
+  
+  map = DepthOneMapTable(
+    map_name="15722/depth1_157221244_lati1_f090",
+    map_path="15722/depth1_157221244_lati1_f090_map.fits",
+    ivar_path="15722/depth1_157221244_lati1_f090_ivar.fits",
+    time_path="15722/depth1_157221244_lati1_f090_time.fits",
+    tube_slot="i1",
+    frequency="090",
+    ctime=157221244.0,
+    start_time=157220244.0,
+    end_time=157222423.0,
+    tods=tods,
+  )
+
+  session.add(map)
+  session.commit()
+```
+By referencing the TOD objects, you automatically create the required
+link table items.

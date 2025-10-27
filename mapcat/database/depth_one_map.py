@@ -28,7 +28,11 @@ class DepthOneMapTable(SQLModel, table=True):
     map_name : str
         Name of depth 1 map
     map_path : str
-        Non-localized path to str
+        Non-localized path to intensity map
+    ivar_path : str
+        Non-localized path to inverse-variance map
+    time_path : str
+        Non-localized path to time map
     tube_slot : str
         OT for map
     wafers : str

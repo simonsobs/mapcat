@@ -30,6 +30,7 @@ dev = [
     "pytest-cov",
     "pytest-asyncio",
     "pre-commit",
+    "gevent"
 ]
 
 [tool.ruff.lint]

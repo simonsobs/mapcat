@@ -17,7 +17,7 @@ using the prefix `MAPCAT_`.
 - `MAPCAT_DATABASE_NAME=mapcat.db`: If using PostgreSQL, this should be
   your connection string; for SQLite it should be the path to the map
   catalog file.
-- `MAPCAT_DATABASE_TYPE=sqlite`: Or `postgrea` if using PostgreSQL.
+- `MAPCAT_DATABASE_TYPE=sqlite`: Or `postgres` if using PostgreSQL.
 - `MAPCAT_DEPTH_ONE_PARENT="."`: Parent directory containing the
   Depth-1 maps referred to by the database on this machine.
 - `MAPCAT_ATOMIC_PARENT="."`: Parent directory containing the

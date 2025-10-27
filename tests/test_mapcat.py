@@ -23,11 +23,10 @@ def run_migration(database_path: str):
     from alembic import command
     from alembic.config import Config
 
-    alembic_cfg = Config("./alembic.ini")
+    alembic_cfg = Config(__file__.replace("tests/test_mapcat.py", "") + "mapcat/alembic.ini")
     database_url = f"sqlite:///{database_path}"
     alembic_cfg.set_main_option("sqlalchemy.url", database_url)
-    alembic_cfg.set_main_option("script_location", "./alembic/")
-    command.upgrade(alembic_cfg, "heads")
+    command.upgrade(alembic_cfg, "head")
 
     return
 
@@ -220,7 +219,7 @@ def test_add_remove_child_tables(database_sessionmaker):
     with database_sessionmaker() as session:
         dmap = DepthOneMapTable(
             map_name="myDepthOne2",
-            map_path="/PATH/TO/DEPTH/ONE",
+            map_path="/PATH/TO/DEPTH/ONE2",
             tube_slot="OTi1",
             frequency="f090",
             ctime=1755787524.0,

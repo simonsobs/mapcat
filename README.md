@@ -30,9 +30,8 @@ Setting up
 Mapcat can be installed like any other python package, using your
 preferred package manager. We recommend using `uv`:
 ```
-uv pip install git+https://github.com/simonsobs/mapcat
+uv pip install mapcat
 ```
-PyPI release builds will be made once the system is more stable.
 
 The database can be migrated (or created, if starting fresh) by using
 the `mapcatmigrate` command. This runs `alembic upgrade head` with the

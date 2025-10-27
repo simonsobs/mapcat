@@ -2,16 +2,19 @@
 Table definitions
 """
 
-from .tod import TODToMapTable
+from .atomic_coadd import AtomicMapCoaddTable
+from .atomic_map import AtomicMapTable
 from .depth_one_map import DepthOneMapTable
-from .processing_status import ProcessingStatusTable
-from .pointing_residual import PointingResidualTable
-from .tod import TODDepthOneTable
+from .depth_one_coadd import DepthOneCoaddTable
 from .pipeline_information import PipelineInformationTable
+from .pointing_residual import PointingResidualTable
+from .processing_status import ProcessingStatusTable
 from .sky_coverage import SkyCoverageTable
+from .tod import TODDepthOneTable
 
 __all__ = [
-    "TODToMapTable",
+    "AtomicMapTable",
+    "AtomicMapCoaddTable",
     "DepthOneMapTable",
     "ProcessingStatusTable",
     "PointingResidualTable",
@@ -21,8 +24,10 @@ __all__ = [
 ]
 
 ALL_TABLES = [
-    TODToMapTable,
+    AtomicMapTable,
+    AtomicMapCoaddTable,
     DepthOneMapTable,
+    DepthOneCoaddTable,
     ProcessingStatusTable,
     PointingResidualTable,
     TODDepthOneTable,

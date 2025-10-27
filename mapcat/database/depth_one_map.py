@@ -12,9 +12,9 @@ if TYPE_CHECKING:
     from .pointing_residual import PointingResidualTable
     from .processing_status import ProcessingStatusTable
     from .sky_coverage import SkyCoverageTable
-    from .tod import TODDepthOneTable, TODToMapTable
+    from .tod import TODDepthOneTable
 
-from .links import DepthOneToCoaddTable
+from .links import DepthOneToCoaddTable, TODToMapTable
 
 
 class DepthOneMapTable(SQLModel, table=True):

@@ -23,7 +23,9 @@ def run_migration(database_path: str):
     from alembic import command
     from alembic.config import Config
 
-    alembic_cfg = Config(__file__.replace("tests/test_mapcat.py", "") + "mapcat/alembic.ini")
+    alembic_cfg = Config(
+        __file__.replace("tests/test_mapcat.py", "") + "mapcat/alembic.ini"
+    )
     database_url = f"sqlite:///{database_path}"
     alembic_cfg.set_main_option("sqlalchemy.url", database_url)
     command.upgrade(alembic_cfg, "head")

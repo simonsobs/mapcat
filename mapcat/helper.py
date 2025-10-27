@@ -16,8 +16,8 @@ class Settings(BaseSettings):  # pragma: no cover
     database_name: str = "mapcat.db"
     database_type: Literal["sqlite", "postgresql"] = "sqlite"
 
-    depth_one_parent: Path = "/"
-    atomic_parent: Path = "/"
+    depth_one_parent: Path = "./"
+    atomic_parent: Path = "./"
 
     echo: bool = False
 

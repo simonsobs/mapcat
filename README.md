@@ -22,6 +22,7 @@ using the prefix `MAPCAT_`.
   Depth-1 maps referred to by the database on this machine.
 - `MAPCAT_ATOMIC_PARENT="."`: Parent directory containing the
   Atomic maps referenced by the database on this machine.
+- `MAPCAT_{DEPTH_ONE,ATOMIC}_COADD_PARENT="."`.
 
 Setting up
 ----------

@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -21,6 +19,11 @@ def maps_containing_obs(obs_id: str, session: Session) -> list[DepthOneMapTable]
     -------
     depth_one_maps : list[DepthOneMapTable]
         Table of depth one maps corresponding to the obs_id
+
+    Raises
+    ------
+    ValueError
+        If no tods with specified obs_id are found
     """
 
     stmt = select(TODDepthOneTable).where(TODDepthOneTable.obs_id == obs_id)

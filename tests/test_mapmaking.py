@@ -71,7 +71,7 @@ def test_build_obslists(database_sessionmaker):
 
         data2 = DepthOneMapTable(
             map_name="myDepthOne2",
-            map_path="/PATH/TO/DEPTH/ONE",
+            map_path="/PATH/TO/DEPTH/ONE2",
             tube_slot="OTi4",
             frequency="f090",
             ctime=1755788524.0,
@@ -88,7 +88,7 @@ def test_build_obslists(database_sessionmaker):
         session.refresh(data2)
 
         map_id1 = data1.map_id
-        map_id2 = data1.map_id
+        map_id2 = data2.map_id
 
     # Get depth one map back
     with database_sessionmaker() as session:
@@ -213,5 +213,8 @@ def test_build_obslists(database_sessionmaker):
         session.commit()
 
     obs_list = build_obslists(obs_ids=obs_ids, session=session)
-
-    assert obs_list[0][0][0].map_id == map_id1
+    assert obs_list[0][obs_ids[0]][0].map_id == map_id1
+    assert obs_list[0][obs_ids[1]][0].map_id == map_id1
+    assert obs_list[0][obs_ids[1]][1].map_id == map_id2
+    assert obs_list[0][obs_ids[2]][0].map_id == map_id2
+    assert obs_ids[3] in obs_list[1]

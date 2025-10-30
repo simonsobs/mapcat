@@ -28,17 +28,15 @@ def maps_containing_obs(obs_id: str, session: Session) -> list[DepthOneMapTable]
         Table of depth one maps corresponding to the obs_id
     """
 
-    with session.begin():
-        stmt = select(TODDepthOneTable).where(TODDepthOneTable.obs_id == obs_id)
+    stmt = select(TODDepthOneTable).where(TODDepthOneTable.obs_id == obs_id)
 
-        tods = session.execute(stmt)
+    tods = session.execute(stmt)
 
-    if len(tods) == 0:
+    tods = tods.scalars().all()
+    if len(tods) == 0:  # pragma: no cover
         raise ValueError(f"No TODs with obs ID {obs_id} found.")
-    # TODO: is an obs_id unique to a TOD?
-    # if len(tod) > 1:
-    #    raise ValueError(f"More than one TOD with obs ID {obs_id} found.")
-    depth_one_maps = [tod.maps for tod in tods]
+
+    depth_one_maps = [tod.maps for tod in tods][0]
     return depth_one_maps
 
 
@@ -63,10 +61,12 @@ def build_obslists(
 
     map_dict = {}
     no_map_list = []
-    for obs_id in obs_ids:
-        try:
-            map_dict[obs_id] = maps_containing_obs(obs_id=obs_id, session=session)
-        except ValueError:
-            no_map_list.append(obs_id)
+    with session.begin():
+        for obs_id in obs_ids:
+            map_list = maps_containing_obs(obs_id=obs_id, session=session)
+            if len(map_list) == 0:
+                no_map_list.append(obs_id)
+            else:
+                map_dict[obs_id] = map_list
 
     return tuple((map_dict, no_map_list))

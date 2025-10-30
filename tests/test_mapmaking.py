@@ -2,11 +2,7 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from mapcat.database import (
-    DepthOneMapTable,
-    TODDepthOneTable,
-)
-
+from mapcat.database import DepthOneMapTable, TODDepthOneTable
 from mapcat.toolkit.mapmaking import build_obslists
 
 

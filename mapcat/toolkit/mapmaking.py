@@ -1,12 +1,9 @@
 from pathlib import Path
 
-from sqlalchemy.orm import Session
 from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-from mapcat.database import (
-    DepthOneMapTable,
-    TODDepthOneTable,
-)
+from mapcat.database import DepthOneMapTable, TODDepthOneTable
 
 
 def maps_containing_obs(obs_id: str, session: Session) -> list[DepthOneMapTable]:

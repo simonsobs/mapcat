@@ -28,13 +28,13 @@ def maps_containing_obs(obs_id: str, session: Session) -> list[DepthOneMapTable]
 
     stmt = select(TODDepthOneTable).where(TODDepthOneTable.obs_id == obs_id)
 
-    tods = session.execute(stmt)
+    tod = session.execute(stmt)
 
-    tods = tods.scalars().all()
-    if len(tods) == 0:  # pragma: no cover
+    tod = tod.scalars().all()
+    if len(tod) == 0:  # pragma: no cover
         raise ValueError(f"No TODs with obs ID {obs_id} found.")
 
-    depth_one_maps = [tod.maps for tod in tods][0]
+    depth_one_maps = tod[0].maps
     return depth_one_maps
 
 

@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import h5py
-
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 

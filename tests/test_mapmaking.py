@@ -4,10 +4,6 @@ from sqlalchemy.orm import sessionmaker
 
 from mapcat.database import (
     DepthOneMapTable,
-    PipelineInformationTable,
-    PointingResidualTable,
-    ProcessingStatusTable,
-    SkyCoverageTable,
     TODDepthOneTable,
 )
 

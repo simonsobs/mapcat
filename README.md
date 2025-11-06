@@ -33,10 +33,17 @@ preferred package manager. We recommend using `uv`:
 uv pip install mapcat
 ```
 
+### Creating or Migrating the Database
+
 The database can be migrated (or created, if starting fresh) by using
-the `mapcatmigrate` command. This runs `alembic upgrade head` with the
-version of the database referred to by your currently installed verison
-of the map catalog.
+the:
+```
+mapcatmigrate
+```
+command. This runs `alembic upgrade head` with the version of the database
+referred to by your currently installed verison of the map catalog.
+The database is created in the file or postgres cluster defined in the
+configuration above.
 
 Command-line Tools
 ------------------

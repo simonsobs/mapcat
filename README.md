@@ -81,7 +81,7 @@ with settings.session() as session:
     frequency="090",
     ctime=157221244.0,
     start_time=157220244.0,
-    end_time=157222423.0,
+    stop_time=157222423.0,
     tods=tods,
   )
 

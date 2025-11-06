@@ -43,8 +43,8 @@ class DepthOneMapTable(SQLModel, table=True):
         Mean unix time of map
     start_time : float
         Start unix time of map
-    end_time : float
-        End unix time of map
+    stop_time : float
+        Stop unix time of map
     processing_status : list[ProcessingStatusTable]
         List of processing status tables associated with d1 map
     pointing_residual : list[PointingResidualTable]

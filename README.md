@@ -16,7 +16,7 @@ using the prefix `MAPCAT_`.
 
 - `export MAPCAT_DATABASE_NAME=mapcat.db`: for SQLite it should be the path to the map
   catalog file;  If using PostgreSQL, this should be your connection string in the form
-  `<username>:<password>@<server_ip>:<server_port>/<dbname>. Please do not include
+  `<username>:<password>@<server_ip>:<server_port>/<dbname>`. Please do not include
   `postgresql://` at the beginning of this variable.
 - `export MAPCAT_DATABASE_TYPE=sqlite`: Or `postgresql` if using PostgreSQL.
 - `export MAPCAT_DEPTH_ONE_PARENT="."`: Parent directory containing the

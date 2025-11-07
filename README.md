@@ -14,15 +14,16 @@ SQLite (testing). It can be configured using the `pydantic-settings`
 interface defined in `mapcat/helper.py`, with environment variables
 using the prefix `MAPCAT_`.
 
-- `MAPCAT_DATABASE_NAME=mapcat.db`: If using PostgreSQL, this should be
-  your connection string; for SQLite it should be the path to the map
-  catalog file.
-- `MAPCAT_DATABASE_TYPE=sqlite`: Or `postgres` if using PostgreSQL.
-- `MAPCAT_DEPTH_ONE_PARENT="."`: Parent directory containing the
+- `export MAPCAT_DATABASE_NAME=mapcat.db`: for SQLite it should be the path to the map
+  catalog file;  If using PostgreSQL, this should be your connection string in the form
+  `<username>:<password>@<server_ip>:<server_port>/<dbname>. Please do not include
+  `postgresql://` at the beginning of this variable.
+- `export MAPCAT_DATABASE_TYPE=sqlite`: Or `postgresql` if using PostgreSQL.
+- `export MAPCAT_DEPTH_ONE_PARENT="."`: Parent directory containing the
   Depth-1 maps referred to by the database on this machine.
-- `MAPCAT_ATOMIC_PARENT="."`: Parent directory containing the
+- `export MAPCAT_ATOMIC_PARENT="."`: Parent directory containing the
   Atomic maps referenced by the database on this machine.
-- `MAPCAT_{DEPTH_ONE,ATOMIC}_COADD_PARENT="."`.
+- `export MAPCAT_{DEPTH_ONE,ATOMIC}_COADD_PARENT="."`.
 
 Setting up
 ----------

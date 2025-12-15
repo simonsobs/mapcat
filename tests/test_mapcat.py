@@ -10,7 +10,7 @@ from mapcat.database import (
     DepthOneMapTable,
     PipelineInformationTable,
     PointingResidualTable,
-    ProcessingStatusTable,
+    TimeDomainProcessingTable,
     SkyCoverageTable,
     TODDepthOneTable,
 )
@@ -92,7 +92,7 @@ def test_create_depth_one(database_sessionmaker):
 
     # Make child tables
     with database_sessionmaker() as session:
-        processing_status = ProcessingStatusTable(
+        processing_status = TimeDomainProcessingTable(
             processing_start=1756787524.0,
             processing_end=1756797524.0,
             processing_status="done",
@@ -156,7 +156,7 @@ def test_create_depth_one(database_sessionmaker):
 
     # Get child tables back
     with database_sessionmaker() as session:
-        proc = session.get(ProcessingStatusTable, proc_id)
+        proc = session.get(TimeDomainProcessingTable, proc_id)
         point = session.get(PointingResidualTable, point_id)
         tod = session.get(TODDepthOneTable, tod_id)
         pipe = session.get(PipelineInformationTable, pipe_id)
@@ -229,7 +229,7 @@ def test_add_remove_child_tables(database_sessionmaker):
             stop_time=1755887524.0,
         )
 
-        processing_status = ProcessingStatusTable(
+        processing_status = TimeDomainProcessingTable(
             processing_start=1756787524.0,
             processing_end=1756797524.0,
             processing_status="done",
@@ -307,7 +307,7 @@ def test_add_remove_child_tables(database_sessionmaker):
 
     with pytest.raises(ValueError):
         with database_sessionmaker() as session:
-            x = session.get(ProcessingStatusTable, proc_id)
+            x = session.get(TimeDomainProcessingTable, proc_id)
             if x is None:
                 raise ValueError("Not found")
 

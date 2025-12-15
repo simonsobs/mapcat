@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from .depth_one_coadd import DepthOneCoaddTable
     from .pipeline_information import PipelineInformationTable
     from .pointing_residual import PointingResidualTable
-    from .processing_status import ProcessingStatusTable
+    from .time_domain_processing import TimeDomainProcessingTable
     from .sky_coverage import SkyCoverageTable
     from .tod import TODDepthOneTable
 
@@ -45,7 +45,7 @@ class DepthOneMapTable(SQLModel, table=True):
         Start unix time of map
     stop_time : float
         Stop unix time of map
-    processing_status : list[ProcessingStatusTable]
+    processing_status : list[TimeDomainProcessingTable]
         List of processing status tables associated with d1 map
     pointing_residual : list[PointingResidualTable]
         List of pointing residual table associated with d1 map
@@ -72,7 +72,7 @@ class DepthOneMapTable(SQLModel, table=True):
     start_time: float = Field(index=True, nullable=False)
     stop_time: float = Field(index=True, nullable=False)
 
-    processing_status: list["ProcessingStatusTable"] = Relationship(
+    processing_status: list["TimeDomainProcessingTable"] = Relationship(
         back_populates="map",
         cascade_delete=True,
     )

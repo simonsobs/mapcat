@@ -7,12 +7,12 @@ from sqlmodel import Field, Relationship, SQLModel
 from .depth_one_map import DepthOneMapTable
 
 
-class ProcessingStatusTable(SQLModel, table=True):
+class TimeDomainProcessingTable(SQLModel, table=True):
     """
     Table for tracking processing status of depth-1 maps
     providing SQLModel functionality. You can export a base model, for example
     for responding to a query with using the `to_model` method. Note some attributes
-    are inherited from ProcessingStatus.
+    are inherited from TimeDomainProcessingTable.
 
     Attributes
     ----------

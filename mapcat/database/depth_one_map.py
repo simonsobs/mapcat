@@ -10,8 +10,8 @@ if TYPE_CHECKING:
     from .depth_one_coadd import DepthOneCoaddTable
     from .pipeline_information import PipelineInformationTable
     from .pointing_residual import PointingResidualTable
-    from .time_domain_processing import TimeDomainProcessingTable
     from .sky_coverage import SkyCoverageTable
+    from .time_domain_processing import TimeDomainProcessingTable
     from .tod import TODDepthOneTable
 
 from .links import DepthOneToCoaddTable, TODToMapTable

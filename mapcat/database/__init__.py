@@ -8,8 +8,8 @@ from .depth_one_coadd import DepthOneCoaddTable
 from .depth_one_map import DepthOneMapTable
 from .pipeline_information import PipelineInformationTable
 from .pointing_residual import PointingResidualTable
-from .time_domain_processing import TimeDomainProcessingTable
 from .sky_coverage import SkyCoverageTable
+from .time_domain_processing import TimeDomainProcessingTable
 from .tod import TODDepthOneTable
 
 __all__ = [

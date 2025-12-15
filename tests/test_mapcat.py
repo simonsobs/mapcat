@@ -10,8 +10,8 @@ from mapcat.database import (
     DepthOneMapTable,
     PipelineInformationTable,
     PointingResidualTable,
-    TimeDomainProcessingTable,
     SkyCoverageTable,
+    TimeDomainProcessingTable,
     TODDepthOneTable,
 )
 

@@ -4,7 +4,7 @@ Depth one map table.
 
 from typing import TYPE_CHECKING, Any
 
-from sqlmodel import Field, JSON, Relationship, SQLModel
+from sqlmodel import JSON, Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from .depth_one_coadd import DepthOneCoaddTable

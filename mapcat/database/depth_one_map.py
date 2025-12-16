@@ -2,9 +2,9 @@
 Depth one map table.
 """
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import JSON, Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from .depth_one_coadd import DepthOneCoaddTable
@@ -55,6 +55,8 @@ class DepthOneMapTable(SQLModel, table=True):
         List of pipeline info associed with d1 map
     depth_one_sky_coverage : list[SkyCoverageTable]
         List of sky coverage patches for d1 map.
+    notes: dict[str, Any]
+        JSON entry that holds additional information about the d1 maps
     """
 
     __tablename__ = "depth_one_maps"
@@ -96,3 +98,4 @@ class DepthOneMapTable(SQLModel, table=True):
         back_populates="maps",
         link_model=DepthOneToCoaddTable,
     )
+    notes: dict[str, Any] | None = Field(default=None, sa_type=JSON) 

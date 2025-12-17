@@ -18,13 +18,15 @@ class AtomicMapCoaddTable(SQLModel, table=True):
     coadd_id: int = Field(primary_key=True)
 
     coadd_name: str = Field()
-    coadd_path: str = Field()
+    prefix_path: str = Field()
 
     platform: str = Field()
     interval: str = Field()
     start_time: float = Field()
-    end_time: float = Field()
-    frequency: str = Field()
+    stop_time: float = Field()
+    freq_channel: str = Field()
+    geom_file_path: str = Field()
+    split_label: str = Field()
 
     atomic_maps: list["AtomicMapTable"] = Relationship(
         back_populates="coadds",

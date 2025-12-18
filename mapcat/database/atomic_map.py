@@ -55,6 +55,7 @@ class AtomicMapTable(SQLModel, table=True):
     moon_distance: float | None = Field()
     wind_speed: float | None = Field()
     wind_direction: float | None = Field()
+    rqu_avg: float | None = Field()
 
     coadds: list["AtomicMapCoaddTable"] = Relationship(
         back_populates="atomic_maps",

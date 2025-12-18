@@ -13,6 +13,8 @@ from mapcat.database import (
     SkyCoverageTable,
     TimeDomainProcessingTable,
     TODDepthOneTable,
+    AtomicMapTable,
+    AtomicMapCoaddTable,
 )
 
 
@@ -332,3 +334,260 @@ def test_add_remove_child_tables(database_sessionmaker):
             x = session.get(SkyCoverageTable, sky_id)
             if x is None:
                 raise ValueError("Not found")
+
+
+def test_create_atomic_map_coadd(database_sessionmaker):
+    # Create a daily (child) coadd
+    with database_sessionmaker() as session:
+        data = AtomicMapCoaddTable(
+            coadd_name="myDailyCoadd",
+            prefix_path="/PATH/TO/DAILY/COADD",
+            platform="satp3",
+            interval="daily",
+            start_time=1755604800.0,
+            stop_time=1755691200.0,
+            freq_channel="f090",
+            geom_file_path="/PATH/TO/GEOM/FILE",
+            split_label="full",
+        )
+
+        session.add(data)
+        session.commit()
+        session.refresh(data)
+
+        daily_coadd_id = data.coadd_id
+
+    # Get daily coadd back
+    with database_sessionmaker() as session:
+        cmap = session.get(AtomicMapCoaddTable, daily_coadd_id)
+
+    assert cmap.coadd_id == daily_coadd_id
+    assert cmap.coadd_name == "myDailyCoadd"
+    assert cmap.prefix_path == "/PATH/TO/DAILY/COADD"
+    assert cmap.platform == "satp3"
+    assert cmap.interval == "daily"
+    assert cmap.start_time == 1755604800.0
+    assert cmap.stop_time == 1755691200.0
+    assert cmap.freq_channel == "f090"
+    assert cmap.geom_file_path == "/PATH/TO/GEOM/FILE"
+    assert cmap.split_label == "full"
+
+    # Make child atomic table
+    with database_sessionmaker() as session:
+        atomic_map = AtomicMapTable(
+            obs_id="obs_1755643930_satp3_1111111",
+            telescope="satp3",
+            freq_channel="f090",
+            wafer="ws0",
+            ctime=1755643932,
+            split_label="full",
+            map_path=None,
+            ivar_path=None,
+            valid=True,
+            split_detail="",
+            prefix_path="PATH/TO/ATOMIC/MAP",
+            elevation=59.9997,
+            azimuth=290.9026,
+            pwv=None,
+            dpwv=None,
+            total_weight_qu=660616773042064.2,
+            mean_weight_qu=4206115923.380497,
+            median_weight_qu=3255646486.1875,
+            leakage_avg=None,
+            noise_avg=None,
+            ampl_2f_avg=None,
+            gain_avg=None,
+            tau_avg=None,
+            f_hwp=None,
+            roll_angle=0.0117,
+            scan_speed=None,
+            scan_acc=None,
+            sun_distance=69.36016359440542,
+            ambient_temperature=None,
+            uv=None,
+            ra_center=None,
+            dec_center=None,
+            number_dets=568,
+            moon_distance=None,
+            wind_speed=None,
+            wind_direction=None,
+            rqu_avg=None,
+            coadds=[cmap],
+        )
+
+        session.add(atomic_map)
+        session.commit()
+
+        atomic_map_id = atomic_map.atomic_map_id
+
+    # Get atomic table back
+    with database_sessionmaker() as session:
+        atomic = session.get(AtomicMapTable, atomic_map_id)
+        atomic_coadds = atomic.coadds
+        
+    assert atomic.atomic_map_id == atomic_map_id
+    assert atomic.obs_id == "obs_1755643930_satp3_1111111"
+    assert atomic.telescope == "satp3"
+    assert atomic.freq_channel == "f090"
+    assert atomic.wafer == "ws0"
+    assert atomic.ctime == 1755643932
+    assert atomic.split_label == "full"
+    assert atomic.map_path == None
+    assert atomic.ivar_path == None
+    assert atomic.valid == True
+    assert atomic.split_detail == ""
+    assert atomic.prefix_path == "PATH/TO/ATOMIC/MAP"
+    assert atomic.elevation == 59.9997
+    assert atomic.azimuth == 290.9026
+    assert atomic.pwv == None
+    assert atomic.dpwv == None
+    assert atomic.total_weight_qu == 660616773042064.2
+    assert atomic.mean_weight_qu == 4206115923.380497
+    assert atomic.median_weight_qu == 3255646486.1875
+    assert atomic.leakage_avg == None
+    assert atomic.noise_avg == None
+    assert atomic.ampl_2f_avg == None
+    assert atomic.gain_avg == None
+    assert atomic.tau_avg == None
+    assert atomic.f_hwp == None
+    assert atomic.roll_angle == 0.0117
+    assert atomic.scan_speed == None
+    assert atomic.scan_acc == None
+    assert atomic.sun_distance == 69.36016359440542
+    assert atomic.ambient_temperature == None
+    assert atomic.uv == None
+    assert atomic.ra_center == None
+    assert atomic.dec_center == None
+    assert atomic.number_dets == 568
+    assert atomic.moon_distance == None
+    assert atomic.wind_speed == None
+    assert atomic.wind_direction == None
+    assert atomic.rqu_avg == None
+    
+    assert atomic_coadds[0].coadd_id == daily_coadd_id
+    
+    # Create a weekly (parent) coadd
+    with database_sessionmaker() as session:
+        data = AtomicMapCoaddTable(
+            coadd_name="myWeeklyCoadd",
+            prefix_path="/PATH/TO/WEEKLY/COADD",
+            platform="satp3",
+            interval="weekly",
+            start_time=1755432000.0,
+            stop_time=1756036800.0,
+            freq_channel="f090",
+            geom_file_path="/PATH/TO/GEOM/FILE",
+            split_label="full",
+            child_coadds=[cmap]
+        )
+
+        session.add(data)
+        session.commit()
+        session.refresh(data)
+
+        weekly_coadd_id = data.coadd_id
+
+    # Get weekly coadd map back
+    with database_sessionmaker() as session:
+        cmap2 = session.get(AtomicMapCoaddTable, weekly_coadd_id)
+        weekly_child_coadds = cmap2.child_coadds
+        
+    assert cmap2.coadd_id == weekly_coadd_id
+    assert weekly_child_coadds[0].coadd_id == daily_coadd_id
+    
+    # Check daily coadd has weekly coadd as parent
+    with database_sessionmaker() as session:
+        cmap = session.get(AtomicMapCoaddTable, daily_coadd_id)
+        daily_parent_coadds = cmap.parent_coadds
+        
+    assert daily_parent_coadds[0].coadd_id == weekly_coadd_id
+
+    # Check bad map ID raises ValueError
+    with pytest.raises(ValueError):
+        with database_sessionmaker() as session:
+            result = session.get(AtomicMapCoaddTable, 999999)
+            if result is None:
+                raise ValueError("Map ID does not exist")
+
+                
+def test_add_remove_atomic_map_coadd(database_sessionmaker):
+    # Create daily and weekly coadds
+    with database_sessionmaker() as session:
+        daily = AtomicMapCoaddTable(
+            coadd_name="myDailyCoadd",
+            prefix_path="/PATH/TO/DAILY/COADD",
+            platform="satp3",
+            interval="daily",
+            start_time=1755604800.0,
+            stop_time=1755691200.0,
+            freq_channel="f090",
+            geom_file_path="/PATH/TO/GEOM/FILE",
+            split_label="full",
+        )
+
+        weekly = AtomicMapCoaddTable(
+            coadd_name="myWeeklyCoadd",
+            prefix_path="/PATH/TO/WEEKLY/COADD",
+            platform="satp3",
+            interval="weekly",
+            start_time=1755432000.0,
+            stop_time=1756036800.0,
+            freq_channel="f090",
+            geom_file_path="/PATH/TO/GEOM/FILE",
+            split_label="full",
+            child_coadds=[daily]
+        )
+
+        session.add_all(
+            [
+                daily,
+                weekly,
+            ]
+        )
+        session.commit()
+        
+        daily_coadd_id = daily.coadd_id
+        weekly_coadd_id = weekly.coadd_id
+    
+    # Remove weekly coadd and check daily coadd parents
+    with database_sessionmaker() as session:
+        x = session.get(AtomicMapCoaddTable, weekly_coadd_id)
+        session.delete(x)
+        session.commit()
+        
+    with pytest.raises(ValueError):
+        with database_sessionmaker() as session:
+            daily = session.get(AtomicMapCoaddTable, daily_coadd_id)
+            if len(daily.parent_coadds) == 0:
+                raise ValueError("Daily map has no parent coadds")
+    
+    # Check in reverse
+    with database_sessionmaker() as session:
+        weekly2 = AtomicMapCoaddTable(
+            coadd_name="myWeeklyCoadd2",
+            prefix_path="/PATH/TO/WEEKLY/COADD",
+            platform="satp3",
+            interval="weekly",
+            start_time=1755432000.0,
+            stop_time=1756036800.0,
+            freq_channel="f090",
+            geom_file_path="/PATH/TO/GEOM/FILE",
+            split_label="full",
+            child_coadds=[daily]
+        )
+
+        session.add(weekly2)
+        session.commit()
+
+        weekly2_coadd_id = weekly2.coadd_id
+        
+    with database_sessionmaker() as session:
+        x = session.get(AtomicMapCoaddTable, daily_coadd_id)
+        session.delete(x)
+        session.commit()
+        
+    with pytest.raises(ValueError):
+        with database_sessionmaker() as session:
+            weekly2 = session.get(AtomicMapCoaddTable, weekly2_coadd_id)
+            if len(weekly2.child_coadds) == 0:
+                raise ValueError("Weekly map has no child coadds")

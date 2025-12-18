@@ -7,9 +7,8 @@ Create Date: 2025-12-18 11:48:53.341162
 """
 from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = '1195d17201ba'
@@ -19,8 +18,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    pass
+    op.add_column('atomic_maps', sa.Column('rqu_avg', sa.Float(), nullable=True))
 
 
 def downgrade() -> None:
-    pass
+    op.drop_column('atomic_maps', 'rqu_avg')

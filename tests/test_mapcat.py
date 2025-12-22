@@ -7,14 +7,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from mapcat.database import (
+    AtomicMapCoaddTable,
+    AtomicMapTable,
     DepthOneMapTable,
     PipelineInformationTable,
     PointingResidualTable,
     SkyCoverageTable,
     TimeDomainProcessingTable,
     TODDepthOneTable,
-    AtomicMapTable,
-    AtomicMapCoaddTable,
 )
 
 

@@ -432,37 +432,37 @@ def test_create_atomic_map_coadd(database_sessionmaker):
     assert atomic.wafer == "ws0"
     assert atomic.ctime == 1755643932
     assert atomic.split_label == "full"
-    assert atomic.map_path == None
-    assert atomic.ivar_path == None
-    assert atomic.valid == True
+    assert atomic.map_path is None
+    assert atomic.ivar_path is None
+    assert atomic.valid
     assert atomic.split_detail == ""
     assert atomic.prefix_path == "PATH/TO/ATOMIC/MAP"
     assert atomic.elevation == 59.9997
     assert atomic.azimuth == 290.9026
-    assert atomic.pwv == None
-    assert atomic.dpwv == None
+    assert atomic.pwv is None
+    assert atomic.dpwv is None
     assert atomic.total_weight_qu == 660616773042064.2
     assert atomic.mean_weight_qu == 4206115923.380497
     assert atomic.median_weight_qu == 3255646486.1875
-    assert atomic.leakage_avg == None
-    assert atomic.noise_avg == None
-    assert atomic.ampl_2f_avg == None
-    assert atomic.gain_avg == None
-    assert atomic.tau_avg == None
-    assert atomic.f_hwp == None
+    assert atomic.leakage_avg is None
+    assert atomic.noise_avg is None
+    assert atomic.ampl_2f_avg is None
+    assert atomic.gain_avg is None
+    assert atomic.tau_avg is None
+    assert atomic.f_hwp is None
     assert atomic.roll_angle == 0.0117
-    assert atomic.scan_speed == None
-    assert atomic.scan_acc == None
+    assert atomic.scan_speed is None
+    assert atomic.scan_acc is None
     assert atomic.sun_distance == 69.36016359440542
-    assert atomic.ambient_temperature == None
-    assert atomic.uv == None
-    assert atomic.ra_center == None
-    assert atomic.dec_center == None
+    assert atomic.ambient_temperature is None
+    assert atomic.uv is None
+    assert atomic.ra_center is None
+    assert atomic.dec_center is None
     assert atomic.number_dets == 568
-    assert atomic.moon_distance == None
-    assert atomic.wind_speed == None
-    assert atomic.wind_direction == None
-    assert atomic.rqu_avg == None
+    assert atomic.moon_distance is None
+    assert atomic.wind_speed is None
+    assert atomic.wind_direction is None
+    assert atomic.rqu_avg is None
     
     assert atomic_coadds[0].coadd_id == daily_coadd_id
     

@@ -73,3 +73,27 @@ class AtomicMapToCoaddTable(SQLModel, table=True):
         index=True,
         ondelete="CASCADE",
     )
+
+
+class CoaddMapToCoaddTable(SQLModel, table=True):
+    """
+    Link table for many-to-many relationship between coadd maps and other coadds.
+    """
+
+    __tablename__ = "link_coadd_map_to_coadd"
+
+    parent_coadd_id: int = Field(
+        foreign_key="atomic_map_coadds.coadd_id",
+        primary_key=True,
+        nullable=False,
+        index=True,
+        ondelete="CASCADE",
+    )
+
+    child_coadd_id: int = Field(
+        foreign_key="atomic_map_coadds.coadd_id",
+        primary_key=True,
+        nullable=False,
+        index=True,
+        ondelete="CASCADE",
+    )

@@ -29,10 +29,21 @@ class DepthOneMapTable(SQLModel, table=True):
         Name of depth 1 map
     map_path : str
         Non-localized path to intensity map
-    ivar_path : str
+    ivar_path : str | None
         Non-localized path to inverse-variance map
-    time_path : str
-        Non-localized path to time map
+    rho_path: str | None
+        Non-localized path to the match-filtered 'rho' map
+    kappa_path: str | None
+        Non-localized path to the match-filtered 'kappa' map
+    start_time_path : str
+        Non-localized path to the start time map. Each pixel represents
+        the earliest time the pixel was observed.
+    mean_time_path : str
+        Non-localized path to the mean time map. If there is only
+        one time map available, this should be it.
+    end_time_path : str
+        Non-localized path to the start time map. Each pixel represents
+        the earliest time the pixel was observed.
     tube_slot : str
         OT for map
     wafers : str
@@ -66,7 +77,12 @@ class DepthOneMapTable(SQLModel, table=True):
 
     map_path: str
     ivar_path: str | None
-    time_path: str | None
+    rho_path: str | None = None
+    kappa_path: str | None = None
+
+    start_time_path: str | None = None
+    mean_time_path: str | None
+    end_time_path: str | None = None
 
     tube_slot: str = Field(index=True, nullable=False)
     frequency: str = Field(index=True, nullable=False)
@@ -98,4 +114,4 @@ class DepthOneMapTable(SQLModel, table=True):
         back_populates="maps",
         link_model=DepthOneToCoaddTable,
     )
-    notes: dict[str, Any] | None = Field(default=None, sa_type=JSON) 
+    notes: dict[str, Any] | None = Field(default=None, sa_type=JSON)

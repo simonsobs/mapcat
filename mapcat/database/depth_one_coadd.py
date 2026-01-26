@@ -19,7 +19,16 @@ class DepthOneCoaddTable(SQLModel, table=True):
     coadd_id: int = Field(primary_key=True)
     coadd_name: str = Field(nullable=False)
     coadd_type: str = Field(nullable=False)
-    coadd_path: str
+
+    map_path: str
+    ivar_path: str | None
+    rho_path: str | None = None
+    kappa_path: str | None = None
+
+    start_time_path: str | None = None
+    mean_time_path: str | None
+    end_time_path: str | None = None
+
     frequency: str = Field(nullable=False)
     ctime: float = Field(nullable=False)
     start_time: float = Field(nullable=False)

@@ -32,7 +32,7 @@ class AtomicMapCoaddTable(SQLModel, table=True):
         back_populates="coadds",
         link_model=AtomicMapToCoaddTable,
     )
-    
+
     child_coadds: list["AtomicMapCoaddTable"] = Relationship(
         back_populates="parent_coadds",
         link_model=CoaddMapToCoaddTable,
@@ -41,7 +41,7 @@ class AtomicMapCoaddTable(SQLModel, table=True):
             "secondaryjoin": "AtomicMapCoaddTable.coadd_id == CoaddMapToCoaddTable.child_coadd_id",
         },
     )
-    
+
     parent_coadds: list["AtomicMapCoaddTable"] = Relationship(
         back_populates="child_coadds",
         link_model=CoaddMapToCoaddTable,

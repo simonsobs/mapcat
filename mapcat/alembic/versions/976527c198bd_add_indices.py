@@ -18,7 +18,12 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
-    op.create_index("ix_depth_one_maps_map_name", "depth_one_maps", ["map_name"], postgresql_using="hash")
+    op.create_index(
+        "ix_depth_one_maps_map_name",
+        "depth_one_maps",
+        ["map_name"],
+        postgresql_using="hash",
+    )
     op.create_index("ix_depth_one_maps_tube_slot", "depth_one_maps", ["tube_slot"])
     op.create_index("ix_depth_one_maps_frequency", "depth_one_maps", ["frequency"])
     op.create_index("ix_depth_one_maps_ctime", "depth_one_maps", ["ctime"])
@@ -33,13 +38,21 @@ def upgrade() -> None:
     op.create_index("ix_tod_depth_one_frequency", "tod_depth_one", ["frequency"])
     op.create_index("ix_tod_depth_one_wafer_count", "tod_depth_one", ["wafer_count"])
 
-    op.create_index("ix_time_domain_processing_map_id", "time_domain_processing", ["map_id"])
-    op.create_index("ix_time_domain_processing_processing_status", "time_domain_processing", ["processing_status"])
+    op.create_index(
+        "ix_time_domain_processing_map_id", "time_domain_processing", ["map_id"]
+    )
+    op.create_index(
+        "ix_time_domain_processing_processing_status",
+        "time_domain_processing",
+        ["processing_status"],
+    )
 
     op.create_index("ix_depth_one_sky_coverage_x", "depth_one_sky_coverage", ["x"])
     op.create_index("ix_depth_one_sky_coverage_y", "depth_one_sky_coverage", ["y"])
 
-    op.create_index("ix_depth_one_pointing_residuals", "depth_one_pointing_residuals", ["map_id"])
+    op.create_index(
+        "ix_depth_one_pointing_residuals", "depth_one_pointing_residuals", ["map_id"]
+    )
 
 
 def downgrade() -> None:
@@ -58,10 +71,17 @@ def downgrade() -> None:
     op.drop_index("ix_tod_depth_one_frequency", table_name="tod_depth_one")
     op.drop_index("ix_tod_depth_one_wafer_count", table_name="tod_depth_one")
 
-    op.drop_index("ix_time_domain_processing_map_id", table_name="time_domain_processing")
-    op.drop_index("ix_time_domain_processing_processing_status", table_name="time_domain_processing")
+    op.drop_index(
+        "ix_time_domain_processing_map_id", table_name="time_domain_processing"
+    )
+    op.drop_index(
+        "ix_time_domain_processing_processing_status",
+        table_name="time_domain_processing",
+    )
 
     op.drop_index("ix_depth_one_sky_coverage_x", table_name="depth_one_sky_coverage")
     op.drop_index("ix_depth_one_sky_coverage_y", table_name="depth_one_sky_coverage")
 
-    op.drop_index("ix_depth_one_pointing_residuals", table_name="depth_one_pointing_residuals")
+    op.drop_index(
+        "ix_depth_one_pointing_residuals", table_name="depth_one_pointing_residuals"
+    )

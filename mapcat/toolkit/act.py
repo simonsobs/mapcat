@@ -78,7 +78,7 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         map_name=filenames["map"].replace("_map.fits", ""),
         map_path=filenames["map"],
         ivar_path=filenames.get("ivar"),
-        time_path=filenames.get("time"),
+        mean_time_path=filenames.get("time"),
         tube_slot=file_info["tube_slot"],
         frequency=file_info["frequency"],
         ctime=file_info["ctime"],

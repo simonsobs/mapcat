@@ -3,6 +3,7 @@ Sky coverage table.
 """
 
 from sqlmodel import Field, Index, Relationship, SQLModel
+from sqlalchemy import PrimaryKeyConstraint
 
 from .depth_one_map import DepthOneMapTable
 
@@ -14,8 +15,8 @@ class SkyCoverageTable(SQLModel, table=True):
 
     Attributes
     ----------
-    id : uuid.UUID
-        Unique ID of this coverage instance
+    sky_cov_id : PrimaryKeyConstraint
+        Composite ID from map_id, x, and y
     map : DepthOneMapTable
        Depth 1 map being tracked. Foreign into DepthOneMap
     map_id : int
@@ -39,7 +40,13 @@ class SkyCoverageTable(SQLModel, table=True):
     )
     map: DepthOneMapTable = Relationship(back_populates="depth_one_sky_coverage")
 
-    __table_args__ = Index(
+    __table_args__ = (
+        PrimaryKeyConstraint("map_id", "x", "y", name="sky_cov_id"),
+    )
+
+    """
+    __table_args__ = (
+        Index(
         "ix_depth_one_sky_coverage_map_id_x_y",
         "map_id",
         "x",
@@ -47,3 +54,5 @@ class SkyCoverageTable(SQLModel, table=True):
         unique=True,
         pimary_key=True,
     )
+    )
+    """

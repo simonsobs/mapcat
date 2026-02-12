@@ -41,4 +41,3 @@ class SkyCoverageTable(SQLModel, table=True):
     map: DepthOneMapTable = Relationship(back_populates="depth_one_sky_coverage")
 
     __table_args__ = (PrimaryKeyConstraint("map_id", "x", "y", name="sky_cov_id"),)
-

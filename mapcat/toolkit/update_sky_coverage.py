@@ -1,8 +1,8 @@
 import numpy as np
 from pixell import enmap
 
-from ..database.depth_one_map import DepthOneMapTable
-from ..database.sky_coverage import SkyCoverageTable
+from mapcat.database.depth_one_map import DepthOneMapTable
+from mapcat.database.sky_coverage import SkyCoverageTable
 
 
 def get_sky_coverage(tmap: enmap.enmap) -> list:
@@ -78,22 +78,19 @@ def coverage_from_depthone(d1map: DepthOneMapTable) -> list[SkyCoverageTable]:
 
 
 def main():
-    from sqlalchemy import select
-
     from mapcat.helper import settings
 
     with settings.session() as session:
-        stmt = (
-            select(DepthOneMapTable.map_name)
-            .select_from(
-                DepthOneMapTable.outerjoin(
-                    SkyCoverageTable,
-                    SkyCoverageTable.map_name == DepthOneMapTable.map_name,
-                )
+        d1maps = (
+            session.query(DepthOneMapTable)
+            .outerjoin(
+                SkyCoverageTable, SkyCoverageTable.map_id == DepthOneMapTable.map_id
             )
-            .where(SkyCoverageTable.map_name.is_(None))
+            .filter(SkyCoverageTable.map_id.is_(None))
+            .all()
         )
-        for d1map in session.execute(stmt):
+        for d1map in d1maps:
+            print(d1map)
             SkyCov = coverage_from_depthone(d1map)
             d1map.depth_one_sky_coverage = SkyCov
             session.add(d1map)

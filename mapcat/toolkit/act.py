@@ -85,7 +85,6 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         ctime=file_info["ctime"],
         start_time=file_info["start_time"],
         stop_time=file_info["stop_time"],
-        box=file_info["box"],
         tods=tods,
     )
 

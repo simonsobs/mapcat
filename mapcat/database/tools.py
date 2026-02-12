@@ -1,20 +1,17 @@
 import numpy as np
-from numpy.typing import NDArray
 from pixell import enmap
 
 from .depth_one_map import DepthOneMapTable
 from .sky_coverage import SkyCoverageTable
 
 
-def get_sky_coverage(box: NDArray, tmap: enmap.enmap) -> list:
+def get_sky_coverage(tmap: enmap.enmap) -> list:
     """
-    Given the bounding box of map, return the list
+    Given the time map of a depth1 map, return the list
     of sky coverage tiles that cover that map
 
     Parameters
     ----------
-    box : NDArray
-        The bounding box of the map, in the format [[dec_min, ra_max], [dec_max, ra_min]], units in radians
     tmap : enmap.enmap
         The time map of the depth-one map. Pixels that were observed have non-zero values.
 
@@ -23,6 +20,7 @@ def get_sky_coverage(box: NDArray, tmap: enmap.enmap) -> list:
     tiles : list
         A list of sky coverage tiles that cover the map
     """
+    box = tmap.box()
 
     dec_min, ra_max = np.rad2deg(box[0])
     dec_max, ra_min = np.rad2deg(box[1])
@@ -70,9 +68,8 @@ def coverage_from_depthone(d1map: DepthOneMapTable) -> list[SkyCoverageTable]:
     """
 
     tmap = enmap.read_map(d1map.mean_time_path)
-    box = d1map.box
 
-    coverage_tiles = get_sky_coverage(box, tmap)
+    coverage_tiles = get_sky_coverage(tmap)
 
     return [
         SkyCoverageTable(x=tile[0], y=tile[1], map=d1map, map_id=d1map.map_id)

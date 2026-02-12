@@ -66,8 +66,7 @@ class DepthOneMapTable(SQLModel, table=True):
         List of pipeline info associed with d1 map
     depth_one_sky_coverage : list[SkyCoverageTable]
         List of sky coverage patches for d1 map.
-    box : list[float]
-        Bounding box of map in format [[dec_min, ra_max], [dec_max, ra_min]], units in radians.
+
     notes: dict[str, Any]
         JSON entry that holds additional information about the d1 maps
     """
@@ -116,5 +115,4 @@ class DepthOneMapTable(SQLModel, table=True):
         back_populates="maps",
         link_model=DepthOneToCoaddTable,
     )
-    box: list[float]
     notes: dict[str, Any] | None = Field(default=None, sa_type=JSON)

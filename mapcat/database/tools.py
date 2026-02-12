@@ -47,3 +47,24 @@ def get_sky_coverage(box: NDArray, tmap: enmap.enmap) -> list:
 
     return list(zip(ra_idx, dec_id))
 
+def coverage_from_depthone(d1map: DepthOneMapTable) -> list[SkyCoverageTable]:
+    """
+    Get the list of sky coverage tiles that cover a given depth one map
+
+    Parameters
+    ----------
+    d1map : DepthOneMapTable
+        The depth one map to get the sky coverage for
+
+    Returns
+    -------
+    tiles : list[SkyCoverageTable]
+        A list of sky coverage tiles that cover the map
+    """
+
+    tmap = enmap.read_map(d1map.mean_time_path)
+    box = d1map.box
+    
+    coverage_tiles = get_sky_coverage(box, tmap)
+
+    return [SkyCoverageTable(x=tile[0], y=tile[1], map=d1map, map_id=d1map.map_id) for tile in coverage_tiles]

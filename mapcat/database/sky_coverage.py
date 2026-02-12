@@ -2,8 +2,8 @@
 Sky coverage table.
 """
 
-from sqlmodel import Field, Index, Relationship, SQLModel
 from sqlalchemy import PrimaryKeyConstraint
+from sqlmodel import Field, Relationship, SQLModel
 
 from .depth_one_map import DepthOneMapTable
 
@@ -40,9 +40,7 @@ class SkyCoverageTable(SQLModel, table=True):
     )
     map: DepthOneMapTable = Relationship(back_populates="depth_one_sky_coverage")
 
-    __table_args__ = (
-        PrimaryKeyConstraint("map_id", "x", "y", name="sky_cov_id"),
-    )
+    __table_args__ = (PrimaryKeyConstraint("map_id", "x", "y", name="sky_cov_id"),)
 
     """
     __table_args__ = (

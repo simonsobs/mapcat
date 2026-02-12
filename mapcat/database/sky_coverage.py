@@ -2,7 +2,7 @@
 Sky coverage table.
 """
 
-from sqlmodel import Field, Relationship, Index, SQLModel
+from sqlmodel import Field, Index, Relationship, SQLModel
 
 from .depth_one_map import DepthOneMapTable
 

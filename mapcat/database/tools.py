@@ -1,9 +1,10 @@
 import numpy as np
-from pixell import enmap
 from numpy.typing import NDArray
+from pixell import enmap
 
 from .depth_one_map import DepthOneMapTable
 from .sky_coverage import SkyCoverageTable
+
 
 def get_sky_coverage(box: NDArray, tmap: enmap.enmap) -> list:
     """

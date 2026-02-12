@@ -35,39 +35,28 @@ def upgrade() -> None:
         ),
     )
 
-    op.add_column(
-        "atomic_map_coadds", sa.Column("stop_time", sa.Float(), nullable=False)
-    )
-    op.add_column(
-        "atomic_map_coadds", sa.Column("prefix_path", sa.String(), nullable=False)
-    )
-    op.add_column(
-        "atomic_map_coadds", sa.Column("freq_channel", sa.String(), nullable=False)
-    )
-    op.add_column(
-        "atomic_map_coadds", sa.Column("geom_file_path", sa.String(), nullable=False)
-    )
-    op.add_column(
-        "atomic_map_coadds", sa.Column("split_label", sa.String(), nullable=False)
-    )
-    op.drop_column("atomic_map_coadds", "end_time")
-    op.drop_column("atomic_map_coadds", "coadd_path")
-    op.drop_column("atomic_map_coadds", "frequency")
+    with op.batch_alter_table("atomic_map_coadds") as batch:
+        batch.add_column(sa.Column("stop_time", sa.Float(), nullable=False))
+        batch.add_column(sa.Column("prefix_path", sa.String(), nullable=False))
+        batch.add_column(sa.Column("freq_channel", sa.String(), nullable=False))
+        batch.add_column(sa.Column("geom_file_path", sa.String(), nullable=False))
+        batch.add_column(sa.Column("split_label", sa.String(), nullable=False))
+
+        batch.drop_column("end_time")
+        batch.drop_column("coadd_path")
+        batch.drop_column("frequency")
 
 
 def downgrade() -> None:
-    op.add_column(
-        "atomic_map_coadds", sa.Column("frequency", sa.String(), nullable=False)
-    )
-    op.add_column(
-        "atomic_map_coadds", sa.Column("coadd_path", sa.String(), nullable=False)
-    )
-    op.add_column(
-        "atomic_map_coadds", sa.Column("end_time", sa.Float(), nullable=False)
-    )
-    op.drop_column("atomic_map_coadds", "split_label")
-    op.drop_column("atomic_map_coadds", "geom_file_path")
-    op.drop_column("atomic_map_coadds", "freq_channel")
-    op.drop_column("atomic_map_coadds", "prefix_path")
-    op.drop_column("atomic_map_coadds", "stop_time")
+    with op.batch_alter_table("atomic_map_coadds") as batch:
+        batch.add_column(sa.Column("frequency", sa.Float(), nullable=False))
+        batch.add_column(sa.Column("coadd_path", sa.String(), nullable=False))
+        batch.add_column(sa.Column("end_time", sa.String(), nullable=False))
+
+        batch.drop_column("split_label")
+        batch.drop_column("geom_file_path")
+        batch.drop_column("freq_channel")
+        batch.drop_column("prefix_path")
+        batch.drop_column("stop_time")
+
     op.drop_table("link_coadd_map_to_coadd")

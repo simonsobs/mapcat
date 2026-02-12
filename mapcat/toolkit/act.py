@@ -18,7 +18,7 @@ def extract_string(input: bytes) -> str:
 
 def parse_info_file(path: Path) -> dict:
     with h5py.File(path, "r") as f:
-        if 'band' in f and 'detset' in f:
+        if "band" in f and "detset" in f:
             ## backward compatibility with old SO format
             return {
                 "frequency": extract_string(f["band"][...])[1:],
@@ -32,14 +32,15 @@ def parse_info_file(path: Path) -> dict:
         else:
             ## ACT depth1 format.
             return {
-            "frequency": extract_string(f["array"][...]).split('_')[1],
-            "tube_slot": extract_string(f["array"][...]).split('_')[0],
-            "observations": [extract_string(x) for x in f["ids"][...]],
-            "start_time": f["period"][0],
-            "stop_time": f["period"][1],
-            "ctime": float(f["t"][...]),
-            "box": f["box"][...],
-        }
+                "frequency": extract_string(f["array"][...]).split("_")[1],
+                "tube_slot": extract_string(f["array"][...]).split("_")[0],
+                "observations": [extract_string(x) for x in f["ids"][...]],
+                "start_time": f["period"][0],
+                "stop_time": f["period"][1],
+                "ctime": float(f["t"][...]),
+                "box": f["box"][...],
+            }
+
 
 def parse_filenames(base: str, relative_to: Path) -> dict[str, str]:
     """

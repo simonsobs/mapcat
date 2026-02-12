@@ -42,15 +42,3 @@ class SkyCoverageTable(SQLModel, table=True):
 
     __table_args__ = (PrimaryKeyConstraint("map_id", "x", "y", name="sky_cov_id"),)
 
-    """
-    __table_args__ = (
-        Index(
-        "ix_depth_one_sky_coverage_map_id_x_y",
-        "map_id",
-        "x",
-        "y",
-        unique=True,
-        pimary_key=True,
-    )
-    )
-    """

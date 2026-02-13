@@ -1,8 +1,29 @@
+from pathlib import Path
+
 import numpy as np
 from pixell import enmap
 
 from mapcat.database.depth_one_map import DepthOneMapTable
 from mapcat.database.sky_coverage import SkyCoverageTable
+from mapcat.helper import settings
+
+
+def resolve_tmap(d1table: DepthOneMapTable) -> Path:
+    """
+    Resolve the local path to a tmap from a d1 table.
+
+    Parameters
+    ----------
+    d1table : DepthOneMapTable
+        The depth one map table to resolve the tmap for
+
+    Returns
+    -------
+    tmap_path : Path
+        The local path to the tmap for the depth one map
+    """
+    tmap_path = settings.depth_one_parent / d1table.mean_time_path
+    return tmap_path
 
 
 def get_sky_coverage(tmap: enmap.enmap) -> list:
@@ -52,7 +73,7 @@ def get_sky_coverage(tmap: enmap.enmap) -> list:
     return list(zip(ra_idx, dec_id))
 
 
-def coverage_from_depthone(d1map: DepthOneMapTable) -> list[SkyCoverageTable]:
+def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
     """
     Get the list of sky coverage tiles that cover a given depth one map
 
@@ -66,21 +87,27 @@ def coverage_from_depthone(d1map: DepthOneMapTable) -> list[SkyCoverageTable]:
     tiles : list[SkyCoverageTable]
         A list of sky coverage tiles that cover the map
     """
-
-    tmap = enmap.read_map(d1map.mean_time_path)
+    tmap_path = resolve_tmap(d1table)
+    tmap = enmap.read_map(str(tmap_path))
 
     coverage_tiles = get_sky_coverage(tmap)
 
     return [
-        SkyCoverageTable(x=tile[0], y=tile[1], map=d1map, map_id=d1map.map_id)
+        SkyCoverageTable(x=tile[0], y=tile[1], map=d1table, map_id=d1table.map_id)
         for tile in coverage_tiles
     ]
 
 
-def main():
-    from mapcat.helper import settings
+def core(session):
+    """
+    Core function for updating the sky coverage table. For each depth one map that does not have any associated sky coverage tiles, compute the sky coverage tiles and add them to the database.
 
-    with settings.session() as session:
+    Parameters
+    ----------
+    session : sessionmaker
+        A SQLAlchemy sessionmaker to use for database access.
+    """
+    with session() as session:
         d1maps = (
             session.query(DepthOneMapTable)
             .outerjoin(
@@ -90,8 +117,13 @@ def main():
             .all()
         )
         for d1map in d1maps:
-            print(d1map)
             SkyCov = coverage_from_depthone(d1map)
+            for cov in SkyCov:
+                session.add(cov)
+                session.commit()
             d1map.depth_one_sky_coverage = SkyCov
-            session.add(d1map)
             session.commit()
+
+
+def main():
+    core(session=settings.session)

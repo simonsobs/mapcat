@@ -35,7 +35,7 @@ def run_migration(database_path: str):
     return
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 def database_sessionmaker(tmp_path_factory):
     """
     Create a temporary SQLite database for testing.
@@ -98,11 +98,11 @@ def test_create_depth_one(database_sessionmaker):
             processing_start=1756787524.0,
             processing_end=1756797524.0,
             processing_status="done",
-            map=dmap,
+            map_id=map_id,
         )
 
         pointing_residual = PointingResidualTable(
-            ra_offset=1.2, dec_offset=-0.8, map=dmap
+            ra_offset=1.2, dec_offset=-0.8, map_id=map_id
         )
 
         tod = TODDepthOneTable(
@@ -136,11 +136,11 @@ def test_create_depth_one(database_sessionmaker):
             sotodlib_version="1.2.3",
             map_maker="minkasi",
             preprocess_info={"config": "test"},
-            map=dmap,
+            map_id=map_id,
         )
 
         sky_coverage = SkyCoverageTable(
-            map=dmap,
+            map_id=map_id,
             x=5,
             y=2,
         )
@@ -154,7 +154,7 @@ def test_create_depth_one(database_sessionmaker):
         point_id = pointing_residual.pointing_residual_id
         tod_id = tod.tod_id
         pipe_id = pipeline_info.pipeline_information_id
-        sky_id = sky_coverage.patch_id
+        sky_id = {"x": 5, "y": 2, "map_id": map_id}
 
     # Get child tables back
     with database_sessionmaker() as session:
@@ -206,7 +206,6 @@ def test_create_depth_one(database_sessionmaker):
     assert pipe.map_maker == "minkasi"
     assert pipe.preprocess_info == {"config": "test"}
 
-    assert sky.patch_id == sky_id
     assert sky.x == "5"
     assert sky.y == "2"
 
@@ -299,7 +298,7 @@ def test_add_remove_child_tables(database_sessionmaker):
         point_id = pointing_residual.pointing_residual_id
         tod_id = tod.tod_id
         pipe_id = pipeline_info.pipeline_information_id
-        sky_id = sky_coverage.patch_id
+        sky_id = {"x": 5, "y": 2, "map_id": dmap_id}
 
     # Check the cascades work
     with database_sessionmaker() as session:

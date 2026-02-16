@@ -136,7 +136,7 @@ def database_sessionmaker(tmp_path_factory):
 
     tmp_path = tmp_path_factory.mktemp("mapcat")
     # Create a temporary SQLite database for testing.
-    database_path = tmp_path / "test.db"
+    database_path = tmp_path / "act_test.db"
 
     # Run the migration on the database. This is blocking.
     run_migration(database_path)
@@ -218,16 +218,22 @@ def test_act(database_sessionmaker, downloaded_data_file):
             assert map.frequency == "f150"
             assert map.ctime in [1505603190, 1505646390]
 
+            # Clean up, otherewise we interfere with test_sky_coverage
+            session.delete(map)
+
+        session.commit()
+
 
 def test_sky_coverage(database_sessionmaker):
     update_sky_coverage.core(session=database_sessionmaker)
     with database_sessionmaker() as session:
         d1maps = session.query(DepthOneMapTable).all()
-        print("LEN", len(d1maps))
         for d1map in d1maps:
-            print("\n\n\n\nD1MAP: ", d1map.depth_one_sky_coverage)
             assert len(d1map.depth_one_sky_coverage) > 0
             for cov in d1map.depth_one_sky_coverage:
                 # Shitty test to make sure the coverage tiles are correct, by checking against the known coverage for these two maps.
                 # The coverage tiles are stored in cov_mapping, which is a dict mapping from ctime to a list of (x,y) tuples representing the coverage tiles.
-                assert tuple(cov.x, cov.y) in cov_mapping[str(d1map.ctime)]
+                assert (
+                    cov.x,
+                    cov.y,
+                ) in cov_mapping[str(d1map.ctime)]

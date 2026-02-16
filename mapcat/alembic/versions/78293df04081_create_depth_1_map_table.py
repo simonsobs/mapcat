@@ -139,14 +139,14 @@ def upgrade() -> None:
 
     op.create_table(
         "depth_one_sky_coverage",
-        sa.Column("patch_id", sa.Integer, primary_key=True),
-        sa.Column("x", sa.CHAR, nullable=False),
-        sa.Column("y", sa.CHAR, nullable=False),
+        sa.Column("x", sa.CHAR, nullable=False, primary_key=True),
+        sa.Column("y", sa.CHAR, nullable=False, primary_key=True),
         sa.Column(
             "map_id",
             sa.Integer,
             sa.ForeignKey("depth_one_maps.map_id", ondelete="CASCADE"),
             nullable=False,
+            primary_key=True,
         ),
     )
 

@@ -16,6 +16,7 @@ dependencies = [
     "alembic",
     "pydantic_settings",
     "pixell",
+    "h5py"
 ]
 
 [project.scripts]

@@ -222,8 +222,6 @@ def test_act(database_sessionmaker, downloaded_data_file):
 def test_sky_coverage(database_sessionmaker):
     update_sky_coverage.core(session=database_sessionmaker)
     with database_sessionmaker() as session:
-        
-
         d1maps = session.query(DepthOneMapTable).all()
         print("LEN", len(d1maps))
         for d1map in d1maps:

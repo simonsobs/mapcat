@@ -27,7 +27,7 @@ def resolve_tmap(d1table: DepthOneMapTable) -> Path:
     return tmap_path
 
 
-def get_sky_coverage(tmap: enmap.enmap) -> list:
+def get_sky_coverage(tmap: enmap.ndmap) -> list:
     """
     Given the time map of a depth1 map, return the list
     of sky coverage tiles that cover that map

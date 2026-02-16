@@ -7,6 +7,8 @@ from mapcat.database.depth_one_map import DepthOneMapTable
 from mapcat.database.sky_coverage import SkyCoverageTable
 from mapcat.helper import settings
 
+from sqlalchemy import update
+
 
 def resolve_tmap(d1table: DepthOneMapTable) -> Path:
     """
@@ -93,7 +95,7 @@ def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
     coverage_tiles = get_sky_coverage(tmap)
 
     return [
-        SkyCoverageTable(x=tile[0], y=tile[1], map=d1table, map_id=d1table.map_id)
+        SkyCoverageTable(x=tile[0], y=tile[1], map_id=d1table.map_id)
         for tile in coverage_tiles
     ]
 
@@ -118,11 +120,12 @@ def core(session):
         )
         for d1map in d1maps:
             SkyCov = coverage_from_depthone(d1map)
-            for cov in SkyCov:
-                session.add(cov)
-                session.commit()
-            d1map.depth_one_sky_coverage = SkyCov
-            session.commit()
+            session.add_all(SkyCov)
+            update_stmt = (update(DepthOneMapTable)
+                           .where(DepthOneMapTable.map_id == d1map.map_id)
+                           .values(depth_one_sky_coverage=SkyCov))
+            session.execute(update_stmt)
+        session.commit()
 
 
 def main():

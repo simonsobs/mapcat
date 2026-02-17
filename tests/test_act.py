@@ -27,7 +27,7 @@ DATA_URLS = [
 ]
 
 cov_mapping = {
-    "1505603190": [
+    "1505603190.0": [
         (-4, 3),
         (-4, 4),
         (-4, 6),
@@ -107,7 +107,7 @@ cov_mapping = {
         (11, 5),
         (11, 6),
     ],
-    "1505646390": [(4, 3), (4, 4), (4, 5), (5, 3), (5, 4), (5, 5)],
+    "1505646390.0": [(4, 3), (4, 4), (4, 5), (5, 3), (5, 4), (5, 5)],
 }
 
 
@@ -158,7 +158,7 @@ def downloaded_data_file(request):
 
     Parameters
     ----------
-    tmp_path_factory : pytest.TempPathFactory
+    request : pytest.FixtureRequest
         Factory to create temporary directory for downloaded files
     Returns
     -------
@@ -224,16 +224,27 @@ def test_act(database_sessionmaker, downloaded_data_file):
         session.commit()
 
 
-def test_sky_coverage(database_sessionmaker):
+def test_sky_coverage(database_sessionmaker, downloaded_data_file):
+    args = ap.Namespace(
+        glob="*/*_map.fits",
+        relative_to=downloaded_data_file,
+        telescope="act",
+    )
+    act.core(session=database_sessionmaker, args=args)
+
     update_sky_coverage.core(session=database_sessionmaker)
     with database_sessionmaker() as session:
         d1maps = session.query(DepthOneMapTable).all()
         for d1map in d1maps:
+            print("\n\n D1MAP: ", d1map)
+            print("\n\n")
             assert len(d1map.depth_one_sky_coverage) > 0
             for cov in d1map.depth_one_sky_coverage:
                 # Shitty test to make sure the coverage tiles are correct, by checking against the known coverage for these two maps.
                 # The coverage tiles are stored in cov_mapping, which is a dict mapping from ctime to a list of (x,y) tuples representing the coverage tiles.
                 assert (
-                    cov.x,
-                    cov.y,
+                    int(
+                        cov.x
+                    ),  # These should be ints, idk why I have to cast them (from str)
+                    int(cov.y),
                 ) in cov_mapping[str(d1map.ctime)]

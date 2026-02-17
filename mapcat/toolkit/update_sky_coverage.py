@@ -120,12 +120,7 @@ def core(session):
         for d1map in d1maps:
             SkyCov = coverage_from_depthone(d1map)
             session.add_all(SkyCov)
-            update_stmt = (
-                update(DepthOneMapTable)
-                .where(DepthOneMapTable.map_id == d1map.map_id)
-                .values(depth_one_sky_coverage=SkyCov)
-            )
-            session.execute(update_stmt)
+            
         session.commit()
 
 

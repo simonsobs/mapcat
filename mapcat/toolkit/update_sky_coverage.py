@@ -2,7 +2,6 @@ from pathlib import Path
 
 import numpy as np
 from pixell import enmap
-from sqlalchemy import update
 
 from mapcat.database.depth_one_map import DepthOneMapTable
 from mapcat.database.sky_coverage import SkyCoverageTable
@@ -120,7 +119,7 @@ def core(session):
         for d1map in d1maps:
             SkyCov = coverage_from_depthone(d1map)
             session.add_all(SkyCov)
-            
+
         session.commit()
 
 

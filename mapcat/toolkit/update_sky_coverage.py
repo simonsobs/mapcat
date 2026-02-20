@@ -87,6 +87,9 @@ def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
         A list of sky coverage tiles that cover the map
     """
     tmap_path = resolve_tmap(d1table)
+    print("\n\n\n")
+    print(tmap_path)
+    print("\n\n\n")
     tmap = enmap.read_map(str(tmap_path))
 
     coverage_tiles = get_sky_coverage(tmap)

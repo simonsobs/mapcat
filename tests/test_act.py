@@ -233,8 +233,6 @@ def test_sky_coverage(database_sessionmaker, downloaded_data_file):
     with database_sessionmaker() as session:
         d1maps = session.query(DepthOneMapTable).all()
         for d1map in d1maps:
-            print("\n\n D1MAP: ", d1map)
-            print("\n\n")
             assert len(d1map.depth_one_sky_coverage) > 0
             for cov in d1map.depth_one_sky_coverage:
                 # Shitty test to make sure the coverage tiles are correct, by checking against the known coverage for these two maps.

@@ -30,6 +30,9 @@ jobs:
       - name: Sync uv
         run: uv pip install ".[dev]"
 
+      - name: Check DEPTH_ONE_PATH
+        run: echo $DEPTH_ONE_PATH
+
       - name: Run tests
         run: pytest --cov
         

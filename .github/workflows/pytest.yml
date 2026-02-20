@@ -3,7 +3,7 @@ name: Run tests
 on: [push]
 
 env:
-  DEPTH_ONE_PATH: "../.pytest_cache/d1maps/"
+  DEPTH_ONE_PARENT: "../.pytest_cache/d1maps/"
 
 jobs:
   runtest:
@@ -29,9 +29,6 @@ jobs:
 
       - name: Sync uv
         run: uv pip install ".[dev]"
-
-      - name: Check DEPTH_ONE_PATH
-        run: echo $DEPTH_ONE_PATH
 
       - name: Run tests
         run: pytest --cov

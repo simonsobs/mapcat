@@ -34,8 +34,7 @@ def maps_containing_obs(obs_id: str, session: Session) -> list[DepthOneMapTable]
     if len(tod) == 0:  # pragma: no cover
         raise ValueError(f"No TODs with obs ID {obs_id} found.")
 
-    depth_one_maps = tod[0].maps
-    return depth_one_maps
+    return tod[0].maps
 
 
 def build_obslists(
@@ -67,4 +66,4 @@ def build_obslists(
             else:
                 map_dict[obs_id] = map_list
 
-    return tuple((map_dict, no_map_list))
+    return (map_dict, no_map_list)

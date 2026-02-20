@@ -32,8 +32,6 @@ def run_migration(database_path: str):
     alembic_cfg.set_main_option("sqlalchemy.url", database_url)
     command.upgrade(alembic_cfg, "head")
 
-    return
-
 
 @pytest.fixture(scope="module", autouse=True)
 def database_sessionmaker(tmp_path_factory):
@@ -210,11 +208,10 @@ def test_create_depth_one(database_sessionmaker):
     assert sky.y == "2"
 
     # Check bad map ID raises ValueError
-    with pytest.raises(ValueError):
-        with database_sessionmaker() as session:
-            result = session.get(DepthOneMapTable, 999999)
-            if result is None:
-                raise ValueError("Map ID does not exist")
+    with pytest.raises(ValueError), database_sessionmaker() as session:
+        result = session.get(DepthOneMapTable, 999999)
+        if result is None:
+            raise ValueError("Map ID does not exist")
 
 
 def test_add_remove_child_tables(database_sessionmaker):
@@ -306,33 +303,29 @@ def test_add_remove_child_tables(database_sessionmaker):
         session.delete(x)
         session.commit()
 
-    with pytest.raises(ValueError):
-        with database_sessionmaker() as session:
-            x = session.get(TimeDomainProcessingTable, proc_id)
-            if x is None:
-                raise ValueError("Not found")
+    with pytest.raises(ValueError), database_sessionmaker() as session:
+        x = session.get(TimeDomainProcessingTable, proc_id)
+        if x is None:
+            raise ValueError("Not found")
 
-    with pytest.raises(ValueError):
-        with database_sessionmaker() as session:
-            x = session.get(PointingResidualTable, point_id)
-            if x is None:
-                raise ValueError("Not found")
+    with pytest.raises(ValueError), database_sessionmaker() as session:
+        x = session.get(PointingResidualTable, point_id)
+        if x is None:
+            raise ValueError("Not found")
 
     with database_sessionmaker() as session:
         tod = session.get(TODDepthOneTable, tod_id)
         assert tod is not None
 
-    with pytest.raises(ValueError):
-        with database_sessionmaker() as session:
-            x = session.get(PipelineInformationTable, pipe_id)
-            if x is None:
-                raise ValueError("Not found")
+    with pytest.raises(ValueError), database_sessionmaker() as session:
+        x = session.get(PipelineInformationTable, pipe_id)
+        if x is None:
+            raise ValueError("Not found")
 
-    with pytest.raises(ValueError):
-        with database_sessionmaker() as session:
-            x = session.get(SkyCoverageTable, sky_id)
-            if x is None:
-                raise ValueError("Not found")
+    with pytest.raises(ValueError), database_sessionmaker() as session:
+        x = session.get(SkyCoverageTable, sky_id)
+        if x is None:
+            raise ValueError("Not found")
 
 
 def test_create_atomic_map_coadd(database_sessionmaker):
@@ -502,11 +495,10 @@ def test_create_atomic_map_coadd(database_sessionmaker):
     assert daily_parent_coadds[0].coadd_id == weekly_coadd_id
 
     # Check bad map ID raises ValueError
-    with pytest.raises(ValueError):
-        with database_sessionmaker() as session:
-            result = session.get(AtomicMapCoaddTable, 999999)
-            if result is None:
-                raise ValueError("Map ID does not exist")
+    with pytest.raises(ValueError), database_sessionmaker() as session:
+        result = session.get(AtomicMapCoaddTable, 999999)
+        if result is None:
+            raise ValueError("Map ID does not exist")
 
 
 def test_add_remove_atomic_map_coadd(database_sessionmaker):
@@ -554,11 +546,10 @@ def test_add_remove_atomic_map_coadd(database_sessionmaker):
         session.delete(x)
         session.commit()
 
-    with pytest.raises(ValueError):
-        with database_sessionmaker() as session:
-            daily = session.get(AtomicMapCoaddTable, daily_coadd_id)
-            if len(daily.parent_coadds) == 0:
-                raise ValueError("Daily map has no parent coadds")
+    with pytest.raises(ValueError), database_sessionmaker() as session:
+        daily = session.get(AtomicMapCoaddTable, daily_coadd_id)
+        if len(daily.parent_coadds) == 0:
+            raise ValueError("Daily map has no parent coadds")
 
     # Check in reverse
     with database_sessionmaker() as session:
@@ -585,8 +576,7 @@ def test_add_remove_atomic_map_coadd(database_sessionmaker):
         session.delete(x)
         session.commit()
 
-    with pytest.raises(ValueError):
-        with database_sessionmaker() as session:
-            weekly2 = session.get(AtomicMapCoaddTable, weekly2_coadd_id)
-            if len(weekly2.child_coadds) == 0:
-                raise ValueError("Weekly map has no child coadds")
+    with pytest.raises(ValueError), database_sessionmaker() as session:
+        weekly2 = session.get(AtomicMapCoaddTable, weekly2_coadd_id)
+        if len(weekly2.child_coadds) == 0:
+            raise ValueError("Weekly map has no child coadds")

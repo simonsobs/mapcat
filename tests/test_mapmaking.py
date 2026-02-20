@@ -20,8 +20,6 @@ def run_migration(database_path: str):
     alembic_cfg.set_main_option("sqlalchemy.url", database_url)
     command.upgrade(alembic_cfg, "head")
 
-    return
-
 
 @pytest.fixture(scope="session", autouse=True)
 def database_sessionmaker(tmp_path_factory):

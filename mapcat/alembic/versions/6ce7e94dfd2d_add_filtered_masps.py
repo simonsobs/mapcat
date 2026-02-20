@@ -6,16 +6,16 @@ Create Date: 2026-01-26 09:47:56.733253
 
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "6ce7e94dfd2d"
-down_revision: Union[str, None] = "976527c198bd"
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = "976527c198bd"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 NEW_COLUMNS_DEPTH_ONE = [
     "rho_path",
@@ -51,8 +51,6 @@ def upgrade() -> None:
             "depth_one_coadds", sa.Column(column_name, sa.String(), nullable=True)
         )
 
-    pass
-
 
 def downgrade() -> None:
     # Depth 1
@@ -63,5 +61,3 @@ def downgrade() -> None:
 
     for column_name in NEW_COLUMNS_DEPTH_ONE_COADDS:
         op.drop_column("depth_one_coadds", column_name)
-
-    pass

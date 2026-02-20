@@ -74,7 +74,7 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         for obs_id in file_info["observations"]
     ]
 
-    depth_one_map = DepthOneMapTable(
+    return DepthOneMapTable(
         map_name=filenames["map"].replace("_map.fits", ""),
         map_path=filenames["map"],
         ivar_path=filenames.get("ivar"),
@@ -86,8 +86,6 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         stop_time=file_info["stop_time"],
         tods=tods,
     )
-
-    return depth_one_map
 
 
 def glob(input_glob: str, relative_to: Path, telescope: str) -> list[DepthOneMapTable]:
@@ -144,10 +142,10 @@ def core(session: sessionmaker, args: ap.Namespace):
        Parsed args with the glob patterns to match.
     """
 
-    with session() as session:
+    with session() as cur_session:
         maps = glob(args.glob, args.relative_to, args.telescope)
-        session.add_all(maps)
-        session.commit()
+        cur_session.add_all(maps)
+        cur_session.commit()
 
 
 def main():

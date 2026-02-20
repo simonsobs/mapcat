@@ -36,5 +36,3 @@ class PipelineInformationTable(SQLModel, table=True):
     sotodlib_version: str
     map_maker: str
     preprocess_info: dict[str, Any] = Field(sa_type=JSON)
-
-    map: DepthOneMapTable = Relationship(back_populates="pipeline_information")

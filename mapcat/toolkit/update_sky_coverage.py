@@ -19,11 +19,10 @@ def resolve_tmap(d1table: DepthOneMapTable) -> Path:
 
     Returns
     -------
-    tmap_path : Path
+    ettings.depth_one_parent / d1table.mean_time_path : Path
         The local path to the tmap for the depth one map
     """
-    tmap_path = settings.depth_one_parent / d1table.mean_time_path
-    return tmap_path
+    return settings.depth_one_parent / d1table.mean_time_path
 
 
 def get_sky_coverage(tmap: enmap.ndmap) -> list:
@@ -107,9 +106,9 @@ def core(session):
     session : sessionmaker
         A SQLAlchemy sessionmaker to use for database access.
     """
-    with session() as session:
+    with session() as cur_session:
         d1maps = (
-            session.query(DepthOneMapTable)
+            cur_session.query(DepthOneMapTable)
             .outerjoin(
                 SkyCoverageTable, SkyCoverageTable.map_id == DepthOneMapTable.map_id
             )
@@ -118,9 +117,9 @@ def core(session):
         )
         for d1map in d1maps:
             SkyCov = coverage_from_depthone(d1map)
-            session.add_all(SkyCov)
+            cur_session.add_all(SkyCov)
 
-        session.commit()
+        cur_session.commit()
 
 
 def main():

@@ -7,9 +7,8 @@ import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import mapcat.toolkit.act as act
-import mapcat.toolkit.update_sky_coverage as update_sky_coverage
 from mapcat.database import DepthOneMapTable
+from mapcat.toolkit import act, update_sky_coverage
 
 DATA_URLS = [
     "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505603190_pa4_f150_info.hdf",
@@ -124,8 +123,6 @@ def run_migration(database_path: str):
     database_url = f"sqlite:///{database_path}"
     alembic_cfg.set_main_option("sqlalchemy.url", database_url)
     command.upgrade(alembic_cfg, "head")
-
-    return
 
 
 @pytest.fixture(scope="session", autouse=True)

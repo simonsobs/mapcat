@@ -2,6 +2,9 @@ name: Run tests
 
 on: [push]
 
+env:
+  DEPTH_ONE_PARENT: "../.pytest_cache/d1maps/"
+
 jobs:
   runtest:
     env:

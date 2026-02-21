@@ -2,14 +2,13 @@
 Create objects from an ACT depth 1 map file.
 """
 
+import argparse as ap
 from pathlib import Path
 
 import h5py
+from sqlalchemy.orm import sessionmaker
 
 from mapcat.database import DepthOneMapTable, TODDepthOneTable
-
-# from astropy import units as u
-# from astropy.coordinates import SkyCoord
 
 
 def extract_string(input: bytes) -> str:
@@ -75,7 +74,7 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         for obs_id in file_info["observations"]
     ]
 
-    depth_one_map = DepthOneMapTable(
+    return DepthOneMapTable(
         map_name=filenames["map"].replace("_map.fits", ""),
         map_path=filenames["map"],
         ivar_path=filenames.get("ivar"),
@@ -87,8 +86,6 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         stop_time=file_info["stop_time"],
         tods=tods,
     )
-
-    return depth_one_map
 
 
 def glob(input_glob: str, relative_to: Path, telescope: str) -> list[DepthOneMapTable]:
@@ -130,9 +127,28 @@ You should pass '/my/path/to/maps' as 'relative-to', and
 """
 
 
-def main():
-    import argparse as ap
+def core(session: sessionmaker, args: ap.Namespace):
+    """
+    Driver function for act.py Takes a session and a arg parser
+    and creates DepthOneMapTable objects from the files listed
+    matching the glob patter in the parser and adds them to the
+    database in session.
 
+    Parameters
+    ----------
+    session : sessionmaker
+        A SQLAlchemy sessionmaker to use for database access.
+    args : argparse.Namespace
+       Parsed args with the glob patterns to match.
+    """
+
+    with session() as cur_session:
+        maps = glob(args.glob, args.relative_to, args.telescope)
+        cur_session.add_all(maps)
+        cur_session.commit()
+
+
+def main():
     from mapcat.helper import settings
 
     parser = ap.ArgumentParser(prog="actingest", usage=USAGE, description=HELP_TEXT)
@@ -163,7 +179,4 @@ def main():
 
     args = parser.parse_args()
 
-    with settings.session() as session:
-        maps = glob(args.glob, args.relative_to, args.telescope)
-        session.add_all(maps)
-        session.commit()
+    core(session=settings.session, args=args)

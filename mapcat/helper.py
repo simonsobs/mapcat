@@ -2,6 +2,7 @@
 Helper for mapcat database.
 """
 
+import os
 from pathlib import Path
 from typing import Literal
 
@@ -16,10 +17,10 @@ class Settings(BaseSettings):  # pragma: no cover
     database_name: str = "mapcat.db"
     database_type: Literal["sqlite", "postgresql"] = "sqlite"
 
-    depth_one_coadd_parent: Path = "./"
-    depth_one_parent: Path = "./"
-    atomic_coadd_parent: Path = "./"
-    atomic_parent: Path = "./"
+    depth_one_coadd_parent: Path = Path(os.environ.get("DEPTH_ONE_COADD_PARENT", "./"))
+    depth_one_parent: Path = Path(os.environ.get("DEPTH_ONE_PARENT", "./"))
+    atomic_coadd_parent: Path = Path(os.environ.get("ATOMIC_COADD_PARENT", "./"))
+    atomic_parent: Path = Path(os.environ.get("ATOMIC_PARENT", "./"))
 
     echo: bool = False
 
@@ -74,5 +75,3 @@ def migrate():
     location = __file__.replace("helper.py", "alembic.ini")
 
     subprocess.call(["alembic", "-c", location, "upgrade", "head"])
-
-    return

@@ -7,16 +7,16 @@ Create Date: 2025-08-12 11:39:10.066048
 
 """
 
-from typing import Sequence, Union
+from collections.abc import Sequence
 
 import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "78293df04081"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
@@ -139,14 +139,14 @@ def upgrade() -> None:
 
     op.create_table(
         "depth_one_sky_coverage",
-        sa.Column("patch_id", sa.Integer, primary_key=True),
-        sa.Column("x", sa.CHAR, nullable=False),
-        sa.Column("y", sa.CHAR, nullable=False),
+        sa.Column("x", sa.CHAR, nullable=False, primary_key=True),
+        sa.Column("y", sa.CHAR, nullable=False, primary_key=True),
         sa.Column(
             "map_id",
             sa.Integer,
             sa.ForeignKey("depth_one_maps.map_id", ondelete="CASCADE"),
             nullable=False,
+            primary_key=True,
         ),
     )
 

@@ -14,7 +14,9 @@ dependencies = [
     "sqlalchemy[asyncio]",
     "aiosqlite",
     "alembic",
-    "pydantic_settings"
+    "pydantic_settings",
+    "pixell",
+    "h5py"
 ]
 
 [project.scripts]

@@ -13,14 +13,14 @@ from .time_domain_processing import TimeDomainProcessingTable
 from .tod import TODDepthOneTable
 
 __all__ = [
-    "AtomicMapTable",
     "AtomicMapCoaddTable",
+    "AtomicMapTable",
     "DepthOneMapTable",
-    "TimeDomainProcessingTable",
-    "PointingResidualTable",
-    "TODDepthOneTable",
     "PipelineInformationTable",
+    "PointingResidualTable",
     "SkyCoverageTable",
+    "TODDepthOneTable",
+    "TimeDomainProcessingTable",
 ]
 
 ALL_TABLES = [

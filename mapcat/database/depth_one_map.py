@@ -66,6 +66,7 @@ class DepthOneMapTable(SQLModel, table=True):
         List of pipeline info associed with d1 map
     depth_one_sky_coverage : list[SkyCoverageTable]
         List of sky coverage patches for d1 map.
+
     notes: dict[str, Any]
         JSON entry that holds additional information about the d1 maps
     """

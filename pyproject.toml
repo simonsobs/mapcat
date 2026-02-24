@@ -22,6 +22,7 @@ dependencies = [
 [project.scripts]
 actingest = "mapcat.toolkit.act:main"
 mapcatmigrate = "mapcat.helper:migrate"
+mapcatreset = "mapcat.toolkit.reset:main"
 
 [project.optional-dependencies]
 dev = [

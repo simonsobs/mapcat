@@ -228,4 +228,4 @@ def test_sky_coverage(database_sessionmaker):
             for cov in d1map.depth_one_sky_coverage:
                 # Shitty test to make sure the coverage tiles are correct, by checking against the known coverage for these two maps.
                 # The coverage tiles are stored in cov_mapping, which is a dict mapping from ctime to a list of (x,y) tuples representing the coverage tiles.
-                assert tuple(cov.x, cov.y) in cov_mapping[str(d1map.ctime)]
+                assert (cov.x, cov.y) in cov_mapping[str(d1map.ctime)]

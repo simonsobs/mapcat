@@ -66,7 +66,7 @@ def get_sky_coverage(tmap: enmap.ndmap) -> list:
             )
             submap = enmap.submap(tmap, skybox)
             if np.any(submap):
-                ra_idx.append(int(ra / 10))
+                ra_idx.append(int(ra / 10) + 18)
                 dec_id.append(int(dec / 10) + 9)
 
     return list(zip(ra_idx, dec_id))

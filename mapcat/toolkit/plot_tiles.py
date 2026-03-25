@@ -21,7 +21,15 @@ pad_map = np.pad(
     imap, ((pad_low, pad_high), (0, 0)), mode="constant", constant_values=0
 )
 del imap
-plt.imshow(pad_map, vmin=-300, vmax=300, origin="lower")
+
+left_limit = pad_map.shape[1]
+right_limit = 0
+top_limit = pad_map.shape[0]
+bottom_limit = 0
+extent = [left_limit, right_limit, bottom_limit, top_limit]
+
+
+plt.imshow(pad_map, vmin=-300, vmax=300, origin="lower", extent=extent)
 plt.vlines(
     np.arange(0, 360 * 6 * 2, 10 * 6 * 2), ymin=0, ymax=180 * 6 * 2, color="black", lw=1
 )
@@ -33,30 +41,38 @@ plt.yticks(np.arange(0, 180 * 6 * 2, 10 * 6 * 2), labels=np.arange(-90, 90, 10))
 plt.xlabel("RA (degrees)")
 plt.ylabel("Dec (degrees)")
 
-tmap_path = "/home/jack/dev/mapcat/.pytest_cache/d1maps/15056/depth1_1505603190_pa4_f150_map.fits"
-tmap = enmap.read_map(str(tmap_path))
-coverage_tiles = get_sky_coverage(tmap)
+d1map_path = "/home/jack/dev/mapcat/.pytest_cache/d1maps/15056/depth1_1505603190_pa4_f150_map.fits"
+d1map = enmap.read_map(str(d1map_path))
+coverage_tiles = get_sky_coverage(d1map)
 
-tbox = tmap.box()
+d1box = d1map.box()
 
-tdec_min, tra_max = np.rad2deg(tbox[0])
-tdec_max, tra_min = np.rad2deg(tbox[1])
+d1dec_min, d1ra_max = np.rad2deg(d1box[0])
+d1dec_max, d1ra_min = np.rad2deg(d1box[1])
 
-tpad_low_dec = int((90 + tdec_min) * 6 * 2)
-tpad_high_dec = int((90 - tdec_max) * 6 * 2)
+d1pad_low_dec = int((90 + d1dec_min) * 6 * 2)
+d1pad_high_dec = int((90 - d1dec_max) * 6 * 2)
 
-tpad_low_ra = int((180 + tra_min) * 6 * 2)
-tpad_high_ra = int((180 - tra_max) * 6 * 2)
+d1pad_low_ra = int((180 + d1ra_min) * 6 * 2)
+d1pad_high_ra = int((180 - d1ra_max) * 6 * 2)
 
-tmap = tmap[0][::10, ::10]
-tpad_map = np.pad(
-    tmap,
-    ((tpad_low_dec, tpad_high_dec), (tpad_low_ra, tpad_high_ra)),
+d1map = d1map[0][::10, ::10]
+d1pad_map = np.pad(
+    d1map,
+    ((d1pad_low_dec, d1pad_high_dec), (d1pad_high_ra, d1pad_low_ra)),
     mode="constant",
     constant_values=0,
 )
 
-plt.imshow(tpad_map, vmin=-300, vmax=300, origin="lower", alpha=0.5, cmap="seismic")
+plt.imshow(
+    d1pad_map,
+    vmin=-300,
+    vmax=300,
+    origin="lower",
+    alpha=0.5,
+    cmap="seismic",
+    extent=extent,
+)
 
 for tile in coverage_tiles:
     plt.gca().add_patch(

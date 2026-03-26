@@ -66,7 +66,7 @@ class Settings(BaseSettings):  # pragma: no cover
 settings = Settings()
 
 
-def migrate():
+def migrate():  # pragma: no cover
     """
     CLI script to run 'alembic upgrade head' with the correct location.
     """

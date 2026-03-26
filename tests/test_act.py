@@ -26,87 +26,87 @@ DATA_URLS = [
 ]
 
 cov_mapping = {
-    "1505603190": [
-        (14, 3),
-        (14, 4),
-        (14, 6),
-        (14, 7),
-        (15, 3),
-        (15, 4),
-        (15, 5),
-        (15, 6),
-        (15, 7),
-        (16, 3),
-        (16, 4),
-        (16, 5),
-        (16, 6),
-        (16, 7),
-        (17, 3),
-        (17, 4),
-        (17, 5),
-        (17, 6),
-        (17, 7),
-        (18, 3),
-        (18, 4),
-        (18, 5),
-        (18, 6),
-        (18, 7),
-        (19, 3),
-        (19, 4),
-        (19, 5),
-        (19, 6),
-        (19, 7),
-        (20, 3),
-        (20, 4),
-        (20, 5),
-        (20, 6),
-        (20, 7),
-        (21, 3),
-        (21, 4),
-        (21, 5),
-        (21, 6),
-        (21, 7),
-        (22, 3),
-        (22, 4),
-        (22, 5),
-        (22, 6),
-        (22, 7),
-        (23, 3),
-        (23, 4),
-        (23, 5),
-        (23, 6),
-        (23, 7),
-        (24, 3),
-        (24, 4),
-        (24, 5),
-        (24, 6),
-        (24, 7),
-        (25, 3),
-        (25, 4),
-        (25, 5),
-        (25, 6),
-        (25, 7),
-        (26, 3),
-        (26, 4),
-        (26, 5),
-        (26, 6),
-        (26, 7),
-        (27, 3),
-        (27, 4),
-        (27, 5),
-        (27, 6),
-        (27, 7),
-        (28, 3),
-        (28, 4),
-        (28, 5),
-        (28, 6),
-        (28, 7),
-        (29, 3),
-        (29, 4),
-        (29, 5),
-        (29, 6),
+    "1505603190.0": [
+        (-4, 3),
+        (-4, 4),
+        (-4, 6),
+        (-4, 7),
+        (-3, 3),
+        (-3, 4),
+        (-3, 5),
+        (-3, 6),
+        (-3, 7),
+        (-2, 3),
+        (-2, 4),
+        (-2, 5),
+        (-2, 6),
+        (-2, 7),
+        (-1, 3),
+        (-1, 4),
+        (-1, 5),
+        (-1, 6),
+        (-1, 7),
+        (0, 3),
+        (0, 4),
+        (0, 5),
+        (0, 6),
+        (0, 7),
+        (1, 3),
+        (1, 4),
+        (1, 5),
+        (1, 6),
+        (1, 7),
+        (2, 3),
+        (2, 4),
+        (2, 5),
+        (2, 6),
+        (2, 7),
+        (3, 3),
+        (3, 4),
+        (3, 5),
+        (3, 6),
+        (3, 7),
+        (4, 3),
+        (4, 4),
+        (4, 5),
+        (4, 6),
+        (4, 7),
+        (5, 3),
+        (5, 4),
+        (5, 5),
+        (5, 6),
+        (5, 7),
+        (6, 3),
+        (6, 4),
+        (6, 5),
+        (6, 6),
+        (6, 7),
+        (7, 3),
+        (7, 4),
+        (7, 5),
+        (7, 6),
+        (7, 7),
+        (8, 3),
+        (8, 4),
+        (8, 5),
+        (8, 6),
+        (8, 7),
+        (9, 3),
+        (9, 4),
+        (9, 5),
+        (9, 6),
+        (9, 7),
+        (10, 3),
+        (10, 4),
+        (10, 5),
+        (10, 6),
+        (10, 7),
+        (11, 3),
+        (11, 4),
+        (11, 5),
+        (11, 6),
     ],
-    "1505646390": [(22, 3), (22, 4), (22, 5), (23, 3), (23, 4), (23, 5)],
+    "1505646390.0": [(4, 3), (4, 4), (4, 5), (5, 3), (5, 4), (5, 5)],
 }
 
 
@@ -133,7 +133,7 @@ def database_sessionmaker(tmp_path_factory):
 
     tmp_path = tmp_path_factory.mktemp("mapcat")
     # Create a temporary SQLite database for testing.
-    database_path = tmp_path / "test.db"
+    database_path = tmp_path / "act_test.db"
 
     # Run the migration on the database. This is blocking.
     run_migration(database_path)
@@ -155,7 +155,7 @@ def downloaded_data_file(request):
 
     Parameters
     ----------
-    tmp_path_factory : pytest.TempPathFactory
+    request : pytest.FixtureRequest
         Factory to create temporary directory for downloaded files
     Returns
     -------
@@ -215,17 +215,31 @@ def test_act(database_sessionmaker, downloaded_data_file):
             assert map.frequency == "f150"
             assert map.ctime in [1505603190, 1505646390]
 
+            # Clean up, otherewise we interfere with test_sky_coverage
+            session.delete(map)
 
-def test_sky_coverage(database_sessionmaker):
+        session.commit()
+
+
+def test_sky_coverage(database_sessionmaker, downloaded_data_file):
+    args = ap.Namespace(
+        glob="*/*_map.fits",
+        relative_to=downloaded_data_file,
+        telescope="act",
+    )
+    act.core(session=database_sessionmaker, args=args)
+
     update_sky_coverage.core(session=database_sessionmaker)
-
     with database_sessionmaker() as session:
         d1maps = session.query(DepthOneMapTable).all()
-        print("LEN", len(d1maps))
         for d1map in d1maps:
-            print("\n\n\n\nD1MAP: ", d1map.depth_one_sky_coverage)
             assert len(d1map.depth_one_sky_coverage) > 0
             for cov in d1map.depth_one_sky_coverage:
                 # Shitty test to make sure the coverage tiles are correct, by checking against the known coverage for these two maps.
                 # The coverage tiles are stored in cov_mapping, which is a dict mapping from ctime to a list of (x,y) tuples representing the coverage tiles.
-                assert (cov.x, cov.y) in cov_mapping[str(d1map.ctime)]
+                assert (
+                    int(
+                        cov.x
+                    ),  # These should be ints, idk why I have to cast them (from str)
+                    int(cov.y),
+                ) in cov_mapping[str(d1map.ctime)]

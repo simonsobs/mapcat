@@ -123,8 +123,7 @@ def main():
         type=float,
         default=None,
         help=(
-            "Only reset entries for maps whose ctime is >= START_TIME "
-            "(unix timestamp)."
+            "Only reset entries for maps whose ctime is >= START_TIME (unix timestamp)."
         ),
     )
 
@@ -133,8 +132,7 @@ def main():
         type=float,
         default=None,
         help=(
-            "Only reset entries for maps whose ctime is <= END_TIME "
-            "(unix timestamp)."
+            "Only reset entries for maps whose ctime is <= END_TIME (unix timestamp)."
         ),
     )
 

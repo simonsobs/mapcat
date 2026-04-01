@@ -9,7 +9,7 @@ from sqlmodel import Field, Relationship, SQLModel
 if TYPE_CHECKING:
     from .atomic_map import AtomicMapTable
 
-from .links import AtomicMapToCoaddTable, CoaddMapToCoaddTable
+from .links import AtomicMapToCoaddTable, CoaddMapToCoaddTable  # pragma: no cover
 
 
 class AtomicMapCoaddTable(SQLModel, table=True):

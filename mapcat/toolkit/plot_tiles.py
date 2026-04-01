@@ -1,10 +1,21 @@
+import argparse as ap
+
 import matplotlib.pyplot as plt
 import numpy as np
 from pixell import enmap
 
 from mapcat.toolkit.update_sky_coverage import *
 
-imap_path = "/home/jack/act_planck_s08_s22_f150_daynight_map.fits"
+parser = ap.ArgumentParser()
+parser.add_argument("--imap_path", type=str)
+parser.add_argument("--d1map_path", type=str)
+parser.add_argument("--opath", type=str)
+
+args = parser.parse_args()
+imap_path = args.imap_path
+d1map_path = args.d1map_path
+opath = args.opath
+
 imap = enmap.read_map(str(imap_path))
 
 box = imap.box()
@@ -41,7 +52,6 @@ plt.yticks(np.arange(0, 180 * 6 * 2, 10 * 6 * 2), labels=np.arange(-90, 90, 10))
 plt.xlabel("RA (degrees)")
 plt.ylabel("Dec (degrees)")
 
-d1map_path = "/home/jack/dev/mapcat/.pytest_cache/d1maps/15056/depth1_1505603190_pa4_f150_map.fits"
 d1map = enmap.read_map(str(d1map_path))
 coverage_tiles = get_sky_coverage(d1map)
 
@@ -86,4 +96,4 @@ for tile in coverage_tiles:
         )
     )
 
-plt.savefig("/mnt/c/Users/Jack/Desktop/act_coverage.png", dpi=300)
+plt.savefig(opath + "act_coverage.png", dpi=300)

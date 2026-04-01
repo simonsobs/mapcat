@@ -41,7 +41,7 @@ def index_to_skybox(ra_idx: int, dec_idx: int) -> np.ndarray:
     skybox : np.ndarray
         A 2x2 array containing the corners of the sky box in radians, in the format [[dec_min, ra_max], [dec_max, ra_min]]
     """
-    ra_min = (ra_idx - 18) * 10
+    ra_min = ra_idx * 10
     ra_max = ra_min + 10
     dec_min = (dec_idx - 9) * 10
     dec_max = dec_min + 10
@@ -145,6 +145,7 @@ def get_sky_coverage(tmap: enmap.ndmap) -> list:
             ra_id = ra_to_index(ra)
             dec_id = dec_to_index(dec)
             skybox = index_to_skybox(ra_id, dec_id)
+            skybox[..., 1] -= np.pi  # Convert from standard RA to pixell convention
             submap = enmap.submap(tmap, skybox)
             if np.any(submap):
                 ra_idx.append(ra_id)

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 
 from sqlmodel import JSON, Field, Relationship, SQLModel
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from .depth_one_coadd import DepthOneCoaddTable
     from .pipeline_information import PipelineInformationTable
     from .pointing_residual import PointingResidualTable

@@ -2,11 +2,16 @@ import argparse as ap
 import os
 from pathlib import Path
 
+import astropy.units as u
+import numpy as np
 import pytest
 import requests
+from astropy.coordinates import ICRS
+from pixell import enmap
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from mapcat.core import get_maps_by_coverage
 from mapcat.database import DepthOneMapTable
 from mapcat.toolkit import act, update_sky_coverage
 
@@ -27,86 +32,86 @@ DATA_URLS = [
 
 cov_mapping = {
     "1505603190.0": [
-        (-4, 3),
-        (-4, 4),
-        (-4, 6),
-        (-4, 7),
-        (-3, 3),
-        (-3, 4),
-        (-3, 5),
-        (-3, 6),
-        (-3, 7),
-        (-2, 3),
-        (-2, 4),
-        (-2, 5),
-        (-2, 6),
-        (-2, 7),
-        (-1, 3),
-        (-1, 4),
-        (-1, 5),
-        (-1, 6),
-        (-1, 7),
-        (0, 3),
-        (0, 4),
-        (0, 5),
-        (0, 6),
-        (0, 7),
-        (1, 3),
-        (1, 4),
-        (1, 5),
-        (1, 6),
-        (1, 7),
-        (2, 3),
-        (2, 4),
-        (2, 5),
-        (2, 6),
-        (2, 7),
-        (3, 3),
-        (3, 4),
-        (3, 5),
-        (3, 6),
-        (3, 7),
-        (4, 3),
-        (4, 4),
-        (4, 5),
-        (4, 6),
-        (4, 7),
-        (5, 3),
-        (5, 4),
-        (5, 5),
-        (5, 6),
-        (5, 7),
-        (6, 3),
-        (6, 4),
-        (6, 5),
-        (6, 6),
-        (6, 7),
-        (7, 3),
-        (7, 4),
-        (7, 5),
-        (7, 6),
-        (7, 7),
-        (8, 3),
-        (8, 4),
-        (8, 5),
-        (8, 6),
-        (8, 7),
-        (9, 3),
-        (9, 4),
-        (9, 5),
-        (9, 6),
-        (9, 7),
-        (10, 3),
-        (10, 4),
-        (10, 5),
-        (10, 6),
-        (10, 7),
-        (11, 3),
-        (11, 4),
-        (11, 5),
-        (11, 6),
+        (14, 3),
+        (14, 4),
+        (14, 6),
+        (14, 7),
+        (15, 3),
+        (15, 4),
+        (15, 5),
+        (15, 6),
+        (15, 7),
+        (16, 3),
+        (16, 4),
+        (16, 5),
+        (16, 6),
+        (16, 7),
+        (17, 3),
+        (17, 4),
+        (17, 5),
+        (17, 6),
+        (17, 7),
+        (18, 3),
+        (18, 4),
+        (18, 5),
+        (18, 6),
+        (18, 7),
+        (19, 3),
+        (19, 4),
+        (19, 5),
+        (19, 6),
+        (19, 7),
+        (20, 3),
+        (20, 4),
+        (20, 5),
+        (20, 6),
+        (20, 7),
+        (21, 3),
+        (21, 4),
+        (21, 5),
+        (21, 6),
+        (21, 7),
+        (22, 3),
+        (22, 4),
+        (22, 5),
+        (22, 6),
+        (22, 7),
+        (23, 3),
+        (23, 4),
+        (23, 5),
+        (23, 6),
+        (23, 7),
+        (24, 3),
+        (24, 4),
+        (24, 5),
+        (24, 6),
+        (24, 7),
+        (25, 3),
+        (25, 4),
+        (25, 5),
+        (25, 6),
+        (25, 7),
+        (26, 3),
+        (26, 4),
+        (26, 5),
+        (26, 6),
+        (26, 7),
+        (27, 3),
+        (27, 4),
+        (27, 5),
+        (27, 6),
+        (27, 7),
+        (28, 3),
+        (28, 4),
+        (28, 5),
+        (28, 6),
+        (28, 7),
+        (29, 3),
+        (29, 4),
+        (29, 5),
+        (29, 6),
     ],
-    "1505646390.0": [(4, 3), (4, 4), (4, 5), (5, 3), (5, 4), (5, 5)],
+    "1505646390.0": [(22, 3), (22, 4), (22, 5), (23, 3), (23, 4), (23, 5)],
 }
 
 
@@ -222,6 +227,7 @@ def test_act(database_sessionmaker, downloaded_data_file):
 
 
 def test_sky_coverage(database_sessionmaker, downloaded_data_file):
+    # I'm not sure we need this test any more, test_sky_coverage_2 is better
     args = ap.Namespace(
         glob="*/*_map.fits",
         relative_to=downloaded_data_file,
@@ -243,3 +249,59 @@ def test_sky_coverage(database_sessionmaker, downloaded_data_file):
                     ),  # These should be ints, idk why I have to cast them (from str)
                     int(cov.y),
                 ) in cov_mapping[str(d1map.ctime)]
+
+    with database_sessionmaker() as session:
+        maps = session.query(DepthOneMapTable).all()
+        for map in maps:
+            # Clean up
+            session.delete(map)
+
+        session.commit()
+
+
+def test_sky_coverage_2(database_sessionmaker, downloaded_data_file):
+    args = ap.Namespace(
+        glob="*/*_map.fits",
+        relative_to=downloaded_data_file,
+        telescope="act",
+    )
+
+    act.core(session=database_sessionmaker, args=args)
+
+    update_sky_coverage.core(session=database_sessionmaker)
+
+    d1maps = act.glob(args.glob, args.relative_to, args.telescope)
+    with database_sessionmaker() as session:
+        for d1map in d1maps:
+            cur_map = enmap.read_map(str(downloaded_data_file) + "/" + d1map.map_path)
+            nonzero_radec = cur_map.pix2sky(np.where(cur_map[0] != 0))
+            idx = np.linspace(0, len(nonzero_radec) - 1, 1000)
+            idx = np.round(idx).astype(int)
+            nonzero_radec = nonzero_radec.T[
+                idx
+            ]  # Only test a subset of the nonzero pixels to speed up the test
+            for pix in nonzero_radec:
+                coord = ICRS(
+                    (pix[1] + np.pi) * u.rad, pix[0] * u.rad
+                )  # Convert from pixel standard to normal RA convention
+                return_d1map = get_maps_by_coverage(coord, session)
+                assert d1map.map_name in [m.map_name for m in return_d1map]
+
+        ra, dec = 0, 0  # Test a point outside the coverage, should return an empty list
+        coord = ICRS(ra * u.rad, dec * u.rad)
+        return_d1map = get_maps_by_coverage(coord, session)
+        assert len(return_d1map) == 0
+
+    with database_sessionmaker() as session:
+        maps = session.query(DepthOneMapTable).all()
+        for map in maps:
+            # Clean up
+            session.delete(map)
+
+        session.commit()
+
+
+def test_ra_to_index_pixell():
+    assert update_sky_coverage._ra_to_index_pixell(-180) == 0
+    assert update_sky_coverage._ra_to_index_pixell(170) == 35
+    assert update_sky_coverage._ra_to_index_pixell(0) == 18

@@ -52,6 +52,8 @@ def parse_filenames(base: str, relative_to: Path) -> dict[str, str]:
         "info": Path(base + "_info.hdf"),
         "ivar": Path(base + "_ivar.fits"),
         "time": Path(base + "_time.fits"),
+        "rho": Path(base + "_rho.fits"),
+        "kappa": Path(base + "_kappa.fits")
     }
 
     # In case e.g. there is no inverse-variance map.
@@ -78,6 +80,8 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         map_name=filenames["map"].replace("_map.fits", ""),
         map_path=filenames["map"],
         ivar_path=filenames.get("ivar"),
+        rho_path=filenames.get("rho"),
+        kappa_path=filenames.get("kappa"),
         mean_time_path=filenames.get("time"),
         tube_slot=file_info["tube_slot"],
         frequency=file_info["frequency"],

@@ -2,6 +2,7 @@
 Table containing pointing residuals.
 """
 
+from collections.abc import Sequence
 from typing import Any
 
 from sqlmodel import JSON, Field, Relationship, SQLModel
@@ -47,6 +48,8 @@ class PointingResidualTable(SQLModel, table=True):
             value = data.get(key)
             if hasattr(value, "tolist"):
                 data[key] = value.tolist()
-            elif isinstance(value, tuple):
+            elif isinstance(value, Sequence) and not isinstance(
+                value, str | bytes | bytearray
+            ):
                 data[key] = list(value)
         super().__init__(**data)

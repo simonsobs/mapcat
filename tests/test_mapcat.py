@@ -101,7 +101,11 @@ def test_create_depth_one(database_sessionmaker):
         )
 
         pointing_residual = PointingResidualTable(
-            ra_offset=1.2, dec_offset=-0.8, map_id=map_id
+            ra_offset=1.2,
+            dec_offset=-0.8,
+            ra_offset_rms=0.3,
+            dec_offset_rms=0.4,
+            map_id=map_id,
         )
 
         tod = TODDepthOneTable(
@@ -173,6 +177,8 @@ def test_create_depth_one(database_sessionmaker):
     assert point.map_id == map_id
     assert point.ra_offset == 1.2
     assert point.dec_offset == -0.8
+    assert point.ra_offset_rms == 0.3
+    assert point.dec_offset_rms == 0.4
 
     assert tod.tod_id == tod_id
     assert tod.pwv == 0.7
@@ -236,7 +242,11 @@ def test_add_remove_child_tables(database_sessionmaker):
         )
 
         pointing_residual = PointingResidualTable(
-            ra_offset=1.2, dec_offset=-0.8, map=dmap
+            ra_offset=1.2,
+            dec_offset=-0.8,
+            ra_offset_rms=0.3,
+            dec_offset_rms=0.4,
+            map=dmap,
         )
 
         tod = TODDepthOneTable(
@@ -348,6 +358,8 @@ def test_pointing_residual_array_offsets(database_sessionmaker):
             map_id=dmap.map_id,
             ra_offset=np.array([1.2, -0.1, 0.01]),
             dec_offset=[-0.8, 0.2],
+            ra_offset_rms=0.5,
+            dec_offset_rms=0.6,
         )
         session.add(point)
         session.commit()
@@ -359,6 +371,8 @@ def test_pointing_residual_array_offsets(database_sessionmaker):
         assert point is not None
         assert point.ra_offset == [1.2, -0.1, 0.01]
         assert point.dec_offset == [-0.8, 0.2]
+        assert point.ra_offset_rms == 0.5
+        assert point.dec_offset_rms == 0.6
 
 
 def test_create_atomic_map_coadd(database_sessionmaker):

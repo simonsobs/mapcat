@@ -26,6 +26,10 @@ class PointingResidualTable(SQLModel, table=True):
         Calculated ra offset of PSes. Can be a scalar or array-like coefficients.
     dec_offset : float | list[float]
         Calculated dec offset of PSes. Can be a scalar or array-like coefficients.
+    ra_offset_rms : float
+        RMS of the ra residuals.
+    dec_offset_rms : float
+        RMS of the dec residuals.
 
     """
 
@@ -41,6 +45,8 @@ class PointingResidualTable(SQLModel, table=True):
 
     ra_offset: float | list[float] | None = Field(default=None, sa_type=JSON)
     dec_offset: float | list[float] | None = Field(default=None, sa_type=JSON)
+    ra_offset_rms: float | None = Field(default=None, nullable=True)
+    dec_offset_rms: float | None = Field(default=None, nullable=True)
     map: DepthOneMapTable = Relationship(back_populates="pointing_residual")
 
     def __init__(self, **data: Any):

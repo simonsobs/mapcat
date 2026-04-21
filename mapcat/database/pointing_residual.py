@@ -2,7 +2,9 @@
 Table containing pointing residuals.
 """
 
-from sqlmodel import Field, Relationship, SQLModel
+from typing import Any
+
+from sqlmodel import JSON, Field, Relationship, SQLModel
 
 from .depth_one_map import DepthOneMapTable
 
@@ -19,10 +21,10 @@ class PointingResidualTable(SQLModel, table=True):
         Internal ID of the pointing error
     map_name : str
         Name of depth 1 map being tracked. Foreign into DepthOneMap
-    ra_offset : float
-        Calculated ra offset of PSes
-    dec_offset : float
-        Calculated dec offset of PSes
+    ra_offset : float | list[float]
+        Calculated ra offset of PSes. Can be a scalar or array-like coefficients.
+    dec_offset : float | list[float]
+        Calculated dec offset of PSes. Can be a scalar or array-like coefficients.
 
     """
 
@@ -36,6 +38,15 @@ class PointingResidualTable(SQLModel, table=True):
         ondelete="CASCADE",
     )
 
-    ra_offset: float = Field(nullable=True)
-    dec_offset: float = Field(nullable=True)
+    ra_offset: float | list[float] | None = Field(default=None, sa_type=JSON)
+    dec_offset: float | list[float] | None = Field(default=None, sa_type=JSON)
     map: DepthOneMapTable = Relationship(back_populates="pointing_residual")
+
+    def __init__(self, **data: Any):
+        for key in ("ra_offset", "dec_offset"):
+            value = data.get(key)
+            if hasattr(value, "tolist"):
+                data[key] = value.tolist()
+            elif isinstance(value, tuple):
+                data[key] = list(value)
+        super().__init__(**data)

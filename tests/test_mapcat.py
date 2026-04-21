@@ -2,6 +2,7 @@
 Test the core functions
 """
 
+import numpy as np
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -326,6 +327,38 @@ def test_add_remove_child_tables(database_sessionmaker):
         x = session.get(SkyCoverageTable, sky_id)
         if x is None:
             raise ValueError("Not found")
+
+
+def test_pointing_residual_array_offsets(database_sessionmaker):
+    with database_sessionmaker() as session:
+        dmap = DepthOneMapTable(
+            map_name="myDepthOneArray",
+            map_path="/PATH/TO/DEPTH/ONE/ARRAY",
+            tube_slot="OTi1",
+            frequency="f090",
+            ctime=1755787524.0,
+            start_time=1755687524.0,
+            stop_time=1755887524.0,
+        )
+        session.add(dmap)
+        session.commit()
+        session.refresh(dmap)
+
+        point = PointingResidualTable(
+            map_id=dmap.map_id,
+            ra_offset=np.array([1.2, -0.1, 0.01]),
+            dec_offset=[-0.8, 0.2],
+        )
+        session.add(point)
+        session.commit()
+        session.refresh(point)
+        point_id = point.pointing_residual_id
+
+    with database_sessionmaker() as session:
+        point = session.get(PointingResidualTable, point_id)
+        assert point is not None
+        assert point.ra_offset == [1.2, -0.1, 0.01]
+        assert point.dec_offset == [-0.8, 0.2]
 
 
 def test_create_atomic_map_coadd(database_sessionmaker):

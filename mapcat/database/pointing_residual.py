@@ -43,8 +43,8 @@ class PointingResidualTable(SQLModel, table=True):
         ondelete="CASCADE",
     )
 
-    ra_offset: float | list[float] | None = Field(default=None, sa_type=JSON)
-    dec_offset: float | list[float] | None = Field(default=None, sa_type=JSON)
+    ra_offset: float | list[float] | None = Field(default=None, sa_type=JSON, nullable=True)
+    dec_offset: float | list[float] | None = Field(default=None, sa_type=JSON, nullable=True)
     ra_offset_rms: float | None = Field(default=None, nullable=True)
     dec_offset_rms: float | None = Field(default=None, nullable=True)
     map: DepthOneMapTable = Relationship(back_populates="pointing_residual")

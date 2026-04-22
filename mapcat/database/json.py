@@ -23,4 +23,4 @@ class JSONEncodedPydantic(TypeDecorator):
     def process_result_value(self, value, dialect):
         if value is None:
             return None
-        return self.pydantic_class(**value)
+        return self.pydantic_class.model_validate(value)

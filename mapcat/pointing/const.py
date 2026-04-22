@@ -21,4 +21,4 @@ class ConstantPointingModel(PointingModelProtocol):
         ra = pos.ra + self.ra_offset
         dec = pos.dec + self.dec_offset
 
-        return SkyCoord(ra=ra, dec=dec)
+        return SkyCoord(ra=ra, dec=dec, frame=pos.frame)

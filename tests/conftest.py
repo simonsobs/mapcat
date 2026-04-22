@@ -41,5 +41,7 @@ def database_sessionmaker(tmp_path_factory):
 
     yield sessionmaker(bind=engine, expire_on_commit=False)
 
+    engine.dispose()
+
     # Clean up the database (don't do this in case we want to inspect)
     database_path.unlink()

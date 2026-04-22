@@ -22,10 +22,8 @@ class PointingResidualTable(SQLModel, table=True):
         Internal ID of the pointing error
     map_name : str
         Name of depth 1 map being tracked. Foreign into DepthOneMap
-    ra_offset : float
-        Calculated ra offset of PSes
-    dec_offset : float
-        Calculated dec offset of PSes
+    residual_model: PointingModel
+        The pointing model to actually store in the database.
 
     """
 

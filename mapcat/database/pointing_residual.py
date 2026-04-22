@@ -4,7 +4,10 @@ Table containing pointing residuals.
 
 from sqlmodel import Field, Relationship, SQLModel
 
+from mapcat.pointing.const import ConstantPointingModel
+
 from .depth_one_map import DepthOneMapTable
+from .json import JSONEncodedPydantic
 
 
 class PointingResidualTable(SQLModel, table=True):
@@ -19,10 +22,8 @@ class PointingResidualTable(SQLModel, table=True):
         Internal ID of the pointing error
     map_name : str
         Name of depth 1 map being tracked. Foreign into DepthOneMap
-    ra_offset : float
-        Calculated ra offset of PSes
-    dec_offset : float
-        Calculated dec offset of PSes
+    residual_model: PointingModel
+        The pointing model to actually store in the database.
 
     """
 
@@ -36,6 +37,7 @@ class PointingResidualTable(SQLModel, table=True):
         ondelete="CASCADE",
     )
 
-    ra_offset: float = Field(nullable=True)
-    dec_offset: float = Field(nullable=True)
+    residual_model: ConstantPointingModel = Field(
+        discriminator="model_type", sa_type=JSONEncodedPydantic(ConstantPointingModel)
+    )
     map: DepthOneMapTable = Relationship(back_populates="pointing_residual")

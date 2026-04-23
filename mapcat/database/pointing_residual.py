@@ -16,14 +16,12 @@ class PointingResidualTable(SQLModel, table=True):
     """
     Table for tracking Pointing error for a depth one map,
     computed by comparing positions of PSes in that map to
-    their known possitions
+    their known positions
 
     Attributes
     ----------
-    id : str
-        Internal ID of the pointing error
-    map_name : str
-        Name of depth 1 map being tracked. Foreign into DepthOneMap
+    map_id : int
+        Internal ID of the depth one map
     residual_model: ConstantPointingModel
         The pointing model to actually store in the database.
     residual_stats: PointingModelStats
@@ -32,7 +30,7 @@ class PointingResidualTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_pointing_residuals"
     pointing_residual_id: int = Field(primary_key=True)
-
+    
     map_id: int = Field(
         index=True,
         nullable=False,

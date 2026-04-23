@@ -1,7 +1,7 @@
 """
 Test the core functions
 """
-
+from astropy import units as u
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -16,6 +16,7 @@ from mapcat.database import (
     TimeDomainProcessingTable,
     TODDepthOneTable,
 )
+from mapcat.pointing.const import ConstantPointingModel
 
 
 def run_migration(database_path: str):
@@ -98,9 +99,13 @@ def test_create_depth_one(database_sessionmaker):
             processing_status="done",
             map_id=map_id,
         )
-
+        pointing_model = ConstantPointingModel(
+            ra_offset=1.2* u.deg,
+            dec_offset=-0.8 * u.deg
+        )
         pointing_residual = PointingResidualTable(
-            ra_offset=1.2, dec_offset=-0.8, map_id=map_id
+            map_id=map_id,
+            pointing_residual=pointing_model, 
         )
 
         tod = TODDepthOneTable(
@@ -170,8 +175,8 @@ def test_create_depth_one(database_sessionmaker):
 
     assert point.pointing_residual_id == point_id
     assert point.map_id == map_id
-    assert point.ra_offset == 1.2
-    assert point.dec_offset == -0.8
+    assert point.pointing_residual.ra_offset == 1.2
+    assert point.pointing_residual.dec_offset == -0.8
 
     assert tod.tod_id == tod_id
     assert tod.pwv == 0.7
@@ -234,8 +239,13 @@ def test_add_remove_child_tables(database_sessionmaker):
             map=dmap,
         )
 
+        pointing_model = ConstantPointingModel(
+            ra_offset=1.2* u.deg,
+            dec_offset=-0.8 * u.deg
+        )
         pointing_residual = PointingResidualTable(
-            ra_offset=1.2, dec_offset=-0.8, map=dmap
+            map_id=dmap.map_id,
+            pointing_residual=pointing_model
         )
 
         tod = TODDepthOneTable(

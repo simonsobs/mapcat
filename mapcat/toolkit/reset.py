@@ -7,14 +7,16 @@ import argparse as ap
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from mapcat.database import DepthOneMapTable, TimeDomainProcessingTable
+from mapcat.database import DepthOneMapTable, PointingResidualTable, TimeDomainProcessingTable
 
 VALID_STATUSES = ["failed", "completed", "permafail"]
 
 HELP_TEXT = """Use this utility to reset processing statuses in the
-TimeDomainProcessingTable. Statuses can be set to 'failed', 'completed', or
-'permafail' (which tells the pipeline not to retry the map due to a
-pathological failure), or removed entirely by not specifying a target status.
+TimeDomainProcessingTable.
+Also deletes any associated PointingResidualTable entries if status is None (default).
+Statuses can be set to 'failed', 'completed', or 'permafail' 
+(which tells the pipeline not to retry the map due to a pathological failure),
+ or removed entirely by not specifying a target status.
 
 Entries to reset can be filtered by map ID, time range (using the map's ctime),
 and/or current processing status.
@@ -77,13 +79,22 @@ def core(session: sessionmaker, args: ap.Namespace):
 
         entries = cur_session.execute(stmt).scalars().all()
 
+        affected_map_ids = [entry.map_id for entry in entries]
+
         if args.status is None:
             for entry in entries:
                 cur_session.delete(entry)
+                pointing_residuals = cur_session.execute(
+                    select(PointingResidualTable).where(
+                        PointingResidualTable.map_id.in_(affected_map_ids)
+                    )
+                ).scalars().all()
+                for pr in pointing_residuals:
+                    cur_session.delete(pr)
         else:
             for entry in entries:
                 entry.processing_status = args.status
-
+        
         cur_session.commit()
 
 

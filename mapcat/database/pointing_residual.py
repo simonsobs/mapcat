@@ -30,7 +30,7 @@ class PointingResidualTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_pointing_residuals"
     pointing_residual_id: int = Field(primary_key=True)
-    
+
     map_id: int = Field(
         index=True,
         nullable=False,

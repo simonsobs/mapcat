@@ -1,6 +1,7 @@
 """
 Test the core functions
 """
+
 from astropy import units as u
 import pytest
 from sqlalchemy import create_engine
@@ -100,12 +101,11 @@ def test_create_depth_one(database_sessionmaker):
             map_id=map_id,
         )
         pointing_model = ConstantPointingModel(
-            ra_offset=1.2* u.deg,
-            dec_offset=-0.8 * u.deg
+            ra_offset=1.2 * u.deg, dec_offset=-0.8 * u.deg
         )
         pointing_residual = PointingResidualTable(
             map_id=map_id,
-            residual_model=pointing_model, 
+            residual_model=pointing_model,
         )
 
         tod = TODDepthOneTable(
@@ -241,12 +241,10 @@ def test_add_remove_child_tables(database_sessionmaker):
         )
 
         pointing_model = ConstantPointingModel(
-            ra_offset=1.2* u.deg,
-            dec_offset=-0.8 * u.deg
+            ra_offset=1.2 * u.deg, dec_offset=-0.8 * u.deg
         )
         pointing_residual = PointingResidualTable(
-            map_id=dmap.map_id,
-            residual_model=pointing_model
+            map_id=dmap.map_id, residual_model=pointing_model
         )
 
         tod = TODDepthOneTable(

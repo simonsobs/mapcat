@@ -7,7 +7,11 @@ import argparse as ap
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from mapcat.database import DepthOneMapTable, PointingResidualTable, TimeDomainProcessingTable
+from mapcat.database import (
+    DepthOneMapTable,
+    PointingResidualTable,
+    TimeDomainProcessingTable,
+)
 
 VALID_STATUSES = ["failed", "completed", "permafail"]
 
@@ -102,7 +106,7 @@ def core(session: sessionmaker, args: ap.Namespace):
         else:
             for entry in entries:
                 entry.processing_status = args.status
-        
+
         cur_session.commit()
 
 

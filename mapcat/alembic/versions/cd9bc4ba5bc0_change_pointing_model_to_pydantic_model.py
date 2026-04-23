@@ -25,8 +25,6 @@ def upgrade() -> None:
         batch.drop_column("ra_offset")
         batch.drop_column("dec_offset")
 
-    pass
-
 
 def downgrade() -> None:
     with op.batch_alter_table("depth_one_pointing_residuals") as batch:
@@ -34,5 +32,3 @@ def downgrade() -> None:
         batch.add_column(sa.Column("dec_offset", sa.Float, nullable=False))
 
         batch.drop_column("residual_model")
-
-    pass

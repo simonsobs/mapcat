@@ -7,14 +7,20 @@ import argparse as ap
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
 
-from mapcat.database import DepthOneMapTable, TimeDomainProcessingTable
+from mapcat.database import (
+    DepthOneMapTable,
+    PointingResidualTable,
+    TimeDomainProcessingTable,
+)
 
 VALID_STATUSES = ["failed", "completed", "permafail"]
 
 HELP_TEXT = """Use this utility to reset processing statuses in the
-TimeDomainProcessingTable. Statuses can be set to 'failed', 'completed', or
-'permafail' (which tells the pipeline not to retry the map due to a
-pathological failure), or removed entirely by not specifying a target status.
+TimeDomainProcessingTable.
+Also deletes any associated PointingResidualTable entries if status is None (default).
+Statuses can be set to 'failed', 'completed', or 'permafail' 
+(which tells the pipeline not to retry the map due to a pathological failure),
+ or removed entirely by not specifying a target status.
 
 Entries to reset can be filtered by map ID, time range (using the map's ctime),
 and/or current processing status.
@@ -80,6 +86,31 @@ def core(session: sessionmaker, args: ap.Namespace):
         if args.status is None:
             for entry in entries:
                 cur_session.delete(entry)
+            
+            # remove the associated pointing residuals as well
+            pr_stmt = select(PointingResidualTable)
+            if args.map_id:
+                pr_stmt = pr_stmt.where(PointingResidualTable.map_id.in_(args.map_id))
+            if args.from_status is not None:
+                pr_stmt = pr_stmt.join(
+                    TimeDomainProcessingTable,
+                    PointingResidualTable.map_id == TimeDomainProcessingTable.map_id,
+                ).where(
+                    TimeDomainProcessingTable.processing_status == args.from_status
+                )
+            if args.start_time is not None or args.end_time is not None:
+                pr_stmt = pr_stmt.join(
+                    DepthOneMapTable,
+                    PointingResidualTable.map_id == DepthOneMapTable.map_id,
+                )
+                if args.start_time is not None:
+                    pr_stmt = pr_stmt.where(DepthOneMapTable.ctime >= args.start_time)
+                if args.end_time is not None:
+                    pr_stmt = pr_stmt.where(DepthOneMapTable.ctime <= args.end_time)
+
+            pointing_residuals = cur_session.execute(pr_stmt).scalars().all()
+            for pr in pointing_residuals:
+                cur_session.delete(pr)
         else:
             for entry in entries:
                 entry.processing_status = args.status

@@ -17,6 +17,9 @@ class ConstantPointingModel(PointingModelProtocol):
     ra_offset: AstroPydanticQuantity[deg]
     dec_offset: AstroPydanticQuantity[deg]
 
+    ra_residual_rms: AstroPydanticQuantity[deg]
+    dec_residual_rms: AstroPydanticQuantity[deg]
+
     def predict(self, pos: SkyCoord) -> SkyCoord:
         ra = pos.ra + self.ra_offset
         dec = pos.dec + self.dec_offset

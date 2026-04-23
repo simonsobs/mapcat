@@ -223,6 +223,7 @@ def test_add_remove_child_tables(database_sessionmaker):
     # Create a depth one map
     with database_sessionmaker() as session:
         dmap = DepthOneMapTable(
+            map_id=42,
             map_name="myDepthOne2",
             map_path="/PATH/TO/DEPTH/ONE2",
             tube_slot="OTi1",

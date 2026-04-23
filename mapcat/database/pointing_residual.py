@@ -41,6 +41,6 @@ class PointingResidualTable(SQLModel, table=True):
         discriminator="model_type", sa_type=JSONEncodedPydantic(ConstantPointingModel)
     )
     residual_stats: PointingModelStats = Field(
-        sa_type=JSONEncodedPydantic(PointingModelStats)
+        default_factory=PointingModelStats, sa_type=JSONEncodedPydantic(PointingModelStats)
     )
     map: DepthOneMapTable = Relationship(back_populates="pointing_residual")

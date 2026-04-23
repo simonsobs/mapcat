@@ -14,9 +14,6 @@ from mapcat.pointing.base import PointingModelProtocol
 class ConstantPointingModel(PointingModelProtocol):
     model_type: Literal["constant"] = "constant"
 
-    ra_offset: AstroPydanticQuantity[deg]
-    dec_offset: AstroPydanticQuantity[deg]
-
     ra_residual_rms: AstroPydanticQuantity[deg]
     dec_residual_rms: AstroPydanticQuantity[deg]
 

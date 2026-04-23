@@ -84,13 +84,13 @@ def core(session: sessionmaker, args: ap.Namespace):
         if args.status is None:
             for entry in entries:
                 cur_session.delete(entry)
-                pointing_residuals = cur_session.execute(
-                    select(PointingResidualTable).where(
-                        PointingResidualTable.map_id.in_(affected_map_ids)
-                    )
-                ).scalars().all()
-                for pr in pointing_residuals:
-                    cur_session.delete(pr)
+            pointing_residuals = cur_session.execute(
+                select(PointingResidualTable).where(
+                    PointingResidualTable.map_id.in_(affected_map_ids)
+                )
+            ).scalars().all()
+            for pr in pointing_residuals:
+                cur_session.delete(pr)
         else:
             for entry in entries:
                 entry.processing_status = args.status

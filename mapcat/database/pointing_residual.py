@@ -22,7 +22,7 @@ class PointingResidualTable(SQLModel, table=True):
     ----------
     map_id : int
         Internal ID of the depth one map
-    pointing_model: ConstantPointingModel
+    pointing_residual: ConstantPointingModel
         The pointing model to actually store in the database.
     residual_stats: PointingModelStats
         Statistics about the pointing residuals, such as mean and stddev of RA and Dec offsets
@@ -37,7 +37,7 @@ class PointingResidualTable(SQLModel, table=True):
         foreign_key="depth_one_maps.map_id",
         ondelete="CASCADE",
     )
-    pointing_model: ConstantPointingModel = Field(
+    pointing_residual: ConstantPointingModel = Field(
         discriminator="model_type", sa_type=JSONEncodedPydantic(ConstantPointingModel)
     )
     residual_stats: PointingModelStats = Field(

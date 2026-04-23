@@ -105,7 +105,7 @@ def test_create_depth_one(database_sessionmaker):
         )
         pointing_residual = PointingResidualTable(
             map_id=map_id,
-            pointing_residual=pointing_model, 
+            residual_model=pointing_model, 
         )
 
         tod = TODDepthOneTable(
@@ -175,8 +175,8 @@ def test_create_depth_one(database_sessionmaker):
 
     assert point.pointing_residual_id == point_id
     assert point.map_id == map_id
-    assert point.pointing_residual.ra_offset == 1.2
-    assert point.pointing_residual.dec_offset == -0.8
+    assert point.residual_model.ra_offset == 1.2 * u.deg
+    assert point.residual_model.dec_offset == -0.8 * u.deg
 
     assert tod.tod_id == tod_id
     assert tod.pwv == 0.7
@@ -245,7 +245,7 @@ def test_add_remove_child_tables(database_sessionmaker):
         )
         pointing_residual = PointingResidualTable(
             map_id=dmap.map_id,
-            pointing_residual=pointing_model
+            residual_model=pointing_model
         )
 
         tod = TODDepthOneTable(

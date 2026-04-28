@@ -4,9 +4,10 @@ Constant pointing model.
 
 from typing import Literal
 
-from astropy.coordinates import SkyCoord
 from astropy import units as u
+from astropy.coordinates import SkyCoord
 from astropydantic import AstroPydanticQuantity
+
 from mapcat.pointing.base import PointingModelProtocol
 
 

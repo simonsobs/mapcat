@@ -5,9 +5,9 @@ Base pointing model.
 from abc import ABC, abstractmethod
 from typing import Literal
 
+from astropy import units as u
 from astropy.coordinates import SkyCoord
 from astropydantic import AstroPydanticQuantity
-from astropy import units as u
 from pydantic import BaseModel
 
 

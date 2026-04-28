@@ -86,7 +86,7 @@ def core(session: sessionmaker, args: ap.Namespace):
         if args.status is None:
             for entry in entries:
                 cur_session.delete(entry)
-            
+
             # remove the associated pointing residuals as well
             pr_stmt = select(PointingResidualTable)
             if args.map_id:
@@ -95,9 +95,7 @@ def core(session: sessionmaker, args: ap.Namespace):
                 pr_stmt = pr_stmt.join(
                     TimeDomainProcessingTable,
                     PointingResidualTable.map_id == TimeDomainProcessingTable.map_id,
-                ).where(
-                    TimeDomainProcessingTable.processing_status == args.from_status
-                )
+                ).where(TimeDomainProcessingTable.processing_status == args.from_status)
             if args.start_time is not None or args.end_time is not None:
                 pr_stmt = pr_stmt.join(
                     DepthOneMapTable,

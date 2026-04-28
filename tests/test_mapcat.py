@@ -2,8 +2,8 @@
 Test the core functions
 """
 
-from astropy import units as u
 import pytest
+from astropy import units as u
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

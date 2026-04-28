@@ -4,9 +4,8 @@ Table containing pointing residuals.
 
 from sqlmodel import Field, Relationship, SQLModel
 
-from mapcat.pointing.const import ConstantPointingModel
-
 from mapcat.pointing.base import PointingModelStats
+from mapcat.pointing.const import ConstantPointingModel
 
 from .depth_one_map import DepthOneMapTable
 from .json import JSONEncodedPydantic
@@ -40,6 +39,7 @@ class PointingResidualTable(SQLModel, table=True):
     residual_model: ConstantPointingModel = Field(
         discriminator="model_type", sa_type=JSONEncodedPydantic(ConstantPointingModel)
     )
-    residual_stats: PointingModelStats | None = Field( nullable=True, sa_type=JSONEncodedPydantic(PointingModelStats)
+    residual_stats: PointingModelStats | None = Field(
+        nullable=True, sa_type=JSONEncodedPydantic(PointingModelStats)
     )
     map: DepthOneMapTable = Relationship(back_populates="pointing_residual")

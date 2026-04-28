@@ -25,6 +25,7 @@ class PolynomialCoefficients(BaseModel):
     """
     coeffs: dict[str,float]
     labels: dict[str, str]
+    unit: u.Unit = u.deg
     poly_order: int
 
 
@@ -133,8 +134,8 @@ class PolynomialPointingModel(PointingModelProtocol):
         ra_coeff_dict = {key: coeff for key, coeff in zip(self._poly_keys(), coeffs_ra)}
         dec_coeff_dict = {key: coeff for key, coeff in zip(self._poly_keys(), coeffs_dec)}
 
-        self.ra_model_coefficients=PolynomialCoefficients(coeffs=ra_coeff_dict, labels={'x':'ra', 'y':'dec'}, poly_order=self.poly_order)
-        self.dec_model_coefficients=PolynomialCoefficients(coeffs=dec_coeff_dict, labels={'x':'ra', 'y':'dec'}, poly_order=self.poly_order)
+        self.ra_model_coefficients=PolynomialCoefficients(coeffs=ra_coeff_dict, labels={'x':'ra', 'y':'dec'}, unit=u.deg, poly_order=self.poly_order)
+        self.dec_model_coefficients=PolynomialCoefficients(coeffs=dec_coeff_dict, labels={'x':'ra', 'y':'dec'}, unit=u.deg, poly_order=self.poly_order)
         
 
     def model_fn(

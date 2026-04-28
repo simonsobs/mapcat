@@ -2,15 +2,22 @@
 Table containing pointing residuals.
 """
 
+from typing import Annotated
+
 from sqlmodel import Field, Relationship, SQLModel
 
 from mapcat.pointing.const import ConstantPointingModel
+from mapcat.pointing.poly import PolynomialPointingModel
 
 from mapcat.pointing.base import PointingModelStats
 
 from .depth_one_map import DepthOneMapTable
 from .json import JSONEncodedPydantic
 
+PointingModel = Annotated[
+    ConstantPointingModel | PolynomialPointingModel,
+    Field(discriminator="model_type")
+]
 
 class PointingResidualTable(SQLModel, table=True):
     """
@@ -37,8 +44,7 @@ class PointingResidualTable(SQLModel, table=True):
         foreign_key="depth_one_maps.map_id",
         ondelete="CASCADE",
     )
-    residual_model: ConstantPointingModel = Field(
-        discriminator="model_type", sa_type=JSONEncodedPydantic(ConstantPointingModel)
+    residual_model: PointingModel = Field(sa_type=JSONEncodedPydantic(PointingModel)
     )
     residual_stats: PointingModelStats | None = Field( nullable=True, sa_type=JSONEncodedPydantic(PointingModelStats)
     )

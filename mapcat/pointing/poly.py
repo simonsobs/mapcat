@@ -1,6 +1,7 @@
 """
 Polynomial pointing model.
 """
+from astropydantic import AstropydanticUnit
 import numpy as np
 from pydantic import BaseModel
 from typing import Literal
@@ -25,7 +26,7 @@ class PolynomialCoefficients(BaseModel):
     """
     coeffs: dict[str,float]
     labels: dict[str, str]
-    unit: u.Unit = u.deg
+    unit: AstropydanticUnit = AstropydanticUnit(u.deg)
     poly_order: int
 
 

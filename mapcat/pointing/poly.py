@@ -161,8 +161,8 @@ class PolynomialPointingModel(PointingModelProtocol):
         racoeffs,deccoeffs = self.extract_coefficients()
         ra_offset = self.model_fn(pos.ra, pos.dec, racoeffs)[0]
         dec_offset = self.model_fn(pos.ra, pos.dec, deccoeffs)[0]
-        ra = pos.ra - ra_offset*u.deg
-        dec = pos.dec - dec_offset*u.deg
+        ra = pos.ra - ra_offset
+        dec = pos.dec - dec_offset
 
         return SkyCoord(ra=ra, dec=dec, frame=pos.frame)
     

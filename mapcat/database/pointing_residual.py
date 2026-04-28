@@ -2,7 +2,7 @@
 Table containing pointing residuals.
 """
 
-from typing import Annotated, Union
+from typing import Union
 
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -14,9 +14,7 @@ from mapcat.pointing.base import PointingModelStats
 from .depth_one_map import DepthOneMapTable
 from .json import JSONEncodedPydantic
 
-PointingModel = Annotated[Union[ConstantPointingModel, PolynomialPointingModel],
-    Field(discriminator="model_type")
-]
+PointingModel = Union[ConstantPointingModel, PolynomialPointingModel]
 
 class PointingResidualTable(SQLModel, table=True):
     """

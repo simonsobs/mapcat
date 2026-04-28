@@ -26,7 +26,7 @@ class PolynomialCoefficients(BaseModel):
     """
     coeffs: dict[str,float]
     labels: dict[str, str]
-    unit: AstroPydanticUnit = AstroPydanticUnit(u.deg)
+    unit: AstroPydanticUnit = u.deg
     poly_order: int
 
 

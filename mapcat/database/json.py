@@ -4,6 +4,8 @@ A custom SQLAlchemy type to (de)serialize pydantic models to JSONB.
 See: https://github.com/fastapi/sqlmodel/pull/1324 - this can be removed at some point.
 """
 
+import typing
+
 from sqlalchemy.types import JSON, TypeDecorator
 
 
@@ -23,4 +25,8 @@ class JSONEncodedPydantic(TypeDecorator):
     def process_result_value(self, value, dialect):
         if value is None:
             return None
-        return self.pydantic_class.model_validate(value)
+        cls = self.pydantic_class
+        args = typing.get_args(cls)
+        if args:
+            cls = next(a for a in args if a is not type(None))
+        return cls.model_validate(value)

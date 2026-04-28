@@ -2,15 +2,15 @@
 Polynomial pointing model.
 """
 import numpy as np
+from pydantic import BaseModel
 from typing import Literal
 
 from astropy.coordinates import SkyCoord
 from astropy import units as u
-from astropydantic import AstroPydanticQuantity
 from mapcat.pointing.base import PointingModelProtocol, PointingModelStats
 
 
-class PolynomialCoefficients(AstroPydanticQuantity):
+class PolynomialCoefficients(BaseModel):
     """
     Coefficients for a polynomial pointing model.
     for example a 2D polynomial of order 2,

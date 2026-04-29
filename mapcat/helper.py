@@ -72,6 +72,8 @@ def migrate():  # pragma: no cover
     """
     import subprocess
 
-    location = __file__.replace("helper.py", "alembic.ini")
+    from mapcat import alembic_location
+
+    location = alembic_location
 
     subprocess.call(["alembic", "-c", location, "upgrade", "head"])

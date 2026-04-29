@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pixell import enmap
 
-from mapcat.toolkit.update_sky_coverage import *
+from mapcat.toolkit.update_sky_coverage import get_sky_coverage
 
 parser = ap.ArgumentParser()
 parser.add_argument("--imap_path", type=str)

@@ -2,15 +2,14 @@
 Tests for the pointing residual models.
 """
 
+import numpy as np
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-import numpy as np
 from sqlmodel import select
 
 from mapcat.database import DepthOneMapTable, PointingResidualTable
 from mapcat.pointing.const import ConstantPointingModel
 from mapcat.pointing.poly import PolynomialPointingModel
-
 
 
 def test_add_retrieve_pointing(database_sessionmaker):

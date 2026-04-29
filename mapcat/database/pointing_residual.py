@@ -6,10 +6,9 @@ from typing import Union
 
 from sqlmodel import Field, Relationship, SQLModel
 
+from mapcat.pointing.base import PointingModelStats
 from mapcat.pointing.const import ConstantPointingModel
 from mapcat.pointing.poly import PolynomialPointingModel
-
-from mapcat.pointing.base import PointingModelStats
 
 from .depth_one_map import DepthOneMapTable
 from .json import JSONEncodedPydantic

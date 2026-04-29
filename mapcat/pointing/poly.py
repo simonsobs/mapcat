@@ -2,12 +2,13 @@
 Polynomial pointing model.
 """
 
-from astropy.coordinates import SkyCoord
-from astropy import units as u
-from astropydantic import AstroPydanticUnit
-import numpy as np
-from pydantic import BaseModel
 from typing import Literal
+
+import numpy as np
+from astropy import units as u
+from astropy.coordinates import SkyCoord
+from astropydantic import AstroPydanticUnit
+from pydantic import BaseModel
 
 from mapcat.pointing.base import PointingModelProtocol, PointingModelStats
 
@@ -64,6 +65,7 @@ class PolynomialPointingModel(PointingModelProtocol):
         Calculate and set the polynomial coefficients for the pointing model
         using the measured and expected positions.
 
+
         Optionally accept uncertainties in the measured positions
         and measurement weights to perform a weighted fit.
 
@@ -73,6 +75,15 @@ class PolynomialPointingModel(PointingModelProtocol):
         or a single list that applies to both.
 
         weights are resolved from uncertainties if not provided, using inverse variance weighting.
+
+        Raises
+        ------
+        ValueError 
+            If no positions are provided for model calculation.
+        ValueError
+            If the lengths of weights do not match the number of positions.
+        ValueError
+            If model coefficients have not been calculated yet when extracting coefficients.
         """
         # Calculate offsets
         ra_offsets = measured_positions.ra - expected_positions.ra
@@ -157,6 +168,11 @@ class PolynomialPointingModel(PointingModelProtocol):
         """
         Extract the coefficients from the PolynomialCoefficients dataclasss and 
         return them as arrays in the correct order for the model function.
+
+        Raises
+        ------
+        ValueError
+            If model coefficients have not been calculated yet.
         """
         if self.ra_model_coefficients is None or self.dec_model_coefficients is None:
             raise ValueError("Model coefficients have not been calculated yet.")

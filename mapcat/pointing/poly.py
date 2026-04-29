@@ -1,13 +1,14 @@
 """
 Polynomial pointing model.
 """
+
+from astropy.coordinates import SkyCoord
+from astropy import units as u
 from astropydantic import AstroPydanticUnit
 import numpy as np
 from pydantic import BaseModel
 from typing import Literal
 
-from astropy.coordinates import SkyCoord
-from astropy import units as u
 from mapcat.pointing.base import PointingModelProtocol, PointingModelStats
 
 
@@ -58,9 +59,9 @@ class PolynomialPointingModel(PointingModelProtocol):
                         expected_positions: SkyCoord, 
                         position_uncertainty: tuple[u.Quantity, u.Quantity] | u.Quantity | None = None,
                         weights: tuple[list[float], list[float]] | list[float] | None = None
-                        ) -> SkyCoord:
+                        ):
         """
-        Calculate the polynomial coefficients for the pointing model
+        Calculate and set the polynomial coefficients for the pointing model
         using the measured and expected positions.
 
         Optionally accept uncertainties in the measured positions
@@ -96,13 +97,13 @@ class PolynomialPointingModel(PointingModelProtocol):
         # Resolve weights from uncertainties if not provided
         if ra_weights is None and dec_weights is None:
             if ra_uncerts is not None and dec_uncerts is not None:
-                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts**2 + dec_uncerts**2)
+                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts.to_value(u.deg)**2 + dec_uncerts.to_value(u.deg)**2)
             elif ra_uncerts is not None:
-                dec_uncerts = np.ones(n) * np.mean(ra_uncerts)
-                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts**2 + dec_uncerts**2)
+                dec_uncerts = np.ones(n) * np.mean(ra_uncerts.to_value(u.deg))
+                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts.to_value(u.deg)**2 + dec_uncerts**2)
             elif dec_uncerts is not None:
-                ra_uncerts = np.ones(n) * np.mean(dec_uncerts)
-                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts**2 + dec_uncerts**2)
+                ra_uncerts = np.ones(n) * np.mean(dec_uncerts.to_value(u.deg))
+                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts**2 + dec_uncerts.to_value(u.deg)**2)
             else:
                 # No uncertainty or weights provided — uniform
                 ra_weights = dec_weights = np.ones(n)
@@ -110,6 +111,11 @@ class PolynomialPointingModel(PointingModelProtocol):
             ra_weights = dec_weights
         elif dec_weights is None:
             dec_weights = ra_weights
+
+        ra_weights = np.asarray(ra_weights)
+        dec_weights = np.asarray(dec_weights)
+        assert len(ra_weights) == n, "Length of ra_weights must match number of positions"
+        assert len(dec_weights) == n, "Length of dec_weights must match number of positions"
 
         ras = measured_positions.ra.to_value(u.deg)
         decs = measured_positions.dec.to_value(u.deg)
@@ -147,7 +153,14 @@ class PolynomialPointingModel(PointingModelProtocol):
         T = self._poly_terms(x, y)
         return (T @ coeffs) * u.deg
     
-    def extract_coefficients(self) -> np.ndarray:
+    def extract_coefficients(self) -> tuple[np.ndarray, np.ndarray]:
+        """
+        Extract the coefficients from the PolynomialCoefficients dataclasss and 
+        return them as arrays in the correct order for the model function.
+        """
+        if self.ra_model_coefficients is None or self.dec_model_coefficients is None:
+            raise ValueError("Model coefficients have not been calculated yet.")
+        
         ra_coeff_array = np.zeros(len(self.ra_model_coefficients.coeffs))
         for i, key in enumerate(self._poly_keys()):
             ra_coeff_array[i] = self.ra_model_coefficients.coeffs.get(key, 0)
@@ -156,13 +169,12 @@ class PolynomialPointingModel(PointingModelProtocol):
         for i, key in enumerate(self._poly_keys()):
             dec_coeff_array[i] = self.dec_model_coefficients.coeffs.get(key, 0)
         
-        
         return ra_coeff_array, dec_coeff_array
     
     def predict(self, pos: SkyCoord) -> SkyCoord:
         racoeffs,deccoeffs = self.extract_coefficients()
-        ra_offset = self.model_fn(pos.ra, pos.dec, racoeffs)[0]
-        dec_offset = self.model_fn(pos.ra, pos.dec, deccoeffs)[0]
+        ra_offset = self.model_fn(pos.ra, pos.dec, racoeffs)
+        dec_offset = self.model_fn(pos.ra, pos.dec, deccoeffs)
         ra = pos.ra - ra_offset
         dec = pos.dec - dec_offset
 

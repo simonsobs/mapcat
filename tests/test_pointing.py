@@ -83,3 +83,7 @@ def test_make_polynomial_pointing_model():
         predicted_pos = model.predict(offset_pos)
         assert np.isclose(predicted_pos.ra.to_value(u.arcmin), ras[i].to_value(u.arcmin), atol=0.1)
         assert np.isclose(predicted_pos.dec.to_value(u.arcmin), decs[i].to_value(u.arcmin), atol=0.1)
+
+    predicted_pos = model.predict(offset_positions)
+    assert np.all(np.isclose(predicted_pos.ra.to_value(u.arcmin), ras.to_value(u.arcmin), atol=0.1))
+    assert np.all(np.isclose(predicted_pos.dec.to_value(u.arcmin), decs.to_value(u.arcmin), atol=0.1))

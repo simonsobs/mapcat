@@ -26,7 +26,7 @@ class PointingResidualTable(SQLModel, table=True):
     ----------
     map_id : int
         Internal ID of the depth one map
-    residual_model: ConstantPointingModel
+    residual_model: ConstantPointingModel | PolynomialPointingModel
         The pointing model to actually store in the database.
     residual_stats: PointingModelStats
         Statistics about the pointing residuals, such as mean and stddev of RA and Dec offsets

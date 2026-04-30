@@ -55,7 +55,7 @@ class PolynomialPointingModel(PointingModelProtocol):
                 keys.append(f"x^{i}y^{j}")
         return keys
 
-    def calculate_model(self, 
+    def build_model(self, 
                         measured_positions: SkyCoord, 
                         expected_positions: SkyCoord, 
                         weights: tuple[list[float], list[float]] | list[float] | None = None

@@ -73,7 +73,7 @@ def test_make_polynomial_pointing_model():
     offset_positions = SkyCoord(
             ra=ras + offset + slope * ras, dec=decs + offset + slope * decs
         )
-    model.calculate_model(measured_positions=offset_positions, expected_positions=SkyCoord(ras, decs))
+    model.build_model(measured_positions=offset_positions, expected_positions=SkyCoord(ras, decs))
 
     assert model.ra_model_coefficients is not None
     assert model.dec_model_coefficients is not None

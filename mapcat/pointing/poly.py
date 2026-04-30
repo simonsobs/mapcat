@@ -58,23 +58,15 @@ class PolynomialPointingModel(PointingModelProtocol):
     def calculate_model(self, 
                         measured_positions: SkyCoord, 
                         expected_positions: SkyCoord, 
-                        position_uncertainty: tuple[u.Quantity, u.Quantity] | u.Quantity | None = None,
                         weights: tuple[list[float], list[float]] | list[float] | None = None
                         ):
         """
         Calculate and set the polynomial coefficients for the pointing model
         using the measured and expected positions.
 
-
-        Optionally accept uncertainties in the measured positions
-        and measurement weights to perform a weighted fit.
-
-        position_uncertainty can be provided as a tuple of (ra_uncertainties, dec_uncertainties) 
-        or a single quantity that applies to both.
-        similarly, weights can be provided as a tuple of (ra_weights, dec_weights) 
+        weights can be provided as a tuple of (ra_weights, dec_weights) 
         or a single list that applies to both.
-
-        weights are resolved from uncertainties if not provided, using inverse variance weighting.
+        
 
         Raises
         ------
@@ -92,12 +84,6 @@ class PolynomialPointingModel(PointingModelProtocol):
         if n == 0:
             raise ValueError("No positions provided for model calculation.")
         
-        # Unpack position_uncertainty into ra_uncerts, dec_uncerts
-        if isinstance(position_uncertainty, tuple):
-            ra_uncerts, dec_uncerts = position_uncertainty
-        else:
-            ra_uncerts = dec_uncerts = position_uncertainty  # None or single Quantity applied to both
-
         # Unpack weights into ra_weights, dec_weights
         if isinstance(weights, tuple):
             ra_weights, dec_weights = weights
@@ -107,17 +93,8 @@ class PolynomialPointingModel(PointingModelProtocol):
         # Lots of logic to check if weights exist, etc.
         # Resolve weights from uncertainties if not provided
         if ra_weights is None and dec_weights is None:
-            if ra_uncerts is not None and dec_uncerts is not None:
-                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts.to_value(u.deg)**2 + dec_uncerts.to_value(u.deg)**2)
-            elif ra_uncerts is not None:
-                dec_uncerts = np.ones(n) * np.mean(ra_uncerts.to_value(u.deg))
-                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts.to_value(u.deg)**2 + dec_uncerts**2)
-            elif dec_uncerts is not None:
-                ra_uncerts = np.ones(n) * np.mean(dec_uncerts.to_value(u.deg))
-                ra_weights = dec_weights = 1 / np.sqrt(ra_uncerts**2 + dec_uncerts.to_value(u.deg)**2)
-            else:
-                # No uncertainty or weights provided — uniform
-                ra_weights = dec_weights = np.ones(n)
+            # No weights provided — uniform
+            ra_weights = dec_weights = np.ones(n)
         elif ra_weights is None:
             ra_weights = dec_weights
         elif dec_weights is None:

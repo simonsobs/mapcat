@@ -13,6 +13,7 @@ from .json import JSONEncodedPydantic
 
 PointingModel = ConstantPointingModel | PolynomialPointingModel
 
+
 class PointingResidualTable(SQLModel, table=True):
     """
     Table for tracking Pointing error for a depth one map,
@@ -38,8 +39,8 @@ class PointingResidualTable(SQLModel, table=True):
         foreign_key="depth_one_maps.map_id",
         ondelete="CASCADE",
     )
-    residual_model: PointingModel = Field(sa_type=JSONEncodedPydantic(PointingModel)
-    )
-    residual_stats: PointingModelStats | None = Field(nullable=True, default=None, sa_type=JSONEncodedPydantic(PointingModelStats)
+    residual_model: PointingModel = Field(sa_type=JSONEncodedPydantic(PointingModel))
+    residual_stats: PointingModelStats | None = Field(
+        nullable=True, default=None, sa_type=JSONEncodedPydantic(PointingModelStats)
     )
     map: DepthOneMapTable = Relationship(back_populates="pointing_residual")

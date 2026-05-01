@@ -26,11 +26,11 @@ class PolynomialCoefficients(BaseModel):
             }
     labels = {'x':'ra', 'y':'dec'}
     """
-    coeffs: dict[str,float]
+
+    coeffs: dict[str, float]
     labels: dict[str, str]
     unit: AstroPydanticUnit = u.deg
     poly_order: int
-
 
 
 class PolynomialPointingModel(PointingModelProtocol):
@@ -55,22 +55,23 @@ class PolynomialPointingModel(PointingModelProtocol):
                 keys.append(f"x^{i}y^{j}")
         return keys
 
-    def build_model(self, 
-                        measured_positions: SkyCoord, 
-                        expected_positions: SkyCoord, 
-                        weights: tuple[list[float], list[float]] | list[float] | None = None
-                        ):
+    def build_model(
+        self,
+        measured_positions: SkyCoord,
+        expected_positions: SkyCoord,
+        weights: tuple[list[float], list[float]] | list[float] | None = None,
+    ):
         """
         Calculate and set the polynomial coefficients for the pointing model
         using the measured and expected positions.
 
-        weights can be provided as a tuple of (ra_weights, dec_weights) 
+        weights can be provided as a tuple of (ra_weights, dec_weights)
         or a single list that applies to both.
-        
+
 
         Raises
         ------
-        ValueError 
+        ValueError
             If no positions are provided for model calculation.
         ValueError
             If the lengths of weights do not match the number of positions.
@@ -83,7 +84,7 @@ class PolynomialPointingModel(PointingModelProtocol):
         n = len(ra_offsets)
         if n == 0:
             raise ValueError("No positions provided for model calculation.")
-        
+
         # Unpack weights into ra_weights, dec_weights
         if isinstance(weights, tuple):
             ra_weights, dec_weights = weights
@@ -102,8 +103,12 @@ class PolynomialPointingModel(PointingModelProtocol):
 
         ra_weights = np.asarray(ra_weights)
         dec_weights = np.asarray(dec_weights)
-        assert len(ra_weights) == n, "Length of ra_weights must match number of positions"
-        assert len(dec_weights) == n, "Length of dec_weights must match number of positions"
+        assert len(ra_weights) == n, (
+            "Length of ra_weights must match number of positions"
+        )
+        assert len(dec_weights) == n, (
+            "Length of dec_weights must match number of positions"
+        )
 
         ras = measured_positions.ra.to_value(u.deg)
         decs = measured_positions.dec.to_value(u.deg)
@@ -125,25 +130,34 @@ class PolynomialPointingModel(PointingModelProtocol):
         Aw = A_dec * w_dec[:, None]
         yw = y_dec * w_dec
         coeffs_dec, *_ = np.linalg.lstsq(Aw, yw, rcond=None)
-        
+
         ra_coeff_dict = {key: coeff for key, coeff in zip(self._poly_keys(), coeffs_ra)}
-        dec_coeff_dict = {key: coeff for key, coeff in zip(self._poly_keys(), coeffs_dec)}
+        dec_coeff_dict = {
+            key: coeff for key, coeff in zip(self._poly_keys(), coeffs_dec)
+        }
 
-        self.ra_model_coefficients=PolynomialCoefficients(coeffs=ra_coeff_dict, labels={'x':'ra', 'y':'dec'}, unit=u.deg, poly_order=self.poly_order)
-        self.dec_model_coefficients=PolynomialCoefficients(coeffs=dec_coeff_dict, labels={'x':'ra', 'y':'dec'}, unit=u.deg, poly_order=self.poly_order)
-        
+        self.ra_model_coefficients = PolynomialCoefficients(
+            coeffs=ra_coeff_dict,
+            labels={"x": "ra", "y": "dec"},
+            unit=u.deg,
+            poly_order=self.poly_order,
+        )
+        self.dec_model_coefficients = PolynomialCoefficients(
+            coeffs=dec_coeff_dict,
+            labels={"x": "ra", "y": "dec"},
+            unit=u.deg,
+            poly_order=self.poly_order,
+        )
 
-    def model_fn(
-        self, x: u.Quantity, y: u.Quantity, coeffs: np.ndarray
-    ) -> u.Quantity:
+    def model_fn(self, x: u.Quantity, y: u.Quantity, coeffs: np.ndarray) -> u.Quantity:
         x = np.atleast_1d(x.to_value(u.deg))
         y = np.atleast_1d(y.to_value(u.deg))
         T = self._poly_terms(x, y)
         return (T @ coeffs) * u.deg
-    
+
     def extract_coefficients(self) -> tuple[np.ndarray, np.ndarray]:
         """
-        Extract the coefficients from the PolynomialCoefficients dataclasss and 
+        Extract the coefficients from the PolynomialCoefficients dataclasss and
         return them as arrays in the correct order for the model function.
 
         Raises
@@ -153,26 +167,26 @@ class PolynomialPointingModel(PointingModelProtocol):
         """
         if self.ra_model_coefficients is None or self.dec_model_coefficients is None:
             raise ValueError("Model coefficients have not been calculated yet.")
-        
+
         ra_coeff_array = np.zeros(len(self.ra_model_coefficients.coeffs))
         for i, key in enumerate(self._poly_keys()):
             ra_coeff_array[i] = self.ra_model_coefficients.coeffs.get(key, 0)
-        
+
         dec_coeff_array = np.zeros(len(self.dec_model_coefficients.coeffs))
         for i, key in enumerate(self._poly_keys()):
             dec_coeff_array[i] = self.dec_model_coefficients.coeffs.get(key, 0)
-        
+
         return ra_coeff_array, dec_coeff_array
-    
+
     def predict(self, pos: SkyCoord) -> SkyCoord:
-        racoeffs,deccoeffs = self.extract_coefficients()
+        racoeffs, deccoeffs = self.extract_coefficients()
         ra_offset = self.model_fn(pos.ra, pos.dec, racoeffs)
         dec_offset = self.model_fn(pos.ra, pos.dec, deccoeffs)
         ra = pos.ra - ra_offset
         dec = pos.dec - dec_offset
 
         return SkyCoord(ra=ra, dec=dec, frame=pos.frame)
-    
+
     def calculate_statistics(self, positions: SkyCoord):
         new_positions = self.predict(positions)
         ra_residuals = (new_positions.ra - positions.ra).to(u.arcsec)

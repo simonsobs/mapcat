@@ -55,8 +55,7 @@ def test_make_constant_pointing_model():
     assert model.ra_offset == 0.5 * u.deg
     assert model.dec_offset == 0.5 * u.deg
 
-    og_pos = SkyCoord(ra=10 * u.deg, dec=20 * u.deg
-                      )
+    og_pos = SkyCoord(ra=10 * u.deg, dec=20 * u.deg)
     offset_pos = SkyCoord(og_pos.ra + model.ra_offset, og_pos.dec + model.dec_offset)
     new_pos = model.predict(offset_pos)
     assert new_pos.ra == og_pos.ra
@@ -71,18 +70,32 @@ def test_make_polynomial_pointing_model():
     slope = 0.1 * u.arcmin / u.deg
 
     offset_positions = SkyCoord(
-            ra=ras + offset + slope * ras, dec=decs + offset + slope * decs
-        )
-    model.build_model(measured_positions=offset_positions, expected_positions=SkyCoord(ras, decs))
+        ra=ras + offset + slope * ras, dec=decs + offset + slope * decs
+    )
+    model.build_model(
+        measured_positions=offset_positions, expected_positions=SkyCoord(ras, decs)
+    )
 
     assert model.ra_model_coefficients is not None
     assert model.dec_model_coefficients is not None
 
     for i, offset_pos in enumerate(offset_positions):
         predicted_pos = model.predict(offset_pos)
-        assert np.isclose(predicted_pos.ra.to_value(u.arcmin), ras[i].to_value(u.arcmin), atol=0.1)
-        assert np.isclose(predicted_pos.dec.to_value(u.arcmin), decs[i].to_value(u.arcmin), atol=0.1)
+        assert np.isclose(
+            predicted_pos.ra.to_value(u.arcmin), ras[i].to_value(u.arcmin), atol=0.1
+        )
+        assert np.isclose(
+            predicted_pos.dec.to_value(u.arcmin), decs[i].to_value(u.arcmin), atol=0.1
+        )
 
     predicted_pos = model.predict(offset_positions)
-    assert np.all(np.isclose(predicted_pos.ra.to_value(u.arcmin), ras.to_value(u.arcmin), atol=0.1))
-    assert np.all(np.isclose(predicted_pos.dec.to_value(u.arcmin), decs.to_value(u.arcmin), atol=0.1))
+    assert np.all(
+        np.isclose(
+            predicted_pos.ra.to_value(u.arcmin), ras.to_value(u.arcmin), atol=0.1
+        )
+    )
+    assert np.all(
+        np.isclose(
+            predicted_pos.dec.to_value(u.arcmin), decs.to_value(u.arcmin), atol=0.1
+        )
+    )

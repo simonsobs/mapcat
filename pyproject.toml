@@ -10,6 +10,7 @@ name = "mapcat"
 version = "0.2.2"
 requires-python = ">=3.10"
 dependencies = [
+    "astropydantic",
     "sqlmodel",
     "sqlalchemy[asyncio]",
     "aiosqlite",

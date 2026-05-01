@@ -4,6 +4,7 @@ A custom SQLAlchemy type to (de)serialize pydantic models to JSONB.
 See: https://github.com/fastapi/sqlmodel/pull/1324 - this can be removed at some point.
 """
 
+from pydantic import TypeAdapter
 from sqlalchemy.types import JSON, TypeDecorator
 
 
@@ -14,6 +15,7 @@ class JSONEncodedPydantic(TypeDecorator):
     def __init__(self, pydantic_class, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.pydantic_class = pydantic_class
+        self._adapter = TypeAdapter(pydantic_class)
 
     def process_bind_param(self, value, dialect):
         if value is None:
@@ -23,4 +25,4 @@ class JSONEncodedPydantic(TypeDecorator):
     def process_result_value(self, value, dialect):
         if value is None:
             return None
-        return self.pydantic_class.model_validate(value)
+        return self._adapter.validate_python(value)

@@ -103,12 +103,12 @@ class PolynomialPointingModel(PointingModelProtocol):
 
         ra_weights = np.asarray(ra_weights)
         dec_weights = np.asarray(dec_weights)
-        assert len(ra_weights) == n, (
-            "Length of ra_weights must match number of positions"
-        )
-        assert len(dec_weights) == n, (
-            "Length of dec_weights must match number of positions"
-        )
+        assert (
+            len(ra_weights) == n
+        ), "Length of ra_weights must match number of positions"
+        assert (
+            len(dec_weights) == n
+        ), "Length of dec_weights must match number of positions"
 
         ras = measured_positions.ra.to_value(u.deg)
         decs = measured_positions.dec.to_value(u.deg)

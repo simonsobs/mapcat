@@ -6,7 +6,7 @@ from mapcat.database import DepthOneMapTable
 from mapcat.toolkit.update_sky_coverage import dec_to_index, ra_to_index
 
 
-def get_maps_by_coverage(
+def _get_maps_by_coverage(
     position: ICRS,
     session: Session,
 ) -> list[DepthOneMapTable]:
@@ -50,3 +50,33 @@ def get_maps_by_coverage(
     )
 
     return session.execute(stmt).scalars().all()
+
+
+def get_maps_by_coverage(
+    position: list[ICRS] | ICRS,
+    session: Session,
+) -> list[list[DepthOneMapTable]] | list[DepthOneMapTable]:
+    """
+    Get the depth one maps that cover a given position.
+
+    Parameters
+    ----------
+    position : list[ICRS] | ICRS
+        The position to query for coverage. Should be in ICRS coordinates.
+    session : Session
+        The database session to use for the query.
+
+    Returns
+    -------
+    list[list[DepthOneMapTable]] | list[DepthOneMapTable]
+        A list of depth one maps that cover the given position.
+
+    Raises
+    ------
+    ValueError
+        If the RA or Dec of the position is out of bounds.
+    """
+    if isinstance(position, list):
+        return [_get_maps_by_coverage(p, session) for p in position]
+    else:
+        return _get_maps_by_coverage(position, session)

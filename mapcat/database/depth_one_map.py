@@ -27,7 +27,7 @@ class DepthOneMapTable(SQLModel, table=True):
         Unique map identifiers. Internal to SO
     map_name : str
         Name of depth 1 map
-    map_path : str
+    map_path : str | None
         Non-localized path to intensity map
     ivar_path : str | None
         Non-localized path to inverse-variance map
@@ -35,6 +35,10 @@ class DepthOneMapTable(SQLModel, table=True):
         Non-localized path to the match-filtered 'rho' map
     kappa_path: str | None
         Non-localized path to the match-filtered 'kappa' map
+    flux_map: str | None
+        Non-localized path to the flux map.
+    snr_map: str | None
+        Non-localized path to the signal-to-noise map.
     start_time_path : str
         Non-localized path to the start time map. Each pixel represents
         the earliest time the pixel was observed.
@@ -76,10 +80,12 @@ class DepthOneMapTable(SQLModel, table=True):
     map_id: int = Field(primary_key=True)
     map_name: str = Field(index=True, unique=True, nullable=False)
 
-    map_path: str
-    ivar_path: str | None
+    map_path: str | None = None
+    ivar_path: str | None = None
     rho_path: str | None = None
     kappa_path: str | None = None
+    flux_map: str | None = None
+    snr_map: str | None = None
 
     start_time_path: str | None = None
     mean_time_path: str | None
@@ -116,3 +122,27 @@ class DepthOneMapTable(SQLModel, table=True):
         link_model=DepthOneToCoaddTable,
     )
     notes: dict[str, Any] | None = Field(default=None, sa_type=JSON)
+
+    @property
+    def coverage_path(self) -> str:
+        """
+        Return a path to a map that can be used for coverage checking.
+        This is required because we generally use the intensity map for
+        coverage checking but it is not always available. We return the
+        first available of: intensity, rho, flux.
+
+        Raises
+        ------
+        ValueError
+            If no coverage-compatible map path is available.
+        """
+
+        if self.map_path is not None:
+            return self.map_path
+        if self.rho_path is not None:
+            return self.rho_path
+        if self.flux_map is not None:
+            return self.flux_map
+        raise ValueError(
+            f"No coverage map available for map {self.map_name} (id {self.map_id})"
+        )

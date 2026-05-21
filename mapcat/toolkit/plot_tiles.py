@@ -53,7 +53,7 @@ plt.xlabel("RA (degrees)")
 plt.ylabel("Dec (degrees)")
 
 d1map = enmap.read_map(str(d1map_path))
-coverage_tiles = get_sky_coverage(d1map)
+coverage_tiles = get_sky_coverage(d1map, convention="ACT")
 
 d1box = d1map.box()
 

@@ -54,6 +54,8 @@ def parse_filenames(base: str, relative_to: Path) -> dict[str, str]:
         "time": Path(base + "_time.fits"),
         "rho": Path(base + "_rho.fits"),
         "kappa": Path(base + "_kappa.fits"),
+        "flux": Path(base + "_flux.fits"),
+        "snr": Path(base + "_snr.fits"),
     }
 
     # In case e.g. there is no inverse-variance map.

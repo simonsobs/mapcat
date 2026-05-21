@@ -35,9 +35,9 @@ class DepthOneMapTable(SQLModel, table=True):
         Non-localized path to the match-filtered 'rho' map
     kappa_path: str | None
         Non-localized path to the match-filtered 'kappa' map
-    flux_map: str | None
+    flux_path: str | None
         Non-localized path to the flux map.
-    snr_map: str | None
+    snr_path: str | None
         Non-localized path to the signal-to-noise map.
     start_time_path : str
         Non-localized path to the start time map. Each pixel represents
@@ -84,8 +84,8 @@ class DepthOneMapTable(SQLModel, table=True):
     ivar_path: str | None = None
     rho_path: str | None = None
     kappa_path: str | None = None
-    flux_map: str | None = None
-    snr_map: str | None = None
+    flux_path: str | None = None
+    snr_path: str | None = None
 
     start_time_path: str | None = None
     mean_time_path: str | None
@@ -141,8 +141,8 @@ class DepthOneMapTable(SQLModel, table=True):
             return self.map_path
         if self.rho_path is not None:
             return self.rho_path
-        if self.flux_map is not None:
-            return self.flux_map
+        if self.flux_path is not None:
+            return self.flux_path
         raise ValueError(
             f"No coverage map available for map {self.map_name} (id {self.map_id})"
         )

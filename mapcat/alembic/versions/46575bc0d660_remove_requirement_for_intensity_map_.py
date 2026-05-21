@@ -20,13 +20,13 @@ depends_on: str | Sequence[str] | None = None
 
 def upgrade() -> None:
     with op.batch_alter_table("depth_one_maps") as batch_op:
-        batch_op.add_column(sa.Column("flux_map", sa.String(), nullable=True))
-        batch_op.add_column(sa.Column("snr_map", sa.String(), nullable=True))
+        batch_op.add_column(sa.Column("flux_path", sa.String(), nullable=True))
+        batch_op.add_column(sa.Column("snr_path", sa.String(), nullable=True))
         batch_op.alter_column("map_path", existing_type=sa.String(), nullable=True)
 
 
 def downgrade() -> None:
     with op.batch_alter_table("depth_one_maps") as batch_op:
-        batch_op.drop_column("flux_map")
-        batch_op.drop_column("snr_map")
+        batch_op.drop_column("flux_path")
+        batch_op.drop_column("snr_path")
         batch_op.alter_column("map_path", existing_type=sa.String(), nullable=False)

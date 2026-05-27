@@ -235,7 +235,7 @@ def test_sky_coverage(database_sessionmaker, downloaded_data_file):
     )
     act.core(session=database_sessionmaker, args=args)
 
-    update_sky_coverage.core(session=database_sessionmaker)
+    update_sky_coverage.core(session=database_sessionmaker, convention="ACT")
     with database_sessionmaker() as session:
         d1maps = session.query(DepthOneMapTable).all()
         for d1map in d1maps:
@@ -268,7 +268,7 @@ def test_sky_coverage_2(database_sessionmaker, downloaded_data_file):
 
     act.core(session=database_sessionmaker, args=args)
 
-    update_sky_coverage.core(session=database_sessionmaker)
+    update_sky_coverage.core(session=database_sessionmaker, convention="ACT")
 
     d1maps = act.glob(args.glob, args.relative_to, args.telescope)
     with database_sessionmaker() as session:
@@ -292,7 +292,9 @@ def test_sky_coverage_2(database_sessionmaker, downloaded_data_file):
         return_d1map = get_maps_by_coverage(coord, session)
         assert len(return_d1map) == 0
 
-        coord2 = ICRS(180 * u.rad, 0 * u.rad)  # Test a point on the opposite side of the sky
+        coord2 = ICRS(
+            180 * u.rad, 0 * u.rad
+        )  # Test a point on the opposite side of the sky
         return_d1map_list = get_maps_by_coverage([coord, coord2], session)
         assert len(return_d1map_list) == 2
 

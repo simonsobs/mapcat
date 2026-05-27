@@ -107,7 +107,7 @@ def _ra_to_index_pixell(ra: float) -> int:
     return int(np.floor(ra / 10)) + 18
 
 
-def get_sky_coverage(tmap: enmap.ndmap) -> list:
+def get_sky_coverage(tmap: enmap.ndmap, convention: str = "standard") -> list:
     """
     Given the time map of a depth1 map, return the list
     of sky coverage tiles that cover that map
@@ -116,12 +116,22 @@ def get_sky_coverage(tmap: enmap.ndmap) -> list:
     ----------
     tmap : enmap.enmap
         The time map of the depth-one map. Pixels that were observed have non-zero values.
+    convention : str, optional
+        The coordinate convention to use. Default is "standard", corresponding to 0 < ra < 360.
+        If ACT is specified, the convention is -180 < ra < 180.
 
     Returns
     -------
     tiles : list
         A list of sky coverage tiles that cover the map
+
+    Raises
+    --------
+    ValueError
+        If the convention is not 'standard' or 'ACT'.
     """
+    if convention not in ["standard", "ACT"]:
+        raise ValueError("Invalid convention. Must be 'standard' or 'ACT'.")
     box = tmap.box()
 
     dec_min, ra_max = np.rad2deg(box[0])
@@ -131,8 +141,9 @@ def get_sky_coverage(tmap: enmap.ndmap) -> list:
     dec_max = np.ceil(dec_max / 10) * 10
     ra_min = np.floor(ra_min / 10) * 10
     ra_max = np.ceil(ra_max / 10) * 10
-    ra_min += 180  # Convert from pixel standard to normal RA convention
-    ra_max += 180
+    if convention == "ACT":
+        ra_min += 180  # Convert from pixel standard to normal RA convention
+        ra_max += 180
 
     ras = np.arange(ra_min, ra_max, 10)
     decs = np.arange(dec_min, dec_max, 10)
@@ -145,7 +156,8 @@ def get_sky_coverage(tmap: enmap.ndmap) -> list:
             ra_id = ra_to_index(ra)
             dec_id = dec_to_index(dec)
             skybox = index_to_skybox(ra_id, dec_id)
-            skybox[..., 1] -= np.pi  # Convert from standard RA to pixell convention
+            if convention == "ACT":
+                skybox[..., 1] -= np.pi  # Convert from standard RA to pixell convention
             submap = enmap.submap(tmap, skybox)
             if np.any(submap):
                 ra_idx.append(ra_id)
@@ -154,7 +166,9 @@ def get_sky_coverage(tmap: enmap.ndmap) -> list:
     return list(zip(ra_idx, dec_idx))
 
 
-def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
+def coverage_from_depthone(
+    d1table: DepthOneMapTable, convention: str = "standard"
+) -> list[SkyCoverageTable]:
     """
     Get the list of sky coverage tiles that cover a given depth one map
 
@@ -162,6 +176,9 @@ def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
     ----------
     d1map : DepthOneMapTable
         The depth one map to get the sky coverage for
+    convention : str, optional
+        The coordinate convention to use. Default is "standard", corresponding to 0 < ra < 360.
+        If ACT is specified, the convention is -180 < ra < 180.
 
     Returns
     -------
@@ -171,7 +188,7 @@ def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
     tmap_path = resolve_tmap(d1table)
     tmap = enmap.read_map(str(tmap_path))
 
-    coverage_tiles = get_sky_coverage(tmap)
+    coverage_tiles = get_sky_coverage(tmap, convention=convention)
 
     return [
         SkyCoverageTable(x=tile[0], y=tile[1], map_id=d1table.map_id)
@@ -179,7 +196,7 @@ def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
     ]
 
 
-def core(session):
+def core(session, convention: str = "standard"):
     """
     Core function for updating the sky coverage table. For each depth one map that does not have any associated sky coverage tiles, compute the sky coverage tiles and add them to the database.
 
@@ -187,6 +204,9 @@ def core(session):
     ----------
     session : sessionmaker
         A SQLAlchemy sessionmaker to use for database access.
+    convention : str, optional
+        The coordinate convention to use. Default is "standard", corresponding to 0 < ra < 360.
+        If ACT is specified, the convention is -180 < ra < 180.
     """
     with session() as cur_session:
         d1maps = (
@@ -198,7 +218,7 @@ def core(session):
             .all()
         )
         for d1map in d1maps:
-            SkyCov = coverage_from_depthone(d1map)
+            SkyCov = coverage_from_depthone(d1map, convention=convention)
             cur_session.add_all(SkyCov)
 
         cur_session.commit()

@@ -18,8 +18,10 @@ from .links import AtomicMapToCoaddTable, CoaddMapToCoaddTable  # pragma: no cov
 
 class AtomicMapCoadd(SQLModel):
     coadd_id: uuid.UUID
+
     coadd_name: str
     prefix_path: str
+
     platform: str
     interval: str
     start_time: AstroPydanticTime

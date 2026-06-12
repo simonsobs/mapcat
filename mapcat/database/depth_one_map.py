@@ -2,8 +2,12 @@
 Depth one map table.
 """
 
+import uuid
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
+from astropy.time import Time
+from astropydantic import AstroPydanticTime
 from sqlmodel import JSON, Field, Relationship, SQLModel
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -17,13 +21,35 @@ if TYPE_CHECKING:  # pragma: no cover
 from .links import DepthOneToCoaddTable, TODToMapTable
 
 
+class DepthOneMap(SQLModel):
+    map_id: uuid.UUID
+    map_name: str
+
+    map_path: str | None
+    ivar_path: str | None
+    rho_path: str | None
+    kappa_path: str | None
+    flux_path: str | None
+    snr_path: str | None
+
+    start_time_path: str | None
+    mean_time_path: str | None
+    end_time_path: str | None
+
+    tube_slot: str
+    frequency: str
+    ctime: AstroPydanticTime
+    start_time: AstroPydanticTime
+    stop_time: AstroPydanticTime
+
+
 class DepthOneMapTable(SQLModel, table=True):
     """
     A depth-1 map.
 
     Attributes
     ----------
-    id : int
+    id : uuid.UUID
         Unique map identifiers. Internal to SO
     map_name : str
         Name of depth 1 map
@@ -54,11 +80,11 @@ class DepthOneMapTable(SQLModel, table=True):
         Standardized names of wafers used in this map
     frequency : str
         Frequency channel of map
-    ctime : float
+    ctime : datetime
         Mean unix time of map
-    start_time : float
+    start_time : datetime
         Start unix time of map
-    stop_time : float
+    stop_time : datetime
         Stop unix time of map
     processing_status : list[TimeDomainProcessingTable]
         List of processing status tables associated with d1 map
@@ -77,7 +103,7 @@ class DepthOneMapTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_maps"
 
-    map_id: int = Field(primary_key=True)
+    map_id: uuid.UUID = Field(default_factory=uuid.uuid7, primary_key=True)
     map_name: str = Field(index=True, unique=True, nullable=False)
 
     map_path: str | None = None
@@ -93,9 +119,9 @@ class DepthOneMapTable(SQLModel, table=True):
 
     tube_slot: str = Field(index=True, nullable=False)
     frequency: str = Field(index=True, nullable=False)
-    ctime: float = Field(index=True, nullable=False)
-    start_time: float = Field(index=True, nullable=False)
-    stop_time: float = Field(index=True, nullable=False)
+    ctime: datetime = Field(index=True, nullable=False)
+    start_time: datetime = Field(index=True, nullable=False)
+    stop_time: datetime = Field(index=True, nullable=False)
 
     processing_status: list["TimeDomainProcessingTable"] = Relationship(
         back_populates="map",
@@ -145,4 +171,32 @@ class DepthOneMapTable(SQLModel, table=True):
             return self.flux_path
         raise ValueError(
             f"No coverage map available for map {self.map_name} (id {self.map_id})"
+        )
+
+    def to_model(self) -> DepthOneMap:
+        """
+        Return an DepthOneMap model from this table entry.
+
+        Returns
+        -------
+        DepthOneMap : DepthOneMap
+             The DepthOneMap model corresponding to this table entry.
+        """
+        return DepthOneMap(
+            map_id=self.map_id,
+            map_name=self.map_name,
+            map_path=self.map_path,
+            ivar_path=self.ivar_path,
+            rho_path=self.rho_path,
+            kappa_path=self.kappa_path,
+            flux_path=self.flux_path,
+            snr_path=self.snr_path,
+            start_time_path=self.start_time_path,
+            mean_time_path=self.mean_time_path,
+            end_time_path=self.end_time_path,
+            tube_slot=self.tube_slot,
+            frequency=self.frequency,
+            ctime=Time(self.ctime),
+            start_time=Time(self.start_time),
+            stop_time=Time(self.stop_time),
         )

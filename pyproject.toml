@@ -7,8 +7,8 @@ mapcat = ["alembic/*", "alembic.ini", "alembic/versions/*"]
 
 [project]
 name = "mapcat"
-version = "0.3.1"
-requires-python = ">=3.10"
+version = "0.3.2"
+requires-python = ">=3.11"
 dependencies = [
     "astropydantic",
     "sqlmodel",
@@ -22,6 +22,7 @@ dependencies = [
 
 [project.scripts]
 actingest = "mapcat.toolkit.act:main"
+sptingest = "mapcat.toolkit.spt:main
 mapcatmigrate = "mapcat.helper:migrate"
 updatesky = "mapcat.toolkit.update_sky_coverage:main"
 mapcatreset = "mapcat.toolkit.reset:main"

@@ -2,6 +2,8 @@
 Link tables.
 """
 
+import uuid
+
 from sqlmodel import Field, SQLModel
 
 
@@ -12,14 +14,14 @@ class DepthOneToCoaddTable(SQLModel, table=True):
 
     __tablename__ = "link_depth_one_map_to_coadd"
 
-    map_id: int = Field(
+    map_id: uuid.UUID = Field(
         foreign_key="depth_one_maps.map_id",
         primary_key=True,
         nullable=False,
         index=True,
         ondelete="CASCADE",
     )
-    coadd_id: int = Field(
+    coadd_id: uuid.UUID = Field(
         foreign_key="depth_one_coadds.coadd_id",
         primary_key=True,
         nullable=False,
@@ -35,14 +37,14 @@ class TODToMapTable(SQLModel, table=True):
 
     __tablename__ = "link_tod_to_depth_one_map"
 
-    tod_id: int = Field(
+    tod_id: uuid.UUID = Field(
         foreign_key="tod_depth_one.tod_id",
         primary_key=True,
         nullable=False,
         index=True,
         ondelete="CASCADE",
     )
-    map_id: int = Field(
+    map_id: uuid.UUID = Field(
         foreign_key="depth_one_maps.map_id",
         primary_key=True,
         nullable=False,
@@ -58,7 +60,7 @@ class AtomicMapToCoaddTable(SQLModel, table=True):
 
     __tablename__ = "link_atomic_map_to_coadd"
 
-    atomic_map_id: int = Field(
+    atomic_map_id: uuid.UUID = Field(
         foreign_key="atomic_maps.atomic_map_id",
         primary_key=True,
         nullable=False,
@@ -66,7 +68,7 @@ class AtomicMapToCoaddTable(SQLModel, table=True):
         ondelete="CASCADE",
     )
 
-    coadd_id: int = Field(
+    coadd_id: uuid.UUID = Field(
         foreign_key="atomic_map_coadds.coadd_id",
         primary_key=True,
         nullable=False,
@@ -82,7 +84,7 @@ class CoaddMapToCoaddTable(SQLModel, table=True):
 
     __tablename__ = "link_coadd_map_to_coadd"
 
-    parent_coadd_id: int = Field(
+    parent_coadd_id: uuid.UUID = Field(
         foreign_key="atomic_map_coadds.coadd_id",
         primary_key=True,
         nullable=False,
@@ -90,7 +92,7 @@ class CoaddMapToCoaddTable(SQLModel, table=True):
         ondelete="CASCADE",
     )
 
-    child_coadd_id: int = Field(
+    child_coadd_id: uuid.UUID = Field(
         foreign_key="atomic_map_coadds.coadd_id",
         primary_key=True,
         nullable=False,

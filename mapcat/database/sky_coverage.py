@@ -2,6 +2,8 @@
 Sky coverage table.
 """
 
+import uuid
+
 from sqlalchemy import PrimaryKeyConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -19,7 +21,7 @@ class SkyCoverageTable(SQLModel, table=True):
         Composite ID from map_id, x, and y
     map : DepthOneMapTable
        Depth 1 map being tracked. Foreign into DepthOneMap
-    map_id : int
+    map_id : uuid.UUID
        ID of depth 1 map being tracked
     x : int
         x-index of coverage patch. x=0 runs from RA 0 to 10,, etc.
@@ -32,7 +34,7 @@ class SkyCoverageTable(SQLModel, table=True):
     x: int = Field(index=True, primary_key=True)
     y: int = Field(index=True, primary_key=True)
 
-    map_id: int = Field(
+    map_id: uuid.UUID = Field(
         foreign_key="depth_one_maps.map_id",
         nullable=False,
         ondelete="CASCADE",

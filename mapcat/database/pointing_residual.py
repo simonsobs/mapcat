@@ -2,6 +2,8 @@
 Table containing pointing residuals.
 """
 
+import uuid
+
 from sqlmodel import Field, Relationship, SQLModel
 
 from mapcat.pointing.base import PointingModelStats
@@ -22,7 +24,7 @@ class PointingResidualTable(SQLModel, table=True):
 
     Attributes
     ----------
-    map_id : int
+    map_id : uuid.UUID
         Internal ID of the depth one map
     residual_model: ConstantPointingModel | PolynomialPointingModel
         The pointing model to actually store in the database.
@@ -31,9 +33,11 @@ class PointingResidualTable(SQLModel, table=True):
     """
 
     __tablename__ = "depth_one_pointing_residuals"
-    pointing_residual_id: int = Field(primary_key=True)
+    pointing_residual_id: uuid.UUID = Field(
+        default_factory=uuid.uuid7, primary_key=True
+    )
 
-    map_id: int = Field(
+    map_id: uuid.UUID = Field(
         index=True,
         nullable=False,
         foreign_key="depth_one_maps.map_id",

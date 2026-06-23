@@ -2,6 +2,7 @@
 Information on the map making pipeline run.
 """
 
+import uuid
 from typing import Any
 
 from sqlmodel import JSON, Field, Relationship, SQLModel
@@ -15,7 +16,7 @@ class PipelineInformationTable(SQLModel, table=True):
 
     Attributes
     ----------
-    id : str
+    id : uuid.UUID
         Internal ID of the pipeline info
     map_name : str
         Name of depth 1 map being tracked. Foreign into DepthOneMap
@@ -29,8 +30,10 @@ class PipelineInformationTable(SQLModel, table=True):
 
     __tablename__ = "pipeline_information"
 
-    pipeline_information_id: int = Field(primary_key=True)
-    map_id: int = Field(foreign_key="depth_one_maps.map_id", nullable=False)
+    pipeline_information_id: uuid.UUID = Field(
+        default_factory=uuid.uuid7, primary_key=True
+    )
+    map_id: uuid.UUID = Field(foreign_key="depth_one_maps.map_id", nullable=False)
     map: DepthOneMapTable = Relationship(back_populates="pipeline_information")
 
     sotodlib_version: str

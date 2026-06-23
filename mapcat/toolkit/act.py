@@ -3,6 +3,7 @@ Create objects from an ACT depth 1 map file.
 """
 
 import argparse as ap
+import datetime
 from pathlib import Path
 
 import h5py
@@ -70,7 +71,7 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         TODDepthOneTable(
             obs_id=obs_id,
             pwv=None,
-            ctime=float(obs_id[4:14]),
+            ctime=datetime.fromtimestamp(float(obs_id[4:14])),
             telescope=telescope,
             tube_slot=file_info["tube_slot"],
             frequency=file_info["frequency"],
@@ -87,9 +88,9 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         mean_time_path=filenames.get("time"),
         tube_slot=file_info["tube_slot"],
         frequency=file_info["frequency"],
-        ctime=file_info["ctime"],
-        start_time=file_info["start_time"],
-        stop_time=file_info["stop_time"],
+        ctime=datetime.fromtimestamp(file_info["ctime"]),
+        start_time=datetime.fromtimestamp(file_info["start_time"]),
+        stop_time=datetime.fromtimestamp(file_info["stop_time"]),
         tods=tods,
     )
 

@@ -102,9 +102,13 @@ def core(session: sessionmaker, args: ap.Namespace):
                     PointingResidualTable.map_id == DepthOneMapTable.map_id,
                 )
                 if args.start_time is not None:
-                    pr_stmt = pr_stmt.where(DepthOneMapTable.ctime >= args.start_time)
+                    pr_stmt = pr_stmt.where(
+                        DepthOneMapTable.ctime.timestamp() >= args.start_time
+                    )
                 if args.end_time is not None:
-                    pr_stmt = pr_stmt.where(DepthOneMapTable.ctime <= args.end_time)
+                    pr_stmt = pr_stmt.where(
+                        DepthOneMapTable.ctime.timestamp() <= args.end_time
+                    )
 
             pointing_residuals = cur_session.execute(pr_stmt).scalars().all()
             for pr in pointing_residuals:

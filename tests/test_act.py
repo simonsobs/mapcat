@@ -218,7 +218,7 @@ def test_act(database_sessionmaker, downloaded_data_file):
         for map in maps:
             assert map.tube_slot in ["pa4", "pa6"]
             assert map.frequency == "f150"
-            assert map.ctime in [1505603190, 1505646390]
+            assert int(map.ctime.timestamp()) in [1505603190, 1505646390]
 
             # Clean up, otherewise we interfere with test_sky_coverage
             session.delete(map)
@@ -248,7 +248,7 @@ def test_sky_coverage(database_sessionmaker, downloaded_data_file):
                         cov.x
                     ),  # These should be ints, idk why I have to cast them (from str)
                     int(cov.y),
-                ) in cov_mapping[str(d1map.ctime)]
+                ) in cov_mapping[str(d1map.ctime.timestamp())]
 
     with database_sessionmaker() as session:
         maps = session.query(DepthOneMapTable).all()

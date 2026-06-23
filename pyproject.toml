@@ -22,7 +22,7 @@ dependencies = [
 
 [project.scripts]
 actingest = "mapcat.toolkit.act:main"
-sptingest = "mapcat.toolkit.spt:main
+sptingest = "mapcat.toolkit.spt:main"
 mapcatmigrate = "mapcat.helper:migrate"
 updatesky = "mapcat.toolkit.update_sky_coverage:main"
 mapcatreset = "mapcat.toolkit.reset:main"

@@ -23,7 +23,7 @@ def create_objects(base: str, relative_to: Path) -> DepthOneMapTable:
     end_time = start_time + 2* 3600 # assume a 2 hour observation for now
     return DepthOneMapTable(
         map_name=base,
-        map_path=Path(base + "_tonly.g3.gz"),
+        map_path=base + "_tonly.g3.gz",
         tube_slot='all',
         frequency=band,
         ctime=start_time,

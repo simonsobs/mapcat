@@ -2,6 +2,8 @@
 Test the core functions
 """
 
+from datetime import UTC, datetime
+
 import pytest
 from astropy import units as u
 from sqlalchemy import create_engine
@@ -70,9 +72,9 @@ def test_create_depth_one(database_sessionmaker):
             map_path="/PATH/TO/DEPTH/ONE",
             tube_slot="OTi1",
             frequency="f090",
-            ctime=1755787524.0,
-            start_time=1755687524.0,
-            stop_time=1755887524.0,
+            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
         )
 
         session.add(data)
@@ -90,13 +92,13 @@ def test_create_depth_one(database_sessionmaker):
     assert dmap.map_path == "/PATH/TO/DEPTH/ONE"
     assert dmap.tube_slot == "OTi1"
     assert dmap.frequency == "f090"
-    assert dmap.ctime == 1755787524.0
+    assert dmap.ctime.unix == 1755787524.0
 
     # Make child tables
     with database_sessionmaker() as session:
         processing_status = TimeDomainProcessingTable(
-            processing_start=1756787524.0,
-            processing_end=1756797524.0,
+            processing_start=datetime.fromtimestamp(1756787524.0, tz=UTC),
+            processing_end=datetime.fromtimestamp(1756797524.0, tz=UTC),
             processing_status="done",
             map_id=map_id,
         )
@@ -111,9 +113,9 @@ def test_create_depth_one(database_sessionmaker):
         tod = TODDepthOneTable(
             obs_id="obs_1753486724_lati6_111",
             pwv=0.7,
-            ctime=1755787524.0,
-            start_time=1755687524.0,
-            stop_time=1755887524.0,
+            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
             nsamples=28562,
             telescope="lat",
             telescope_flavor="lat",
@@ -169,8 +171,8 @@ def test_create_depth_one(database_sessionmaker):
 
     assert proc.processing_status_id == proc_id
     assert proc.map_id == map_id
-    assert proc.processing_start == 1756787524.0
-    assert proc.processing_end == 1756797524.0
+    assert proc.processing_start.unix == 1756787524.0
+    assert proc.processing_end.unix == 1756797524.0
     assert proc.processing_status == "done"
 
     assert point.pointing_residual_id == point_id
@@ -181,9 +183,9 @@ def test_create_depth_one(database_sessionmaker):
     assert tod.tod_id == tod_id
     assert tod.pwv == 0.7
     assert tod.obs_id == "obs_1753486724_lati6_111"
-    assert tod.ctime == 1755787524.0
-    assert tod.start_time == 1755687524.0
-    assert tod.stop_time == 1755887524.0
+    assert tod.ctime.unix == 1755787524.0
+    assert tod.start_time.unix == 1755687524.0
+    assert tod.stop_time.unix == 1755887524.0
     assert tod.nsamples == 28562
     assert tod.telescope == "lat"
     assert tod.telescope_flavor == "lat"
@@ -228,14 +230,14 @@ def test_add_remove_child_tables(database_sessionmaker):
             map_path="/PATH/TO/DEPTH/ONE2",
             tube_slot="OTi1",
             frequency="f090",
-            ctime=1755787524.0,
-            start_time=1755687524.0,
-            stop_time=1755887524.0,
+            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
         )
 
         processing_status = TimeDomainProcessingTable(
-            processing_start=1756787524.0,
-            processing_end=1756797524.0,
+            processing_start=datetime.fromtimestamp(1756787524.0, tz=UTC),
+            processing_end=datetime.fromtimestamp(1756797524.0, tz=UTC),
             processing_status="done",
             map=dmap,
         )
@@ -250,9 +252,9 @@ def test_add_remove_child_tables(database_sessionmaker):
         tod = TODDepthOneTable(
             obs_id="obs_1753486724_lati6_111",
             pwv=0.7,
-            ctime=1755787524.0,
-            start_time=1755687524.0,
-            stop_time=1755887524.0,
+            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
             nsamples=28562,
             telescope="lat",
             telescope_flavor="lat",
@@ -345,8 +347,8 @@ def test_create_atomic_map_coadd(database_sessionmaker):
             prefix_path="/PATH/TO/DAILY/COADD",
             platform="satp3",
             interval="daily",
-            start_time=1755604800.0,
-            stop_time=1755691200.0,
+            start_time=datetime.fromtimestamp(1755604800.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1755691200.0, tz=UTC),
             freq_channel="f090",
             geom_file_path="/PATH/TO/GEOM/FILE",
             split_label="full",
@@ -367,8 +369,8 @@ def test_create_atomic_map_coadd(database_sessionmaker):
     assert cmap.prefix_path == "/PATH/TO/DAILY/COADD"
     assert cmap.platform == "satp3"
     assert cmap.interval == "daily"
-    assert cmap.start_time == 1755604800.0
-    assert cmap.stop_time == 1755691200.0
+    assert cmap.start_time.unix == 1755604800.0
+    assert cmap.stop_time.unix == 1755691200.0
     assert cmap.freq_channel == "f090"
     assert cmap.geom_file_path == "/PATH/TO/GEOM/FILE"
     assert cmap.split_label == "full"
@@ -380,7 +382,7 @@ def test_create_atomic_map_coadd(database_sessionmaker):
             telescope="satp3",
             freq_channel="f090",
             wafer="ws0",
-            ctime=1755643932,
+            ctime=datetime.fromtimestamp(1755643932, tz=UTC),
             split_label="full",
             map_path=None,
             ivar_path=None,
@@ -431,7 +433,7 @@ def test_create_atomic_map_coadd(database_sessionmaker):
     assert atomic.telescope == "satp3"
     assert atomic.freq_channel == "f090"
     assert atomic.wafer == "ws0"
-    assert atomic.ctime == 1755643932
+    assert atomic.ctime.unix == 1755643932
     assert atomic.split_label == "full"
     assert atomic.map_path is None
     assert atomic.ivar_path is None
@@ -474,8 +476,8 @@ def test_create_atomic_map_coadd(database_sessionmaker):
             prefix_path="/PATH/TO/WEEKLY/COADD",
             platform="satp3",
             interval="weekly",
-            start_time=1755432000.0,
-            stop_time=1756036800.0,
+            start_time=datetime.fromtimestamp(1755432000.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1756036800.0, tz=UTC),
             freq_channel="f090",
             geom_file_path="/PATH/TO/GEOM/FILE",
             split_label="full",
@@ -518,8 +520,8 @@ def test_add_remove_atomic_map_coadd(database_sessionmaker):
             prefix_path="/PATH/TO/DAILY/COADD",
             platform="satp3",
             interval="daily",
-            start_time=1755604800.0,
-            stop_time=1755691200.0,
+            start_time=datetime.fromtimestamp(1755604800.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1755691200.0, tz=UTC),
             freq_channel="f090",
             geom_file_path="/PATH/TO/GEOM/FILE",
             split_label="full",
@@ -530,8 +532,8 @@ def test_add_remove_atomic_map_coadd(database_sessionmaker):
             prefix_path="/PATH/TO/WEEKLY/COADD",
             platform="satp3",
             interval="weekly",
-            start_time=1755432000.0,
-            stop_time=1756036800.0,
+            start_time=datetime.fromtimestamp(1755432000.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1756036800.0, tz=UTC),
             freq_channel="f090",
             geom_file_path="/PATH/TO/GEOM/FILE",
             split_label="full",
@@ -567,8 +569,8 @@ def test_add_remove_atomic_map_coadd(database_sessionmaker):
             prefix_path="/PATH/TO/WEEKLY/COADD",
             platform="satp3",
             interval="weekly",
-            start_time=1755432000.0,
-            stop_time=1756036800.0,
+            start_time=datetime.fromtimestamp(1755432000.0, tz=UTC),
+            stop_time=datetime.fromtimestamp(1756036800.0, tz=UTC),
             freq_channel="f090",
             geom_file_path="/PATH/TO/GEOM/FILE",
             split_label="full",

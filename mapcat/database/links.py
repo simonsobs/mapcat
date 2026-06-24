@@ -2,8 +2,7 @@
 Link tables.
 """
 
-import uuid
-
+import uuid7 as uuid
 from sqlmodel import Field, SQLModel
 
 

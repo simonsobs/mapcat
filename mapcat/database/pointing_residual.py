@@ -2,8 +2,7 @@
 Table containing pointing residuals.
 """
 
-import uuid
-
+import uuid7 as uuid
 from sqlmodel import Field, Relationship, SQLModel
 
 from mapcat.pointing.base import PointingModelStats

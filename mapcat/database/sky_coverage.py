@@ -2,8 +2,7 @@
 Sky coverage table.
 """
 
-import uuid
-
+import uuid7 as uuid
 from sqlalchemy import PrimaryKeyConstraint
 from sqlmodel import Field, Relationship, SQLModel
 

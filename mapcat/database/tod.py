@@ -2,9 +2,9 @@
 Table for TODs
 """
 
-import uuid
 from datetime import datetime
 
+import uuid7 as uuid
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel

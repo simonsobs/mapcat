@@ -2,9 +2,9 @@
 Information on the map making pipeline run.
 """
 
-import uuid
 from typing import Any
 
+import uuid7 as uuid
 from sqlmodel import JSON, Field, Relationship, SQLModel
 
 from .depth_one_map import DepthOneMapTable

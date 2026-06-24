@@ -2,10 +2,10 @@
 Depth one map table.
 """
 
-import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
+import uuid7 as uuid
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import JSON, Field, Relationship, SQLModel

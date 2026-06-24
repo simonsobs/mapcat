@@ -2,9 +2,9 @@
 Table containing information about Depth-1 map coadds.
 """
 
-import uuid
 from datetime import datetime
 
+import uuid7 as uuid
 from astropy.time import Time
 from sqlmodel import Field, Relationship, SQLModel
 

@@ -2,10 +2,10 @@
 Table for atomic maps.
 """
 
-import uuid
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+import uuid7 as uuid
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel

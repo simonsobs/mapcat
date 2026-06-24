@@ -31,7 +31,7 @@ class PipelineInformationTable(SQLModel, table=True):
     __tablename__ = "pipeline_information"
 
     pipeline_information_id: uuid.UUID = Field(
-        default_factory=uuid.uuid7, primary_key=True
+        default_factory=uuid.create, primary_key=True
     )
     map_id: uuid.UUID = Field(foreign_key="depth_one_maps.map_id", nullable=False)
     map: DepthOneMapTable = Relationship(back_populates="pipeline_information")

@@ -61,7 +61,7 @@ class AtomicMap(SQLModel):
 class AtomicMapTable(SQLModel, table=True):
     __tablename__ = "atomic_maps"
 
-    atomic_map_id: uuid.UUID = Field(default_factory=uuid.uuid7, primary_key=True)
+    atomic_map_id: uuid.UUID = Field(default_factory=uuid.create, primary_key=True)
 
     obs_id: str = Field()
     telescope: str = Field()

@@ -46,7 +46,7 @@ class TimeDomainProcessingTable(SQLModel, table=True):
     __tablename__ = "time_domain_processing"
 
     processing_status_id: uuid.UUID = Field(
-        prdefault_factory=uuid.uuid7, primary_key=True
+        prdefault_factory=uuid.create, primary_key=True
     )
 
     map_id: uuid.UUID = Field(

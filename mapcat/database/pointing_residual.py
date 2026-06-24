@@ -33,7 +33,7 @@ class PointingResidualTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_pointing_residuals"
     pointing_residual_id: uuid.UUID = Field(
-        default_factory=uuid.uuid7, primary_key=True
+        default_factory=uuid.create, primary_key=True
     )
 
     map_id: uuid.UUID = Field(

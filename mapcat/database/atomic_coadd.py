@@ -34,7 +34,7 @@ class AtomicMapCoadd(SQLModel):
 class AtomicMapCoaddTable(SQLModel, table=True):
     __tablename__ = "atomic_map_coadds"
 
-    coadd_id: uuid.UUID = Field(default_factory=uuid.uuid7, primary_key=True)
+    coadd_id: uuid.UUID = Field(default_factory=uuid.create, primary_key=True)
 
     coadd_name: str = Field()
     prefix_path: str = Field()

@@ -103,7 +103,7 @@ class DepthOneMapTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_maps"
 
-    map_id: uuid.UUID = Field(default_factory=uuid.uuid7, primary_key=True)
+    map_id: uuid.UUID = Field(default_factory=uuid.create, primary_key=True)
     map_name: str = Field(index=True, unique=True, nullable=False)
 
     map_path: str | None = None

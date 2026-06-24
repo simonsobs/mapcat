@@ -99,7 +99,7 @@ class TODDepthOneTable(SQLModel, table=True):
     """
 
     __tablename__ = "tod_depth_one"
-    tod_id: uuid.UUID = Field(default_factory=uuid.uuid7, primary_key=True)
+    tod_id: uuid.UUID = Field(default_factory=uuid.create, primary_key=True)
     obs_id: str = Field(nullable=False)
     pwv: float | None = Field(index=True, nullable=True)
     ctime: datetime = Field(index=True, nullable=False)

@@ -4,10 +4,11 @@ Table containing information about processing status of the Depth-1 maps.
 
 from datetime import datetime
 
-import uuid7 as uuid
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel
+
+import uuid7 as uuid
 
 from .depth_one_map import DepthOneMapTable
 
@@ -46,7 +47,7 @@ class TimeDomainProcessingTable(SQLModel, table=True):
     __tablename__ = "time_domain_processing"
 
     processing_status_id: uuid.UUID = Field(
-        prdefault_factory=uuid.create, primary_key=True
+        default_factory=uuid.create, primary_key=True
     )
 
     map_id: uuid.UUID = Field(

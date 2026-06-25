@@ -19,50 +19,6 @@ down_revision: str | None = "46575bc0d660"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
-
-def _table_exists(bind: Any, table_name: str) -> bool:
-    return bind.dialect.has_table(bind, table_name)
-
-
-def _rename_tables(tables: Sequence[str]) -> None:
-    bind = op.get_bind()
-    for table_name in tables:
-        if _table_exists(bind, table_name):
-            op.rename_table(table_name, f"{table_name}_old")
-
-
-def _copy_rows(
-    source_table: str,
-    target_table: str,
-    columns: Sequence[str],
-    *,
-    id_column: str | None = None,
-    id_map: dict[Any, Any] | None = None,
-    converters: dict[str, Any] | None = None,
-) -> None:
-    bind = op.get_bind()
-    metadata = sa.MetaData()
-    source = sa.Table(source_table, metadata, autoload_with=bind)
-    target = sa.Table(target_table, metadata, autoload_with=bind)
-
-    rows = bind.execute(sa.select(*[source.c[column] for column in columns])).fetchall()
-
-    for row in rows:
-        values: dict[str, Any] = {}
-        for column in columns:
-            value = getattr(row, column)
-            if id_column is not None and column == id_column:
-                new_id = uuid.create()
-                if id_map is not None:
-                    id_map[value] = new_id
-                values[column] = new_id
-            elif converters and column in converters:
-                values[column] = converters[column](value)
-            else:
-                values[column] = value
-        bind.execute(target.insert(), values)
-
-
 def _update_links(
     link_table_name: str,
     link_column_name: str,

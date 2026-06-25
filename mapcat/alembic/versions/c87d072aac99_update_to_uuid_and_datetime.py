@@ -7,7 +7,6 @@ Create Date: 2026-06-24 13:58:05.429510
 """
 
 from collections.abc import Sequence
-from typing import Any
 
 import sqlalchemy as sa
 import uuid7 as uuid
@@ -18,6 +17,7 @@ revision: str = "c87d072aac99"
 down_revision: str | None = "46575bc0d660"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
+
 
 def _update_links(
     link_table_name: str,
@@ -107,7 +107,9 @@ def _update_links(
 
 
 def _update_to_UUID_with_links(
-    table_name: str, old_key_name: str, link_table_list: list[tuple[str, str]]
+    table_name: str,
+    old_key_name: str,
+    link_table_list: list[tuple[str, str]] | None = None,
 ) -> None:
     """
     Function to update a table from integer ID to UUID.
@@ -120,9 +122,10 @@ def _update_to_UUID_with_links(
         Name of the table to update UUIDs.
     old_key_name : str
         Name of the column containing the old primary keys to be updated.
-    link_table_list : list[tuple[str, str]]
+    link_table_list : list[tuple[str, str]] | None, default; None
         List of tuples where each entry is a pair of link table with a foreign key into table_name
-        to be updated and foreign key name in that link table.
+        to be updated and foreign key name in that link table. If none, table_name has no foreign keys
+        into it so we can just skip updating those links.
 
     Returns
     -------
@@ -150,14 +153,15 @@ def _update_to_UUID_with_links(
         )
 
     # Update the link tables
-    for link_table_name, link_column_name in link_table_list:
-        _update_links(
-            link_table_name=link_table_name,
-            link_column_name=link_column_name,
-            foreign_table_name=table_name,
-            foreign_key_name=old_key_name,
-            foreign_uuid_column_name=tmp_key_name,
-        )
+    if link_table_list:
+        for link_table_name, link_column_name in link_table_list:
+            _update_links(
+                link_table_name=link_table_name,
+                link_column_name=link_column_name,
+                foreign_table_name=table_name,
+                foreign_key_name=old_key_name,
+                foreign_uuid_column_name=tmp_key_name,
+            )
 
     # Now that we've done the sandbag swap we can drop the old ID
     # column and alter the new column to have the correct name and be primary
@@ -174,19 +178,25 @@ def _update_to_UUID_with_links(
         [old_key_name],
     )
 
-    # Recreate the foreign key constraints on the link tables
-    for link_table_name, link_column_name in link_table_list:
-        op.create_foreign_key(
-            f"fk_{link_table_name}_{link_column_name}",
-            link_table_name,
-            table_name,
-            [link_column_name],
-            [old_key_name],
-        )
+    if link_table_list:
+        # Recreate the foreign key constraints on the link tables
+        for link_table_name, link_column_name in link_table_list:
+            op.create_foreign_key(
+                f"fk_{link_table_name}_{link_column_name}",
+                link_table_name,
+                table_name,
+                [link_column_name],
+                [old_key_name],
+            )
+
+
+def _update_sky_coverage():
+    pass
 
 
 def upgrade() -> None:
 
+    # TODO: check these for foreign keys not in links.py
     atomic_coadd_link_tables = [
         ("link_atomic_map_to_coadd", "coadd_id"),
         ("link_coadd_map_to_coadd", "parent_coadd_id"),
@@ -196,4 +206,58 @@ def upgrade() -> None:
         table_name="atomic_map_coadds",
         old_key_name="coadd_id",
         link_table_list=atomic_coadd_link_tables,
+    )
+
+    atomic_map_link_tables = [("link_atomic_map_to_coadd", "atomic_map_id")]
+    _update_to_UUID_with_links(
+        table_name="atomic_maps",
+        old_key_name="atomic_map_id",
+        link_table_list=atomic_map_link_tables,
+    )
+
+    depth_one_coadd_link_tables = [("link_depth_one_map_to_coadd", "coadd_id")]
+    _update_to_UUID_with_links(
+        table_name="depth_one_coadds",
+        old_key_name="coadd_id",
+        link_table_list=depth_one_coadd_link_tables,
+    )
+
+    depth_one_link_tables = [
+        ("link_depth_one_map_to_coadd", "map_id"),
+        ("link_tod_to_depth_one_map", "map_id"),
+    ]
+    _update_to_UUID_with_links(
+        table_name="depth_one_maps",
+        old_key_name="map_id",
+        link_table_list=depth_one_link_tables,
+    )
+
+    _update_to_UUID_with_links(
+        table_name="pipeline_information",
+        old_key_name="pipeline_information_id",
+        link_table_list=None,
+    )
+
+    _update_to_UUID_with_links(
+        table_name="depth_one_pointing_residuals",
+        old_key_name="pointing_residual_id",
+        link_table_list=None,
+    )
+
+    # TODO: write migration for sky coverage
+    _update_sky_coverage()
+
+    _update_to_UUID_with_links(
+        table_name="time_domain_processing",
+        old_key_name="processing_status_id",
+        link_table_list=None,
+    )
+
+    tod_link_tables = [
+        ("link_tod_to_depth_one_map", "tod_id"),
+    ]
+    _update_to_UUID_with_links(
+        table_name="tod_depth_one",
+        old_key_name="tod_id",
+        link_table_list=tod_link_tables,
     )

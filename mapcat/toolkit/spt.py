@@ -16,10 +16,11 @@ def extract_string(input: bytes) -> str:
 
 
 def create_objects(base: str, relative_to: Path) -> DepthOneMapTable:
-    
     tods = []
     obsid, band = base.split('/')[-1].split('_')[:2]
-    start_time = int(obsid) + 1483228800
+    ## could read in the observation frame, but then
+    ## we have to read every map file.
+    start_time = int(obsid) + 1483228800 # unix time
     end_time = start_time + 2* 3600 # assume a 2 hour observation for now
     return DepthOneMapTable(
         map_name=base,

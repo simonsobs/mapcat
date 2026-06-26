@@ -7,3 +7,5 @@ dist/*
 *.fits
 *.hdf
 .coverage
+
+*.ipynb_checkpoints/

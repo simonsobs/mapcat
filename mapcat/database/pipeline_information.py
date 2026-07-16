@@ -3,7 +3,9 @@ Information on the map making pipeline run.
 """
 
 from typing import Any
+from uuid import UUID
 
+from sqlalchemy import Uuid
 from sqlmodel import JSON, Field, Relationship, SQLModel
 
 from .depth_one_map import DepthOneMapTable
@@ -30,7 +32,9 @@ class PipelineInformationTable(SQLModel, table=True):
     __tablename__ = "pipeline_information"
 
     pipeline_information_id: int = Field(primary_key=True)
-    map_id: int = Field(foreign_key="depth_one_maps.map_id", nullable=False)
+    map_id: UUID = Field(
+        foreign_key="depth_one_maps.map_id", nullable=False, sa_type=Uuid
+    )
     map: DepthOneMapTable = Relationship(back_populates="pipeline_information")
 
     sotodlib_version: str

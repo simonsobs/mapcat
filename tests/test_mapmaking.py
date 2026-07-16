@@ -162,7 +162,9 @@ def test_build_obslists(database_sessionmaker):
 
     obs_list = build_obslists(obs_ids=obs_ids, session=session)
     assert obs_list[0][obs_ids[0]][0].map_id == map_id1
-    assert obs_list[0][obs_ids[1]][0].map_id == map_id1
-    assert obs_list[0][obs_ids[1]][1].map_id == map_id2
+    # obs_ids[1] is linked to both maps -- the relationship list's order
+    # isn't guaranteed by the DB (no explicit order_by on the relationship),
+    # so compare as a set rather than asserting a specific position.
+    assert {m.map_id for m in obs_list[0][obs_ids[1]]} == {map_id1, map_id2}
     assert obs_list[0][obs_ids[2]][0].map_id == map_id2
     assert obs_ids[3] in obs_list[1]

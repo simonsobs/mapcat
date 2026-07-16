@@ -8,7 +8,11 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from mapcat.database import DepthOneMapTable, TimeDomainProcessingTable
+from mapcat.database import (
+    DepthOneCoaddTable,
+    DepthOneMapTable,
+    TimeDomainProcessingTable,
+)
 from mapcat.toolkit.reset import VALID_STATUSES, core
 
 
@@ -80,6 +84,40 @@ def _get_proc(session, proc_id):
         return s.get(TimeDomainProcessingTable, proc_id)
 
 
+def _make_coadd(session, name, ctime):
+    """Helper to insert a DepthOneCoaddTable row and return its coadd_id."""
+    with session() as s:
+        coadd = DepthOneCoaddTable(
+            coadd_name=name,
+            coadd_type="depth1_streaming_coadd",
+            map_path=f"/path/{name}_flux.fits",
+            ivar_path=None,
+            frequency="f090",
+            ctime=ctime,
+            start_time=ctime - 500,
+            stop_time=ctime + 500,
+        )
+        s.add(coadd)
+        s.commit()
+        s.refresh(coadd)
+        return coadd.coadd_id
+
+
+def _make_coadd_proc(session, coadd_id, status):
+    """Helper to insert a coadd-linked TimeDomainProcessingTable row."""
+    with session() as s:
+        proc = TimeDomainProcessingTable(
+            coadd_id=coadd_id,
+            processing_start=1756000000.0,
+            processing_end=1756001000.0,
+            processing_status=status,
+        )
+        s.add(proc)
+        s.commit()
+        s.refresh(proc)
+        return proc.processing_status_id
+
+
 def test_valid_statuses():
     assert "failed" in VALID_STATUSES
     assert "completed" in VALID_STATUSES
@@ -93,6 +131,7 @@ def test_reset_all_to_failed(database_sessionmaker):
 
     args = argparse.Namespace(
         status="failed",
+        coadd_id=None,
         map_id=None,
         start_time=None,
         end_time=None,
@@ -115,6 +154,7 @@ def test_reset_by_map_id(database_sessionmaker):
 
     args = argparse.Namespace(
         status="completed",
+        coadd_id=None,
         map_id=[map_id_a],
         start_time=None,
         end_time=None,
@@ -140,6 +180,7 @@ def test_reset_by_time_range(database_sessionmaker):
 
     args = argparse.Namespace(
         status="failed",
+        coadd_id=None,
         map_id=None,
         start_time=1753000000.0,
         end_time=1755000000.0,
@@ -165,6 +206,7 @@ def test_reset_by_from_status(database_sessionmaker):
 
     args = argparse.Namespace(
         status="completed",
+        coadd_id=None,
         map_id=None,
         start_time=None,
         end_time=None,
@@ -187,6 +229,7 @@ def test_remove_entries_no_status(database_sessionmaker):
 
     args = argparse.Namespace(
         status=None,
+        coadd_id=None,
         map_id=[map_id],
         start_time=None,
         end_time=None,
@@ -205,6 +248,7 @@ def test_permafail_status(database_sessionmaker):
 
     args = argparse.Namespace(
         status="permafail",
+        coadd_id=None,
         map_id=[map_id],
         start_time=None,
         end_time=None,
@@ -215,6 +259,33 @@ def test_permafail_status(database_sessionmaker):
     proc = _get_proc(database_sessionmaker, proc_id)
     assert proc is not None
     assert proc.processing_status == "permafail"
+
+
+def test_reset_by_coadd_id(database_sessionmaker):
+    """Reset only the entry for a specific coadd ID, leaving map-linked
+    entries untouched."""
+    map_id = _make_map(database_sessionmaker, "reset_coadd_map", 1755900000.0)
+    coadd_id = _make_coadd(database_sessionmaker, "reset_coadd_a", 1755900500.0)
+
+    map_proc_id = _make_proc(database_sessionmaker, map_id, "running")
+    coadd_proc_id = _make_coadd_proc(database_sessionmaker, coadd_id, "running")
+
+    args = argparse.Namespace(
+        status="completed",
+        map_id=None,
+        coadd_id=[coadd_id],
+        start_time=None,
+        end_time=None,
+        from_status=None,
+    )
+    core(session=database_sessionmaker, args=args)
+
+    map_proc = _get_proc(database_sessionmaker, map_proc_id)
+    coadd_proc = _get_proc(database_sessionmaker, coadd_proc_id)
+
+    assert coadd_proc.processing_status == "completed"
+    # the map-linked entry should be untouched
+    assert map_proc.processing_status == "running"
 
 
 def test_combined_filters(database_sessionmaker):
@@ -228,6 +299,7 @@ def test_combined_filters(database_sessionmaker):
     # Only reset map_id_a if its status is "running"
     args = argparse.Namespace(
         status="failed",
+        coadd_id=None,
         map_id=[map_id_a],
         start_time=None,
         end_time=None,

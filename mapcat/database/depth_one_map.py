@@ -3,8 +3,11 @@ Depth one map table.
 """
 
 from typing import TYPE_CHECKING, Any
+from uuid import UUID
 
+from sqlalchemy import Uuid
 from sqlmodel import JSON, Field, Relationship, SQLModel
+from uuid7 import create as uuid7_create
 
 if TYPE_CHECKING:  # pragma: no cover
     from .depth_one_coadd import DepthOneCoaddTable
@@ -77,7 +80,7 @@ class DepthOneMapTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_maps"
 
-    map_id: int = Field(primary_key=True)
+    map_id: UUID = Field(default_factory=uuid7_create, primary_key=True, sa_type=Uuid)
     map_name: str = Field(index=True, unique=True, nullable=False)
 
     map_path: str | None = None

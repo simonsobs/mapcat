@@ -2,6 +2,8 @@
 Test the core functions
 """
 
+from uuid import uuid4
+
 import pytest
 from astropy import units as u
 from sqlalchemy import create_engine
@@ -214,7 +216,7 @@ def test_create_depth_one(database_sessionmaker):
 
     # Check bad map ID raises ValueError
     with pytest.raises(ValueError), database_sessionmaker() as session:
-        result = session.get(DepthOneMapTable, 999999)
+        result = session.get(DepthOneMapTable, uuid4())
         if result is None:
             raise ValueError("Map ID does not exist")
 
@@ -223,7 +225,6 @@ def test_add_remove_child_tables(database_sessionmaker):
     # Create a depth one map
     with database_sessionmaker() as session:
         dmap = DepthOneMapTable(
-            map_id=42,
             map_name="myDepthOne2",
             map_path="/PATH/TO/DEPTH/ONE2",
             tube_slot="OTi1",

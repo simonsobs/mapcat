@@ -2,10 +2,18 @@
 Table containing information about Depth-1 map coadds.
 """
 
+from typing import TYPE_CHECKING
+from uuid import UUID
+
+from sqlalchemy import Uuid
 from sqlmodel import Field, Relationship, SQLModel
+from uuid7 import create as uuid7_create
 
 from .depth_one_map import DepthOneMapTable
 from .links import DepthOneToCoaddTable
+
+if TYPE_CHECKING:  # pragma: no cover
+    from .time_domain_processing import TimeDomainProcessingTable
 
 
 class DepthOneCoaddTable(SQLModel, table=True):
@@ -16,7 +24,9 @@ class DepthOneCoaddTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_coadds"
 
-    coadd_id: int = Field(primary_key=True)
+    coadd_id: UUID = Field(
+        default_factory=uuid7_create, primary_key=True, sa_type=Uuid
+    )
     coadd_name: str = Field(nullable=False)
     coadd_type: str = Field(nullable=False)
 
@@ -37,4 +47,8 @@ class DepthOneCoaddTable(SQLModel, table=True):
     maps: list["DepthOneMapTable"] = Relationship(
         back_populates="coadds",
         link_model=DepthOneToCoaddTable,
+    )
+    processing_status: list["TimeDomainProcessingTable"] = Relationship(
+        back_populates="coadd",
+        cascade_delete=True,
     )

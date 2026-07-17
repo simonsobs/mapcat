@@ -39,7 +39,15 @@ depends_on: str | Sequence[str] | None = None
 def _backfill(bind, table: str, id_column: str, mapping: dict) -> None:
     """UPDATE `table` SET `id_column`_new = <uuid> WHERE `id_column` = <old id>,
     for every (old id -> new uuid) pair in `mapping`. Batches statements in
-    chunks rather than one round-trip per row."""
+    chunks rather than one round-trip per row.
+
+    Writes the 32-char hex form (no dashes), matching the string SQLAlchemy's
+    sa.Uuid() bind processor produces for SQLite -- writing str(new_uuid)
+    (36-char, dashed) here would silently desync from any UUID value bound
+    via the ORM later (e.g. an explicit map_id=/coadd_id= filter), since
+    SQLite compares TEXT columns byte-for-byte and never normalizes the two
+    forms as equal.
+    """
     new_column = f"{id_column}_new"
     items = list(mapping.items())
     chunk_size = 500
@@ -51,7 +59,7 @@ def _backfill(bind, table: str, id_column: str, mapping: dict) -> None:
                     f"UPDATE {table} SET {new_column} = :new_uuid "
                     f"WHERE {id_column} = :old_id"
                 ),
-                {"new_uuid": str(new_uuid), "old_id": old_id},
+                {"new_uuid": new_uuid.hex, "old_id": old_id},
             )
 
 

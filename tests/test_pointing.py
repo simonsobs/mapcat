@@ -81,6 +81,10 @@ def test_make_polynomial_pointing_model():
 
     for i, offset_pos in enumerate(offset_positions):
         predicted_pos = model.predict(offset_pos)
+        assert predicted_pos.isscalar, (
+            "predict() on a scalar SkyCoord must return a scalar SkyCoord, "
+            f"got shape {predicted_pos.ra.shape}"
+        )
         assert np.isclose(
             predicted_pos.ra.to_value(u.arcmin), ras[i].to_value(u.arcmin), atol=0.1
         )
@@ -89,6 +93,7 @@ def test_make_polynomial_pointing_model():
         )
 
     predicted_pos = model.predict(offset_positions)
+    assert not predicted_pos.isscalar
     assert np.all(
         np.isclose(
             predicted_pos.ra.to_value(u.arcmin), ras.to_value(u.arcmin), atol=0.1

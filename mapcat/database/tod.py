@@ -4,7 +4,6 @@ Table for TODs
 
 from datetime import datetime
 
-import uuid7 as uuid
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel
@@ -14,7 +13,7 @@ from .links import TODToMapTable
 
 
 class TODDepthOne(SQLModel):
-    tod_id: uuid.UUID
+    tod_id: int
     obs_id: str
     pwv: float | None
     ctime: AstroPydanticTime
@@ -46,7 +45,7 @@ class TODDepthOneTable(SQLModel, table=True):
 
     Attributes
     ----------
-    tod_id : uuid.UUID
+    tod_id : int
         Unique TOD identifier. Internal to SO
     map_name : str
         Name of map this TOD went into. Foreign key
@@ -99,7 +98,7 @@ class TODDepthOneTable(SQLModel, table=True):
     """
 
     __tablename__ = "tod_depth_one"
-    tod_id: uuid.UUID = Field(default_factory=uuid.create, primary_key=True)
+    tod_id: int = Field(primary_key=True)
     obs_id: str = Field(nullable=False)
     pwv: float | None = Field(index=True, nullable=True)
     ctime: datetime = Field(index=True, nullable=False)

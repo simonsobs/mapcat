@@ -5,7 +5,6 @@ Depth one map table.
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-import uuid7 as uuid
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import JSON, Field, Relationship, SQLModel
@@ -22,7 +21,7 @@ from .links import DepthOneToCoaddTable, TODToMapTable
 
 
 class DepthOneMap(SQLModel):
-    map_id: uuid.UUID
+    map_id: int
     map_name: str
 
     map_path: str | None
@@ -49,7 +48,7 @@ class DepthOneMapTable(SQLModel, table=True):
 
     Attributes
     ----------
-    id : uuid.UUID
+    id : int
         Unique map identifiers. Internal to SO
     map_name : str
         Name of depth 1 map
@@ -103,7 +102,7 @@ class DepthOneMapTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_maps"
 
-    map_id: uuid.UUID = Field(default_factory=uuid.create, primary_key=True)
+    map_id: int = Field(primary_key=True)
     map_name: str = Field(index=True, unique=True, nullable=False)
 
     map_path: str | None = None

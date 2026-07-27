@@ -4,7 +4,6 @@ Table containing information about Depth-1 map coadds.
 
 from datetime import datetime
 
-import uuid7 as uuid
 from astropy.time import Time
 from sqlmodel import Field, Relationship, SQLModel
 
@@ -13,7 +12,7 @@ from .links import DepthOneToCoaddTable
 
 
 class DepthOneCoadd(SQLModel):
-    coadd_id: uuid.UUID
+    coadd_id: int
     coadd_name: str
     coadd_type: str
 
@@ -40,7 +39,7 @@ class DepthOneCoaddTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_coadds"
 
-    coadd_id: int = Field(default_factory=uuid.create, primary_key=True)
+    coadd_id: int = Field(primary_key=True)
     coadd_name: str = Field(nullable=False)
     coadd_type: str = Field(nullable=False)
 

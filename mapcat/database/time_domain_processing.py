@@ -8,15 +8,13 @@ from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel
 
-import uuid7 as uuid
-
 from .depth_one_map import DepthOneMapTable
 
 
 class TimeDomainProcessing(SQLModel):
-    processing_status_id: uuid.UUID
+    processing_status_id: int
 
-    map_id: uuid.UUID
+    map_id: int
 
     processing_start: AstroPydanticTime | None
     processing_end: AstroPydanticTime | None
@@ -32,9 +30,9 @@ class TimeDomainProcessingTable(SQLModel, table=True):
 
     Attributes
     ----------
-    processing_status_id : uuid.UUID
+    processing_status_id : int
         Internal ID of the processing status
-    map_name : uuid.UUID
+    map_name : int
         Name of depth 1 map being tracked. Foreign into DepthOneMap
     processing_start : datetime | None
         Time processing started. None if not started.
@@ -46,11 +44,9 @@ class TimeDomainProcessingTable(SQLModel, table=True):
 
     __tablename__ = "time_domain_processing"
 
-    processing_status_id: uuid.UUID = Field(
-        default_factory=uuid.create, primary_key=True
-    )
+    processing_status_id: int = Field(primary_key=True)
 
-    map_id: uuid.UUID = Field(
+    map_id: int = Field(
         index=True,
         nullable=False,
         foreign_key="depth_one_maps.map_id",

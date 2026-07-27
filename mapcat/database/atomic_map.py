@@ -5,7 +5,6 @@ Table for atomic maps.
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-import uuid7 as uuid
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel
@@ -17,7 +16,7 @@ if TYPE_CHECKING:
 
 
 class AtomicMap(SQLModel):
-    atomic_map_id: uuid.UUID
+    atomic_map_id: int
 
     obs_id: str
     telescope: str
@@ -61,7 +60,7 @@ class AtomicMap(SQLModel):
 class AtomicMapTable(SQLModel, table=True):
     __tablename__ = "atomic_maps"
 
-    atomic_map_id: uuid.UUID = Field(default_factory=uuid.create, primary_key=True)
+    atomic_map_id: int = Field(primary_key=True)
 
     obs_id: str = Field()
     telescope: str = Field()

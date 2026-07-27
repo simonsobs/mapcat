@@ -5,7 +5,6 @@ Atomic map coadds
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-import uuid7 as uuid
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel
@@ -17,7 +16,7 @@ from .links import AtomicMapToCoaddTable, CoaddMapToCoaddTable  # pragma: no cov
 
 
 class AtomicMapCoadd(SQLModel):
-    coadd_id: uuid.UUID
+    coadd_id: int
 
     coadd_name: str
     prefix_path: str
@@ -34,7 +33,7 @@ class AtomicMapCoadd(SQLModel):
 class AtomicMapCoaddTable(SQLModel, table=True):
     __tablename__ = "atomic_map_coadds"
 
-    coadd_id: uuid.UUID = Field(default_factory=uuid.create, primary_key=True)
+    coadd_id: int = Field(primary_key=True)
 
     coadd_name: str = Field()
     prefix_path: str = Field()

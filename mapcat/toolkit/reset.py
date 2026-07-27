@@ -3,7 +3,7 @@ Reset processing statuses in the TimeDomainProcessingTable.
 """
 
 import argparse as ap
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
@@ -75,12 +75,12 @@ def core(session: sessionmaker, args: ap.Namespace):
             if args.start_time is not None:
                 stmt = stmt.where(
                     DepthOneMapTable.ctime
-                    >= datetime.fromtimestamp(args.start_time, tz=UTC)
+                    >= datetime.fromtimestamp(args.start_time, tz=timezone.utc)
                 )
             if args.end_time is not None:
                 stmt = stmt.where(
                     DepthOneMapTable.ctime
-                    <= datetime.fromtimestamp(args.end_time, tz=UTC)
+                    <= datetime.fromtimestamp(args.end_time, tz=timezone.utc)
                 )
 
         if args.from_status is not None:
@@ -111,12 +111,12 @@ def core(session: sessionmaker, args: ap.Namespace):
                 if args.start_time is not None:
                     pr_stmt = pr_stmt.where(
                         DepthOneMapTable.ctime
-                        >= datetime.fromtimestamp(args.start_time, tz=UTC)
+                        >= datetime.fromtimestamp(args.start_time, tz=timezone.utc)
                     )
                 if args.end_time is not None:
                     pr_stmt = pr_stmt.where(
                         DepthOneMapTable.ctime
-                        <= datetime.fromtimestamp(args.end_time, tz=UTC)
+                        <= datetime.fromtimestamp(args.end_time, tz=timezone.utc)
                     )
 
             pointing_residuals = cur_session.execute(pr_stmt).scalars().all()

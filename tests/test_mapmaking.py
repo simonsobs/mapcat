@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 
 from mapcat.database import DepthOneMapTable, TODDepthOneTable
 from mapcat.toolkit.mapmaking import build_obslists
@@ -14,9 +14,9 @@ def test_build_obslists(database_sessionmaker):
             map_path="/PATH/TO/DEPTH/ONE",
             tube_slot="OTi1",
             frequency="f090",
-            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
-            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
-            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
+            ctime=datetime.fromtimestamp(1755787524.0, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=timezone.utc),
         )
 
         data2 = DepthOneMapTable(
@@ -24,9 +24,9 @@ def test_build_obslists(database_sessionmaker):
             map_path="/PATH/TO/DEPTH/ONE2",
             tube_slot="OTi4",
             frequency="f090",
-            ctime=datetime.fromtimestamp(1755788524.0, tz=UTC),
-            start_time=datetime.fromtimestamp(1755787524.0, tz=UTC),
-            stop_time=datetime.fromtimestamp(1755897524.0, tz=UTC),
+            ctime=datetime.fromtimestamp(1755788524.0, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(1755787524.0, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(1755897524.0, tz=timezone.utc),
         )
 
         session.add(data1)
@@ -56,9 +56,9 @@ def test_build_obslists(database_sessionmaker):
         tod1 = TODDepthOneTable(
             obs_id=obs_ids[0],
             pwv=0.7,
-            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
-            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
-            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
+            ctime=datetime.fromtimestamp(1755787524.0, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=timezone.utc),
             nsamples=28562,
             telescope="lat",
             telescope_flavor="lat",
@@ -82,9 +82,9 @@ def test_build_obslists(database_sessionmaker):
         tod2 = TODDepthOneTable(
             obs_id=obs_ids[1],
             pwv=0.7,
-            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
-            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
-            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
+            ctime=datetime.fromtimestamp(1755787524.0, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=timezone.utc),
             nsamples=28562,
             telescope="lat",
             telescope_flavor="lat",
@@ -108,9 +108,9 @@ def test_build_obslists(database_sessionmaker):
         tod3 = TODDepthOneTable(
             obs_id=obs_ids[2],
             pwv=0.7,
-            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
-            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
-            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
+            ctime=datetime.fromtimestamp(1755787524.0, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=timezone.utc),
             nsamples=28562,
             telescope="lat",
             telescope_flavor="lat",
@@ -135,9 +135,9 @@ def test_build_obslists(database_sessionmaker):
         tod4 = TODDepthOneTable(
             obs_id=obs_ids[3],
             pwv=0.7,
-            ctime=datetime.fromtimestamp(1755787524.0, tz=UTC),
-            start_time=datetime.fromtimestamp(1755687524.0, tz=UTC),
-            stop_time=datetime.fromtimestamp(1755887524.0, tz=UTC),
+            ctime=datetime.fromtimestamp(1755787524.0, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=timezone.utc),
             nsamples=28562,
             telescope="lat",
             telescope_flavor="lat",

@@ -182,6 +182,12 @@ class PolynomialPointingModel(PointingModelProtocol):
         racoeffs, deccoeffs = self.extract_coefficients()
         ra_offset = self.model_fn(pos.ra, pos.dec, racoeffs)
         dec_offset = self.model_fn(pos.ra, pos.dec, deccoeffs)
+        if pos.isscalar:
+            # model_fn always returns at-least-1d arrays (see np.atleast_1d
+            # above); squeeze back down so a scalar input yields a scalar
+            # SkyCoord rather than silently promoting it to shape (1,).
+            ra_offset = ra_offset[0]
+            dec_offset = dec_offset[0]
         ra = pos.ra - ra_offset
         dec = pos.dec - dec_offset
 

@@ -54,7 +54,7 @@ def _make_map(session, name, ctime, start_time=None, stop_time=None):
             map_path=f"/path/{name}_map.fits",
             tube_slot="OTi1",
             frequency="f090",
-            ctime=ctime,
+            ctime=datetime.fromtimestamp(ctime, tz=UTC),
             start_time=datetime.fromtimestamp(start_time, tz=UTC),
             stop_time=datetime.fromtimestamp(stop_time, tz=UTC),
         )

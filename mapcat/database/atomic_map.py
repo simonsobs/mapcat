@@ -66,7 +66,7 @@ class AtomicMapTable(SQLModel, table=True):
     telescope: str = Field()
     freq_channel: str = Field()
     wafer: str = Field()
-    ctime: datetime = Field()
+    ctime: datetime = Field(nullable=False)
     split_label: str = Field()
 
     map_path: str | None = Field()

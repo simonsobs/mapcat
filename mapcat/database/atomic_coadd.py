@@ -40,8 +40,8 @@ class AtomicMapCoaddTable(SQLModel, table=True):
 
     platform: str = Field()
     interval: str = Field()
-    start_time: datetime = Field()
-    stop_time: datetime = Field()
+    start_time: datetime = Field(nullable=False)
+    stop_time: datetime = Field(nullable=False)
     freq_channel: str = Field()
     geom_file_path: str = Field()
     split_label: str = Field()

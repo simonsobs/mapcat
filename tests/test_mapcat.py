@@ -92,7 +92,9 @@ def test_create_depth_one(database_sessionmaker):
     assert dmap.map_path == "/PATH/TO/DEPTH/ONE"
     assert dmap.tube_slot == "OTi1"
     assert dmap.frequency == "f090"
-    assert dmap.ctime.unix == 1755787524.0
+    ctime = dmap.ctime
+    ctime = ctime.replace(tzinfo=UTC) if ctime.tzinfo is None else ctime
+    assert int(ctime.timestamp()) == 1755787524.0
 
     # Make child tables
     with database_sessionmaker() as session:
@@ -171,8 +173,20 @@ def test_create_depth_one(database_sessionmaker):
 
     assert proc.processing_status_id == proc_id
     assert proc.map_id == map_id
-    assert proc.processing_start.unix == 1756787524.0
-    assert proc.processing_end.unix == 1756797524.0
+    processing_start = proc.processing_start
+    processing_start = (
+        processing_start.replace(tzinfo=UTC)
+        if processing_start.tzinfo is None
+        else processing_start
+    )
+    processing_end = proc.processing_end
+    processing_end = (
+        processing_end.replace(tzinfo=UTC)
+        if processing_end.tzinfo is None
+        else processing_end
+    )
+    assert int(processing_start.timestamp()) == 1756787524.0
+    assert int(processing_end.timestamp()) == 1756797524.0
     assert proc.processing_status == "done"
 
     assert point.pointing_residual_id == point_id
@@ -183,9 +197,17 @@ def test_create_depth_one(database_sessionmaker):
     assert tod.tod_id == tod_id
     assert tod.pwv == 0.7
     assert tod.obs_id == "obs_1753486724_lati6_111"
-    assert tod.ctime.unix == 1755787524.0
-    assert tod.start_time.unix == 1755687524.0
-    assert tod.stop_time.unix == 1755887524.0
+    ctime = tod.ctime
+    ctime = ctime.replace(tzinfo=UTC) if ctime.tzinfo is None else ctime
+    start_time = tod.start_time
+    start_time = (
+        start_time.replace(tzinfo=UTC) if start_time.tzinfo is None else start_time
+    )
+    stop_time = tod.stop_time
+    stop_time = stop_time.replace(tzinfo=UTC) if stop_time.tzinfo is None else stop_time
+    assert int(ctime.timestamp()) == 1755787524.0
+    assert int(start_time.timestamp()) == 1755687524.0
+    assert int(stop_time.timestamp()) == 1755887524.0
     assert tod.nsamples == 28562
     assert tod.telescope == "lat"
     assert tod.telescope_flavor == "lat"
@@ -369,8 +391,14 @@ def test_create_atomic_map_coadd(database_sessionmaker):
     assert cmap.prefix_path == "/PATH/TO/DAILY/COADD"
     assert cmap.platform == "satp3"
     assert cmap.interval == "daily"
-    assert cmap.start_time.unix == 1755604800.0
-    assert cmap.stop_time.unix == 1755691200.0
+    start_time = cmap.start_time
+    start_time = (
+        start_time.replace(tzinfo=UTC) if start_time.tzinfo is None else start_time
+    )
+    stop_time = cmap.stop_time
+    stop_time = stop_time.replace(tzinfo=UTC) if stop_time.tzinfo is None else stop_time
+    assert int(start_time.timestamp()) == 1755604800.0
+    assert int(stop_time.timestamp()) == 1755691200.0
     assert cmap.freq_channel == "f090"
     assert cmap.geom_file_path == "/PATH/TO/GEOM/FILE"
     assert cmap.split_label == "full"
@@ -433,7 +461,9 @@ def test_create_atomic_map_coadd(database_sessionmaker):
     assert atomic.telescope == "satp3"
     assert atomic.freq_channel == "f090"
     assert atomic.wafer == "ws0"
-    assert atomic.ctime.unix == 1755643932
+    ctime = atomic.ctime
+    ctime = ctime.replace(tzinfo=UTC) if ctime.tzinfo is None else ctime
+    assert int(ctime.timestamp()) == 1755643932.0
     assert atomic.split_label == "full"
     assert atomic.map_path is None
     assert atomic.ivar_path is None

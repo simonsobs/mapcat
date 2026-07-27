@@ -1,5 +1,6 @@
 import argparse as ap
 import os
+from datetime import timezone
 from pathlib import Path
 
 import astropy.units as u
@@ -218,7 +219,11 @@ def test_act(database_sessionmaker, downloaded_data_file):
         for map in maps:
             assert map.tube_slot in ["pa4", "pa6"]
             assert map.frequency == "f150"
-            assert int(map.ctime.timestamp()) in [1505603190, 1505646390]
+            ctime = map.ctime
+            ctime = (
+                ctime.replace(tzinfo=timezone.utc) if ctime.tzinfo is None else ctime
+            )
+            assert int(ctime.timestamp()) in [1505603190, 1505646390]
 
             # Clean up, otherewise we interfere with test_sky_coverage
             session.delete(map)
@@ -239,6 +244,10 @@ def test_sky_coverage(database_sessionmaker, downloaded_data_file):
     with database_sessionmaker() as session:
         d1maps = session.query(DepthOneMapTable).all()
         for d1map in d1maps:
+            ctime = d1map.ctime
+            ctime = (
+                ctime.replace(tzinfo=timezone.utc) if ctime.tzinfo is None else ctime
+            )
             assert len(d1map.depth_one_sky_coverage) > 0
             for cov in d1map.depth_one_sky_coverage:
                 # Shitty test to make sure the coverage tiles are correct, by checking against the known coverage for these two maps.
@@ -248,7 +257,7 @@ def test_sky_coverage(database_sessionmaker, downloaded_data_file):
                         cov.x
                     ),  # These should be ints, idk why I have to cast them (from str)
                     int(cov.y),
-                ) in cov_mapping[str(d1map.ctime.timestamp())]
+                ) in cov_mapping[str(ctime.timestamp())]
 
     with database_sessionmaker() as session:
         maps = session.query(DepthOneMapTable).all()

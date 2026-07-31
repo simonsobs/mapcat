@@ -18,17 +18,17 @@ undashed form. It is idempotent (only touches values that are still
 6eeaa35444bb's backfill fix landed -- it only matters for databases
 migrated before that fix.
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = 'fa43e5586322'
-down_revision: Union[str, None] = '6eeaa35444bb'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = "fa43e5586322"
+down_revision: str | None = "6eeaa35444bb"
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 # (table, column) pairs touched by 6eeaa35444bb's backfill.

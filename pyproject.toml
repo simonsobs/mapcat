@@ -30,7 +30,7 @@ mapcatreset = "mapcat.toolkit.reset:main"
 [project.optional-dependencies]
 dev = [
     "pytest",
-    "ruff",
+    "ruff==0.16.1",
     "testcontainers",
     "coverage",
     "pytest-cov",

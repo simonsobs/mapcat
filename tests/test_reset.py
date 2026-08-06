@@ -3,7 +3,7 @@ Tests for the mapcatreset CLI (mapcat/toolkit/reset.py).
 """
 
 import argparse
-from datetime import UTC, datetime
+from datetime import timezone, datetime
 
 import pytest
 from sqlalchemy import create_engine
@@ -54,9 +54,9 @@ def _make_map(session, name, ctime, start_time=None, stop_time=None):
             map_path=f"/path/{name}_map.fits",
             tube_slot="OTi1",
             frequency="f090",
-            ctime=datetime.fromtimestamp(ctime, tz=UTC),
-            start_time=datetime.fromtimestamp(start_time, tz=UTC),
-            stop_time=datetime.fromtimestamp(stop_time, tz=UTC),
+            ctime=datetime.fromtimestamp(ctime, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(start_time, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(stop_time, tz=timezone.utc),
         )
         s.add(dmap)
         s.commit()
@@ -69,8 +69,8 @@ def _make_proc(session, map_id, status):
     with session() as s:
         proc = TimeDomainProcessingTable(
             map_id=map_id,
-            processing_start=datetime.fromtimestamp(1756000000.0, tz=UTC),
-            processing_end=datetime.fromtimestamp(1756001000.0, tz=UTC),
+            processing_start=datetime.fromtimestamp(1756000000.0, tz=timezone.utc),
+            processing_end=datetime.fromtimestamp(1756001000.0, tz=timezone.utc),
             processing_status=status,
         )
         s.add(proc)

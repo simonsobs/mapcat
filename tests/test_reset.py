@@ -3,7 +3,7 @@ Tests for the mapcatreset CLI (mapcat/toolkit/reset.py).
 """
 
 import argparse
-from datetime import timezone, datetime
+from datetime import datetime, timezone
 
 import pytest
 from sqlalchemy import create_engine

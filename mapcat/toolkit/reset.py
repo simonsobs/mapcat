@@ -3,6 +3,7 @@ Reset processing statuses in the TimeDomainProcessingTable.
 """
 
 import argparse as ap
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
@@ -72,9 +73,15 @@ def core(session: sessionmaker, args: ap.Namespace):
                 TimeDomainProcessingTable.map_id == DepthOneMapTable.map_id,
             )
             if args.start_time is not None:
-                stmt = stmt.where(DepthOneMapTable.ctime >= args.start_time)
+                stmt = stmt.where(
+                    DepthOneMapTable.ctime
+                    >= datetime.fromtimestamp(args.start_time, tz=timezone.utc)
+                )
             if args.end_time is not None:
-                stmt = stmt.where(DepthOneMapTable.ctime <= args.end_time)
+                stmt = stmt.where(
+                    DepthOneMapTable.ctime
+                    <= datetime.fromtimestamp(args.end_time, tz=timezone.utc)
+                )
 
         if args.from_status is not None:
             stmt = stmt.where(
@@ -102,9 +109,15 @@ def core(session: sessionmaker, args: ap.Namespace):
                     PointingResidualTable.map_id == DepthOneMapTable.map_id,
                 )
                 if args.start_time is not None:
-                    pr_stmt = pr_stmt.where(DepthOneMapTable.ctime >= args.start_time)
+                    pr_stmt = pr_stmt.where(
+                        DepthOneMapTable.ctime
+                        >= datetime.fromtimestamp(args.start_time, tz=timezone.utc)
+                    )
                 if args.end_time is not None:
-                    pr_stmt = pr_stmt.where(DepthOneMapTable.ctime <= args.end_time)
+                    pr_stmt = pr_stmt.where(
+                        DepthOneMapTable.ctime
+                        <= datetime.fromtimestamp(args.end_time, tz=timezone.utc)
+                    )
 
             pointing_residuals = cur_session.execute(pr_stmt).scalars().all()
             for pr in pointing_residuals:

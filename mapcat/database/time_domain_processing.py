@@ -2,9 +2,23 @@
 Table containing information about processing status of the Depth-1 maps.
 """
 
+from datetime import datetime
+
+from astropy.time import Time
+from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel
 
 from .depth_one_map import DepthOneMapTable
+
+
+class TimeDomainProcessing(SQLModel):
+    processing_status_id: int
+
+    map_id: int
+
+    processing_start: AstroPydanticTime | None
+    processing_end: AstroPydanticTime | None
+    processing_status: str
 
 
 class TimeDomainProcessingTable(SQLModel, table=True):
@@ -16,13 +30,13 @@ class TimeDomainProcessingTable(SQLModel, table=True):
 
     Attributes
     ----------
-    id : int
+    processing_status_id : int
         Internal ID of the processing status
-    map_name : str
+    map_name : int
         Name of depth 1 map being tracked. Foreign into DepthOneMap
-    processing_start : float | None
+    processing_start : datetime | None
         Time processing started. None if not started.
-    processing_end : float | None
+    processing_end : datetime | None
         Time processing ended. None if not ended.
     processing_status : str
         Status of processing
@@ -40,6 +54,23 @@ class TimeDomainProcessingTable(SQLModel, table=True):
     )
     map: DepthOneMapTable = Relationship(back_populates="processing_status")
 
-    processing_start: float = Field(nullable=True)
-    processing_end: float = Field(nullable=True)
+    processing_start: datetime = Field(nullable=True)
+    processing_end: datetime = Field(nullable=True)
     processing_status: str = Field(index=True, nullable=False)
+
+    def to_model(self) -> TimeDomainProcessing:
+        """
+        Return a TimeDomainProcessing model from this table entry
+
+        Returns
+        -------
+        TimeDomainProcessing : TimeDomainProcessing
+            The TimeDomainProcessing model corresponding to this table entry.
+        """
+        return TimeDomainProcessing(
+            processing_status_id=self.processing_status_id,
+            map_id=self.map_id,
+            processing_start=Time(self.processing_start),
+            processing_end=Time(self.processing_end),
+            processing_status=self.processing_status,
+        )

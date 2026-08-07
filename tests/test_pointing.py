@@ -2,6 +2,8 @@
 Tests for the pointing residual models.
 """
 
+from datetime import datetime, timezone
+
 import numpy as np
 from astropy import units as u
 from astropy.coordinates import SkyCoord
@@ -21,9 +23,9 @@ def test_add_retrieve_pointing(database_sessionmaker):
             map_path="DoesntExist/Map",
             tube_slot="i1",
             frequency="f090",
-            ctime=1755787524.0,
-            start_time=1755687524.0,
-            stop_time=1755887524.0,
+            ctime=datetime.fromtimestamp(1755787524.0, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(1755687524.0, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(1755887524.0, tz=timezone.utc),
         )
 
         session.add(sample_map)

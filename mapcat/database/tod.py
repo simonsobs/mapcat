@@ -2,10 +2,41 @@
 Table for TODs
 """
 
+from datetime import datetime
+
+from astropy.time import Time
+from astropydantic import AstroPydanticTime
 from sqlmodel import Field, Relationship, SQLModel
 
 from .depth_one_map import DepthOneMapTable
 from .links import TODToMapTable
+
+
+class TODDepthOne(SQLModel):
+    tod_id: int
+    obs_id: str
+    pwv: float | None
+    ctime: AstroPydanticTime
+    start_time: AstroPydanticTime | None
+    stop_time: AstroPydanticTime | None
+    nsamples: int | None
+    telescope: str
+    telescope_flavor: str | None
+    tube_slot: str
+    tube_flavor: str | None
+    frequency: str
+    scan_type: str
+    subtype: str
+    wafer_count: int
+    duration: float
+    az_center: float
+    az_throw: float
+    el_center: float
+    el_throw: float
+    roll_center: float
+    roll_throw: float
+    wafer_slots_list: str
+    stream_ids_list: str
 
 
 class TODDepthOneTable(SQLModel, table=True):
@@ -14,7 +45,7 @@ class TODDepthOneTable(SQLModel, table=True):
 
     Attributes
     ----------
-    id : int
+    tod_id : int
         Unique TOD identifier. Internal to SO
     map_name : str
         Name of map this TOD went into. Foreign key
@@ -22,11 +53,11 @@ class TODDepthOneTable(SQLModel, table=True):
         SO ID of TOD
     pwv : float
         Precipitable  water vapor at time of obs
-    ctime : float
+    ctime : datetime
         Mean unix time of obs
-    start_time : float
+    start_time : datetime
         Start time of obs
-    stop_time : float
+    stop_time : datetime
         End time of obs
     nsamples : int
         Number of samps in obs
@@ -70,9 +101,9 @@ class TODDepthOneTable(SQLModel, table=True):
     tod_id: int = Field(primary_key=True)
     obs_id: str = Field(nullable=False)
     pwv: float | None = Field(index=True, nullable=True)
-    ctime: float = Field(index=True, nullable=False)
-    start_time: float | None = Field(index=True, nullable=True)
-    stop_time: float | None = Field(index=True, nullable=True)
+    ctime: datetime = Field(index=True, nullable=False)
+    start_time: datetime | None = Field(index=True, nullable=True)
+    stop_time: datetime | None = Field(index=True, nullable=True)
     nsamples: int | None = Field()
     telescope: str = Field(index=True, nullable=False)
     telescope_flavor: str | None = Field()
@@ -94,3 +125,39 @@ class TODDepthOneTable(SQLModel, table=True):
     maps: list[DepthOneMapTable] = Relationship(
         back_populates="tods", link_model=TODToMapTable
     )
+
+    def to_model(self) -> TODDepthOne:
+        """
+        Return an TODDepthOne model from this table entry.
+
+        Returns
+        -------
+        TODDepthOne : TODDepthOne
+             The TODDepthOne model corresponding to this table entry.
+        """
+        return TODDepthOne(
+            tod_id=self.tod_id,
+            obs_id=self.obs_id,
+            pwv=self.pwv,
+            ctime=Time(self.ctime),
+            start_time=Time(self.start_time),
+            stop_time=Time(self.stop_time),
+            nsamples=self.nsamples,
+            telescope=self.telescope,
+            telescope_flavor=self.telescope_flavor,
+            tube_slot=self.tube_slot,
+            tube_flavor=self.tube_flavor,
+            frequency=self.frequency,
+            scan_type=self.scan_type,
+            subtype=self.subtype,
+            wafer_count=self.wafer_count,
+            duration=self.duration,
+            az_center=self.az_center,
+            az_throw=self.az_throw,
+            el_center=self.el_center,
+            el_throw=self.el_throw,
+            roll_center=self.roll_center,
+            roll_throw=self.roll_throw,
+            wafer_slots_list=self.wafer_slots_list,
+            stream_ids_list=self.stream_ids_list,
+        )

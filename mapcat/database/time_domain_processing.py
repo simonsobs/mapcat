@@ -59,7 +59,7 @@ class TimeDomainProcessingTable(SQLModel, table=True):
 
     __tablename__ = "time_domain_processing"
 
-    processing_status_id: UUID7 = Field(primary_key=True,sa_type=Uuid)
+    processing_status_id: UUID7 = Field(primary_key=True, sa_type=Uuid)
 
     map_id: UUID7 | None = Field(
         default=None,

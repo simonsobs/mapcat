@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+import uuid7 
 
 from mapcat.database import (
     DepthOneCoaddTable,
@@ -72,6 +73,7 @@ def _make_proc(session, map_id, status):
     """Helper to insert a TimeDomainProcessingTable row and return its id."""
     with session() as s:
         proc = TimeDomainProcessingTable(
+            processing_status_id=map_id,
             map_id=map_id,
             processing_start=datetime.fromtimestamp(1756000000.0, tz=timezone.utc),
             processing_end=datetime.fromtimestamp(1756001000.0, tz=timezone.utc),
@@ -112,6 +114,7 @@ def _make_coadd_proc(session, coadd_id, status):
     """Helper to insert a coadd-linked TimeDomainProcessingTable row."""
     with session() as s:
         proc = TimeDomainProcessingTable(
+            processing_status_id=coadd_id,
             coadd_id=coadd_id,
             processing_start=datetime.fromtimestamp(1756000000.0, tz=timezone.utc),
             processing_end=datetime.fromtimestamp(1756001000.0, tz=timezone.utc),

@@ -274,7 +274,6 @@ def test_sky_coverage_2(database_sessionmaker, downloaded_data_file):
         relative_to=downloaded_data_file,
         telescope="act",
     )
-
     act.core(session=database_sessionmaker, args=args)
 
     update_sky_coverage.core(session=database_sessionmaker, convention="ACT")

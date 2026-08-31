@@ -82,6 +82,7 @@ def upgrade() -> None:
     with op.batch_alter_table("time_domain_processing") as batch_op:
         batch_op.add_column(sa.Column("map_id_new", sa.Uuid(), nullable=True))
         batch_op.add_column(sa.Column("coadd_id", sa.Uuid(), nullable=True))
+        batch_op.add_column(sa.Column("processing_status_id_new", sa.Uuid(), nullable=True))
     with op.batch_alter_table("depth_one_pointing_residuals") as batch_op:
         batch_op.add_column(sa.Column("map_id_new", sa.Uuid(), nullable=True))
     with op.batch_alter_table("depth_one_sky_coverage") as batch_op:
@@ -101,6 +102,12 @@ def upgrade() -> None:
     map_rows = bind.execute(sa.text("SELECT map_id FROM depth_one_maps")).fetchall()
     map_id_mapping = {row.map_id: uuid7.create() for row in map_rows}
     _backfill(bind, "depth_one_maps", "map_id", map_id_mapping)
+
+    proc_rows = bind.execute(
+        sa.text("SELECT processing_status_id FROM time_domain_processing")
+        ).fetchall()
+    proc_id_mapping = {row.processing_status_id: uuid7.create() for row in proc_rows}
+    _backfill(bind, "time_domain_processing", "processing_status_id", proc_id_mapping)
 
     coadd_rows = bind.execute(
         sa.text("SELECT coadd_id FROM depth_one_coadds")
@@ -202,7 +209,7 @@ def upgrade() -> None:
         "time_domain_processing",
         """
         CREATE TABLE time_domain_processing_new (
-            processing_status_id INTEGER NOT NULL,
+            processing_status_id CHAR(32) NOT NULL,
             processing_start FLOAT,
             processing_end FLOAT,
             processing_status VARCHAR NOT NULL,
@@ -217,7 +224,7 @@ def upgrade() -> None:
         """,
         """
         INSERT INTO time_domain_processing_new
-        SELECT processing_status_id, processing_start, processing_end,
+        SELECT processing_status_id_new, processing_start, processing_end,
                processing_status, map_id_new, coadd_id
         FROM time_domain_processing
         """,

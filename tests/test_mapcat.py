@@ -2,8 +2,8 @@
 Test the core functions
 """
 
-from uuid import uuid4
 from datetime import datetime, timezone
+from uuid import uuid4
 
 import pytest
 from astropy import units as u

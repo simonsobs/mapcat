@@ -17,7 +17,7 @@ class PipelineInformationTable(SQLModel, table=True):
 
     Attributes
     ----------
-    id : str
+    id : int
         Internal ID of the pipeline info
     map_name : str
         Name of depth 1 map being tracked. Foreign into DepthOneMap

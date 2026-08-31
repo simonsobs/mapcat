@@ -3,10 +3,12 @@ Reset processing statuses in the TimeDomainProcessingTable.
 """
 
 import argparse as ap
-import uuid
+from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
+
+from uuid7 import UUID as UUID7
 
 from mapcat.database import (
     DepthOneMapTable,
@@ -82,9 +84,15 @@ def core(session: sessionmaker, args: ap.Namespace):
                 TimeDomainProcessingTable.map_id == DepthOneMapTable.map_id,
             )
             if args.start_time is not None:
-                stmt = stmt.where(DepthOneMapTable.ctime >= args.start_time)
+                stmt = stmt.where(
+                    DepthOneMapTable.ctime
+                    >= datetime.fromtimestamp(args.start_time, tz=timezone.utc)
+                )
             if args.end_time is not None:
-                stmt = stmt.where(DepthOneMapTable.ctime <= args.end_time)
+                stmt = stmt.where(
+                    DepthOneMapTable.ctime
+                    <= datetime.fromtimestamp(args.end_time, tz=timezone.utc)
+                )
 
         if args.from_status is not None:
             stmt = stmt.where(
@@ -112,9 +120,15 @@ def core(session: sessionmaker, args: ap.Namespace):
                     PointingResidualTable.map_id == DepthOneMapTable.map_id,
                 )
                 if args.start_time is not None:
-                    pr_stmt = pr_stmt.where(DepthOneMapTable.ctime >= args.start_time)
+                    pr_stmt = pr_stmt.where(
+                        DepthOneMapTable.ctime
+                        >= datetime.fromtimestamp(args.start_time, tz=timezone.utc)
+                    )
                 if args.end_time is not None:
-                    pr_stmt = pr_stmt.where(DepthOneMapTable.ctime <= args.end_time)
+                    pr_stmt = pr_stmt.where(
+                        DepthOneMapTable.ctime
+                        <= datetime.fromtimestamp(args.end_time, tz=timezone.utc)
+                    )
 
             pointing_residuals = cur_session.execute(pr_stmt).scalars().all()
             for pr in pointing_residuals:
@@ -151,7 +165,7 @@ def main():
     parser.add_argument(
         "-m",
         "--map-id",
-        type=uuid.UUID,
+        type=UUID7,
         nargs="+",
         default=None,
         help="Only reset entries for these map IDs.",
@@ -160,7 +174,7 @@ def main():
     parser.add_argument(
         "-c",
         "--coadd-id",
-        type=uuid.UUID,
+        type=UUID7,
         nargs="+",
         default=None,
         help="Only reset entries for these coadd IDs.",

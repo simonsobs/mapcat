@@ -3,6 +3,7 @@ Tests for the mapcatreset CLI (mapcat/toolkit/reset.py).
 """
 
 import argparse
+from datetime import datetime, timezone
 
 import pytest
 from sqlalchemy import create_engine
@@ -48,14 +49,18 @@ def database_sessionmaker(tmp_path_factory):
 def _make_map(session, name, ctime, start_time=None, stop_time=None):
     """Helper to insert a DepthOneMapTable row and return its map_id."""
     with session() as s:
+        if start_time is None:
+            start_time = ctime - 500
+        if stop_time is None:
+            stop_time = ctime + 500
         dmap = DepthOneMapTable(
             map_name=name,
             map_path=f"/path/{name}_map.fits",
             tube_slot="OTi1",
             frequency="f090",
-            ctime=ctime,
-            start_time=start_time or ctime - 500,
-            stop_time=stop_time or ctime + 500,
+            ctime=datetime.fromtimestamp(ctime, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(start_time, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(stop_time, tz=timezone.utc),
         )
         s.add(dmap)
         s.commit()
@@ -68,8 +73,8 @@ def _make_proc(session, map_id, status):
     with session() as s:
         proc = TimeDomainProcessingTable(
             map_id=map_id,
-            processing_start=1756000000.0,
-            processing_end=1756001000.0,
+            processing_start=datetime.fromtimestamp(1756000000.0, tz=timezone.utc),
+            processing_end=datetime.fromtimestamp(1756001000.0, tz=timezone.utc),
             processing_status=status,
         )
         s.add(proc)

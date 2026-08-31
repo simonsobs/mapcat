@@ -24,7 +24,7 @@ from .links import DepthOneToCoaddTable, TODToMapTable
 
 
 class DepthOneMap(SQLModel):
-    map_id: int
+    map_id: UUID7
     map_name: str
 
     map_path: str | None
@@ -51,8 +51,8 @@ class DepthOneMapTable(SQLModel, table=True):
 
     Attributes
     ----------
-    id : int
-        Unique map identifiers. Internal to SO
+    id : UUID7
+        Unique map identifier. Internal to SO
     map_name : str
         Name of depth 1 map
     map_path : str | None

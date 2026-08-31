@@ -18,9 +18,9 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class TimeDomainProcessing(SQLModel):
-    processing_status_id: int
+    processing_status_id: UUID7
 
-    map_id: int
+    map_id: UUID7
 
     processing_start: AstroPydanticTime | None
     processing_end: AstroPydanticTime | None
@@ -40,8 +40,8 @@ class TimeDomainProcessingTable(SQLModel, table=True):
 
     Attributes
     ----------
-    processing_status_id : int
-        Internal ID of the processing status. A plain autoincrement PK,
+    processing_status_id : UUID7
+        Internal ID of the processing status. Yet another uuid,
         independent of the map/coadd being tracked.
     map_id : UUID7 | None
         Depth-1 map being tracked, if this row is for a map.
@@ -59,7 +59,7 @@ class TimeDomainProcessingTable(SQLModel, table=True):
 
     __tablename__ = "time_domain_processing"
 
-    processing_status_id: int = Field(primary_key=True)
+    processing_status_id: UUID7 = Field(primary_key=True,sa_type=Uuid)
 
     map_id: UUID7 | None = Field(
         default=None,

@@ -98,9 +98,9 @@ def _make_coadd(session, name, ctime):
             map_path=f"/path/{name}_flux.fits",
             ivar_path=None,
             frequency="f090",
-            ctime=ctime,
-            start_time=ctime - 500,
-            stop_time=ctime + 500,
+            ctime=datetime.fromtimestamp(ctime, tz=timezone.utc),
+            start_time=datetime.fromtimestamp(ctime - 500, tz=timezone.utc),
+            stop_time=datetime.fromtimestamp(ctime + 500, tz=timezone.utc),
         )
         s.add(coadd)
         s.commit()
@@ -113,8 +113,8 @@ def _make_coadd_proc(session, coadd_id, status):
     with session() as s:
         proc = TimeDomainProcessingTable(
             coadd_id=coadd_id,
-            processing_start=1756000000.0,
-            processing_end=1756001000.0,
+            processing_start=datetime.fromtimestamp(1756000000.0, tz=timezone.utc),
+            processing_end=datetime.fromtimestamp(1756001000.0, tz=timezone.utc),
             processing_status=status,
         )
         s.add(proc)

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
-from sqalchemy import Uuid
+from sqlalchemy import Uuid
 from sqlmodel import JSON, Field, Relationship, SQLModel
 from uuid7 import UUID as UUID7
 from uuid7 import create as uuid7_create

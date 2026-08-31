@@ -23,7 +23,7 @@ and verified against a real SQLite database before this migration was
 finalized.
 """
 
-import uuid
+import uuid7
 from collections.abc import Sequence
 
 import sqlalchemy as sa
@@ -38,9 +38,7 @@ depends_on: str | Sequence[str] | None = None
 
 def _backfill(bind, table: str, id_column: str, mapping: dict) -> None:
     """UPDATE `table` SET `id_column`_new = <uuid> WHERE `id_column` = <old id>,
-    for every (old id -> new uuid) pair in `mapping`. Batches statements in
-    chunks rather than one round-trip per row.
-
+    for every (old id -> new uuid) pair in `mapping`. 
     Writes the 32-char hex form (no dashes), matching the string SQLAlchemy's
     sa.Uuid() bind processor produces for SQLite -- writing str(new_uuid)
     (36-char, dashed) here would silently desync from any UUID value bound
@@ -49,16 +47,12 @@ def _backfill(bind, table: str, id_column: str, mapping: dict) -> None:
     forms as equal.
     """
     new_column = f"{id_column}_new"
-    items = list(mapping.items())
-    chunk_size = 500
-    for start in range(0, len(items), chunk_size):
-        chunk = items[start : start + chunk_size]
-        for old_id, new_uuid in chunk:
-            bind.execute(
-                sa.text(
-                    f"UPDATE {table} SET {new_column} = :new_uuid "
-                    f"WHERE {id_column} = :old_id"
-                ),
+    for old_id, new_uuid in mapping.items():
+        bind.execute(
+            sa.text(
+                f"UPDATE {table} SET {new_column} = :new_uuid "
+                f"WHERE {id_column} = :old_id"
+            ),
                 {"new_uuid": new_uuid.hex, "old_id": old_id},
             )
 
@@ -105,13 +99,13 @@ def upgrade() -> None:
     # Raw SQL only -- never import the (still-evolving) ORM model classes
     # inside a migration.
     map_rows = bind.execute(sa.text("SELECT map_id FROM depth_one_maps")).fetchall()
-    map_id_mapping = {row.map_id: uuid.uuid4() for row in map_rows}
+    map_id_mapping = {row.map_id: uuid7.create() for row in map_rows}
     _backfill(bind, "depth_one_maps", "map_id", map_id_mapping)
 
     coadd_rows = bind.execute(
         sa.text("SELECT coadd_id FROM depth_one_coadds")
     ).fetchall()
-    coadd_id_mapping = {row.coadd_id: uuid.uuid4() for row in coadd_rows}
+    coadd_id_mapping = {row.coadd_id: uuid7.create() for row in coadd_rows}
     _backfill(bind, "depth_one_coadds", "coadd_id", coadd_id_mapping)
 
     _backfill(bind, "time_domain_processing", "map_id", map_id_mapping)

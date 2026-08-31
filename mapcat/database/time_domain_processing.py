@@ -3,15 +3,14 @@ Table containing information about processing status of the Depth-1 maps
 and depth-1 map coadds.
 """
 
-from typing import TYPE_CHECKING
-from uuid7 import UUID as UUID7
-
-from sqlalchemy import CheckConstraint, Uuid
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
+from sqlalchemy import CheckConstraint, Uuid
 from sqlmodel import Field, Relationship, SQLModel
+from uuid7 import UUID as UUID7
 
 if TYPE_CHECKING:  # pragma: no cover
     from .depth_one_coadd import DepthOneCoaddTable

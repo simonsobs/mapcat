@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
-
 from uuid7 import UUID as UUID7
 
 from mapcat.database import (

@@ -2,15 +2,14 @@
 Table containing information about Depth-1 map coadds.
 """
 
+from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Uuid
-from datetime import datetime
-
 from astropy.time import Time
+from sqlalchemy import Uuid
 from sqlmodel import Field, Relationship, SQLModel
-from uuid7 import create as uuid7_create
 from uuid7 import UUID as UUID7
+from uuid7 import create as uuid7_create
 
 from .depth_one_map import DepthOneMapTable
 from .links import DepthOneToCoaddTable

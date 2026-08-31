@@ -26,8 +26,8 @@ finalized.
 from collections.abc import Sequence
 
 import sqlalchemy as sa
-from alembic import op
 import uuid7
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "6eeaa35444bb"

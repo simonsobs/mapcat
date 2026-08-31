@@ -100,6 +100,7 @@ def test_create_depth_one(database_sessionmaker):
     # Make child tables
     with database_sessionmaker() as session:
         processing_status = TimeDomainProcessingTable(
+            processing_status_id=map_id,
             processing_start=datetime.fromtimestamp(1756787524.0, tz=timezone.utc),
             processing_end=datetime.fromtimestamp(1756797524.0, tz=timezone.utc),
             processing_status="done",
@@ -264,6 +265,7 @@ def test_add_remove_child_tables(database_sessionmaker):
         )
 
         processing_status = TimeDomainProcessingTable(
+            processing_status_id=dmap.map_id,
             processing_start=datetime.fromtimestamp(1756787524.0, tz=timezone.utc),
             processing_end=datetime.fromtimestamp(1756797524.0, tz=timezone.utc),
             processing_status="done",

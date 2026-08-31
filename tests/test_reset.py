@@ -8,7 +8,6 @@ from datetime import datetime, timezone
 import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import uuid7 
 
 from mapcat.database import (
     DepthOneCoaddTable,

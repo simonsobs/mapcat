@@ -2,6 +2,9 @@
 Link tables.
 """
 
+from uuid import UUID
+
+from sqlalchemy import Uuid
 from sqlmodel import Field, SQLModel
 
 
@@ -12,19 +15,21 @@ class DepthOneToCoaddTable(SQLModel, table=True):
 
     __tablename__ = "link_depth_one_map_to_coadd"
 
-    map_id: int = Field(
+    map_id: UUID = Field(
         foreign_key="depth_one_maps.map_id",
         primary_key=True,
         nullable=False,
         index=True,
         ondelete="CASCADE",
+        sa_type=Uuid,
     )
-    coadd_id: int = Field(
+    coadd_id: UUID = Field(
         foreign_key="depth_one_coadds.coadd_id",
         primary_key=True,
         nullable=False,
         index=True,
         ondelete="CASCADE",
+        sa_type=Uuid,
     )
 
 
@@ -42,12 +47,13 @@ class TODToMapTable(SQLModel, table=True):
         index=True,
         ondelete="CASCADE",
     )
-    map_id: int = Field(
+    map_id: UUID = Field(
         foreign_key="depth_one_maps.map_id",
         primary_key=True,
         nullable=False,
         index=True,
         ondelete="CASCADE",
+        sa_type=Uuid,
     )
 
 

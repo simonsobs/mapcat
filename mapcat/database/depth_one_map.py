@@ -7,7 +7,10 @@ from typing import TYPE_CHECKING, Any
 
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
+from sqlalchemy import Uuid
 from sqlmodel import JSON, Field, Relationship, SQLModel
+from uuid7 import UUID as UUID7
+from uuid7 import create as uuid7_create
 
 if TYPE_CHECKING:  # pragma: no cover
     from .depth_one_coadd import DepthOneCoaddTable
@@ -21,7 +24,7 @@ from .links import DepthOneToCoaddTable, TODToMapTable
 
 
 class DepthOneMap(SQLModel):
-    map_id: int
+    map_id: UUID7
     map_name: str
 
     map_path: str | None
@@ -48,8 +51,8 @@ class DepthOneMapTable(SQLModel, table=True):
 
     Attributes
     ----------
-    id : int
-        Unique map identifiers. Internal to SO
+    id : UUID7
+        Unique map identifier. Internal to SO
     map_name : str
         Name of depth 1 map
     map_path : str | None
@@ -102,7 +105,7 @@ class DepthOneMapTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_maps"
 
-    map_id: int = Field(primary_key=True)
+    map_id: UUID7 = Field(default_factory=uuid7_create, primary_key=True, sa_type=Uuid)
     map_name: str = Field(index=True, unique=True, nullable=False)
 
     map_path: str | None = None

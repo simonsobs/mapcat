@@ -15,6 +15,7 @@ from .tod import TODDepthOneTable
 __all__ = [
     "AtomicMapCoaddTable",
     "AtomicMapTable",
+    "DepthOneCoaddTable",
     "DepthOneMapTable",
     "PipelineInformationTable",
     "PointingResidualTable",

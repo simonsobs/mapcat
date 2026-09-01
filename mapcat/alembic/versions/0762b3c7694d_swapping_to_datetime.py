@@ -1,7 +1,7 @@
 """Swapping to datetime
 
 Revision ID: 0762b3c7694d
-Revises: 46575bc0d660
+Revises: 6eeaa35444bb
 Create Date: 2026-07-27 11:19:49.803412
 
 """
@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "0762b3c7694d"
-down_revision: str | None = "46575bc0d660"
+down_revision: str | None = "6eeaa35444bb"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

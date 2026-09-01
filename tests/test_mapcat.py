@@ -3,6 +3,7 @@ Test the core functions
 """
 
 from datetime import datetime, timezone
+from uuid import uuid4
 
 import pytest
 from astropy import units as u
@@ -99,6 +100,7 @@ def test_create_depth_one(database_sessionmaker):
     # Make child tables
     with database_sessionmaker() as session:
         processing_status = TimeDomainProcessingTable(
+            processing_status_id=map_id,
             processing_start=datetime.fromtimestamp(1756787524.0, tz=timezone.utc),
             processing_end=datetime.fromtimestamp(1756797524.0, tz=timezone.utc),
             processing_status="done",
@@ -244,7 +246,7 @@ def test_create_depth_one(database_sessionmaker):
 
     # Check bad map ID raises ValueError
     with pytest.raises(ValueError), database_sessionmaker() as session:
-        result = session.get(DepthOneMapTable, 999999)
+        result = session.get(DepthOneMapTable, uuid4())
         if result is None:
             raise ValueError("Map ID does not exist")
 
@@ -253,7 +255,6 @@ def test_add_remove_child_tables(database_sessionmaker):
     # Create a depth one map
     with database_sessionmaker() as session:
         dmap = DepthOneMapTable(
-            map_id=42,
             map_name="myDepthOne2",
             map_path="/PATH/TO/DEPTH/ONE2",
             tube_slot="OTi1",
@@ -264,6 +265,7 @@ def test_add_remove_child_tables(database_sessionmaker):
         )
 
         processing_status = TimeDomainProcessingTable(
+            processing_status_id=dmap.map_id,
             processing_start=datetime.fromtimestamp(1756787524.0, tz=timezone.utc),
             processing_end=datetime.fromtimestamp(1756797524.0, tz=timezone.utc),
             processing_status="done",

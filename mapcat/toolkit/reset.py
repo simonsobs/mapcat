@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.orm import sessionmaker
+from uuid7 import UUID as UUID7
 
 from mapcat.database import (
     DepthOneMapTable,
@@ -23,8 +24,10 @@ Statuses can be set to 'failed', 'completed', or 'permafail'
 (which tells the pipeline not to retry the map due to a pathological failure),
  or removed entirely by not specifying a target status.
 
-Entries to reset can be filtered by map ID, time range (using the map's ctime),
-and/or current processing status.
+Entries to reset can be filtered by map ID, coadd ID, time range (using the
+map's ctime), and/or current processing status. --start-time/--end-time only
+filter map-linked entries (DepthOneCoaddTable also has a ctime, but time
+filtering for coadd entries isn't supported yet).
 """
 
 USAGE = """Examples:
@@ -35,7 +38,7 @@ USAGE = """Examples:
 
   Remove processing status entries for specific map IDs:
 
-    mapcatreset --map-id 10 11 12
+    mapcatreset --map-id 3fa85f64-5717-4562-b3fc-2c963f66afa6
 
   Reset entries with status 'running' to 'failed' in a time range:
 
@@ -44,7 +47,11 @@ USAGE = """Examples:
 
   Mark a specific map as 'permafail' (will not be retried by the pipeline):
 
-    mapcatreset --status permafail --map-id 42
+    mapcatreset --status permafail --map-id 3fa85f64-5717-4562-b3fc-2c963f66afa6
+
+  Mark a specific coadd as 'permafail':
+
+    mapcatreset --status permafail --coadd-id 9c858901-8a57-4791-81fe-4c455b0c9c78
 """
 
 
@@ -66,6 +73,9 @@ def core(session: sessionmaker, args: ap.Namespace):
 
         if args.map_id:
             stmt = stmt.where(TimeDomainProcessingTable.map_id.in_(args.map_id))
+
+        if args.coadd_id:
+            stmt = stmt.where(TimeDomainProcessingTable.coadd_id.in_(args.coadd_id))
 
         if args.start_time is not None or args.end_time is not None:
             stmt = stmt.join(
@@ -154,10 +164,19 @@ def main():
     parser.add_argument(
         "-m",
         "--map-id",
-        type=int,
+        type=UUID7,
         nargs="+",
         default=None,
         help="Only reset entries for these map IDs.",
+    )
+
+    parser.add_argument(
+        "-c",
+        "--coadd-id",
+        type=UUID7,
+        nargs="+",
+        default=None,
+        help="Only reset entries for these coadd IDs.",
     )
 
     parser.add_argument(

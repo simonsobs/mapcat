@@ -78,7 +78,6 @@ def create_objects(base: str, relative_to: Path, telescope: str) -> DepthOneMapT
         )
         for obs_id in file_info["observations"]
     ]
-
     return DepthOneMapTable(
         map_name=filenames["map"].replace("_map.fits", ""),
         map_path=filenames["map"],

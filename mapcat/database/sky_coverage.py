@@ -2,7 +2,9 @@
 Sky coverage table.
 """
 
-from sqlalchemy import PrimaryKeyConstraint
+from uuid import UUID
+
+from sqlalchemy import PrimaryKeyConstraint, Uuid
 from sqlmodel import Field, Relationship, SQLModel
 
 from .depth_one_map import DepthOneMapTable
@@ -32,11 +34,12 @@ class SkyCoverageTable(SQLModel, table=True):
     x: int = Field(index=True, primary_key=True)
     y: int = Field(index=True, primary_key=True)
 
-    map_id: int = Field(
+    map_id: UUID = Field(
         foreign_key="depth_one_maps.map_id",
         nullable=False,
         ondelete="CASCADE",
         primary_key=True,
+        sa_type=Uuid,
     )
 
     map: DepthOneMapTable = Relationship(back_populates="depth_one_sky_coverage")

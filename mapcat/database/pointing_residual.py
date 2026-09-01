@@ -2,6 +2,9 @@
 Table containing pointing residuals.
 """
 
+from uuid import UUID
+
+from sqlalchemy import Uuid
 from sqlmodel import Field, Relationship, SQLModel
 
 from mapcat.pointing.base import PointingModelStats
@@ -33,11 +36,12 @@ class PointingResidualTable(SQLModel, table=True):
     __tablename__ = "depth_one_pointing_residuals"
     pointing_residual_id: int = Field(primary_key=True)
 
-    map_id: int = Field(
+    map_id: UUID = Field(
         index=True,
         nullable=False,
         foreign_key="depth_one_maps.map_id",
         ondelete="CASCADE",
+        sa_type=Uuid,
     )
     residual_model: PointingModel = Field(sa_type=JSONEncodedPydantic(PointingModel))
     residual_stats: PointingModelStats | None = Field(

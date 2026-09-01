@@ -66,7 +66,14 @@ It is also wise to include the TOD information used for creating the map,
 so that we can later track individual TODs' contributions to various maps.
 Note that there does not need to be a one-to-one relationship between
 maps and TODs.
+
+`ctime`, `start_time`, and `stop_time` on depth-1 maps and coadds are
+timezone-aware `datetime` objects (UTC), not unix timestamps. `map_id`
+(and `coadd_id` on coadds) is a UUID7, auto-generated when the row is
+created -- you don't need to set it yourself.
 ```python3
+from datetime import datetime, timezone
+
 from mapcat.helper import settings
 from mapcat.database import DepthOneMapTable, TODDepthOneTable
 
@@ -84,17 +91,19 @@ with settings.session() as session:
     map_name="15722/depth1_157221244_lati1_f090",
     map_path="15722/depth1_157221244_lati1_f090_map.fits",
     ivar_path="15722/depth1_157221244_lati1_f090_ivar.fits",
-    time_path="15722/depth1_157221244_lati1_f090_time.fits",
+    mean_time_path="15722/depth1_157221244_lati1_f090_time.fits",
     tube_slot="i1",
     frequency="090",
-    ctime=157221244.0,
-    start_time=157220244.0,
-    stop_time=157222423.0,
+    ctime=datetime.fromtimestamp(157221244.0, tz=timezone.utc),
+    start_time=datetime.fromtimestamp(157220244.0, tz=timezone.utc),
+    stop_time=datetime.fromtimestamp(157222423.0, tz=timezone.utc),
     tods=tods,
   )
 
   session.add(map)
   session.commit()
+
+  print(map.map_id)  # auto-generated UUID7
 ```
 By referencing the TOD objects, you automatically create the required
 link table items.

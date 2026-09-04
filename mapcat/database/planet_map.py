@@ -65,7 +65,7 @@ class PlanetMap(SQLModel):
 
 
 class PlanetMapTable(SQLModel, table=True):
-    __tablename__ = "planet_maps"
+    __tablename__ = "planet_map"
 
     planet_map_id: int = Field(primary_key=True)
 

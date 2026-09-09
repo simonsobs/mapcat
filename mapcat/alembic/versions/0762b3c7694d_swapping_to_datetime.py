@@ -68,12 +68,15 @@ def unix_to_datetime(
         op.add_column(
             table_name, sa.Column(temp_col_name, sa.DateTime(), nullable=True)
         )
+        # Re-reflect: the table was just reflected before the temp column
+        # existed, so cur_table.c wouldn't otherwise know about it.
+        cur_table = sa.Table(table_name, sa.MetaData(), autoload_with=bind)
 
         stmt = sa.select(cur_table.c[column_name], cur_table.c[primary_key_name])
         results = bind.execute(stmt).fetchall()
         for row in results:
-            unix_time = row[column_name]
-            primary_key_value = row[primary_key_name]
+            unix_time = row._mapping[column_name]
+            primary_key_value = row._mapping[primary_key_name]
             datetime_value = datetime.fromtimestamp(int(unix_time), tz=timezone.utc)
             update_stmt = (
                 cur_table.update()
@@ -125,12 +128,15 @@ def datetime_to_unix(
             op.drop_index(f"ix_{table_name}_{column_name}", table_name=table_name)
 
         op.add_column(table_name, sa.Column(temp_col_name, sa.String(), nullable=True))
+        # Re-reflect: the table was just reflected before the temp column
+        # existed, so cur_table.c wouldn't otherwise know about it.
+        cur_table = sa.Table(table_name, sa.MetaData(), autoload_with=bind)
 
         stmt = sa.select(cur_table.c[column_name], cur_table.c[primary_key_name])
         results = bind.execute(stmt).fetchall()
         for row in results:
-            datetime_value = row[column_name]
-            primary_key_value = row[primary_key_name]
+            datetime_value = row._mapping[column_name]
+            primary_key_value = row._mapping[primary_key_name]
             unix_time = _datetime_to_unix_value(datetime_value)
             update_stmt = (
                 cur_table.update()

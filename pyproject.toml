@@ -26,6 +26,7 @@ actingest = "mapcat.toolkit.act:main"
 mapcatmigrate = "mapcat.helper:migrate"
 updatesky = "mapcat.toolkit.update_sky_coverage:main"
 mapcatreset = "mapcat.toolkit.reset:main"
+mapcatrelativize = "mapcat.toolkit.relativize:main"
 
 [project.optional-dependencies]
 dev = [

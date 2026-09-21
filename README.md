@@ -58,6 +58,16 @@ actingest --relative-to=/path/to/maps --glob=*/*_map.fits --telescope=act
 ```
 More information on the parameters is available through `actingest -h`.
 
+Path columns (`map_path`, `ivar_path`, etc.) are meant to be stored
+relative to their corresponding `MAPCAT_*_PARENT` directory. If some
+rows ended up with absolute paths instead (e.g. from an external
+ingestion pipeline), they can be rewritten in place with:
+```
+mapcatrelativize --dry-run   # preview the changes
+mapcatrelativize             # apply them
+```
+More information is available through `mapcatrelativize -h`.
+
 Registering new Maps
 --------------------
 

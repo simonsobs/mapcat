@@ -1,6 +1,7 @@
 """
 Rewrite absolute paths stored in the mapcat database to be relative to
-the appropriate MAPCAT_*_PARENT directory.
+the appropriate MAPCAT_*_PARENT directory, or to an explicit
+--parent-path.
 """
 
 import argparse as ap
@@ -18,9 +19,16 @@ from mapcat.database import (
 )
 
 HELP_TEXT = """Use this utility to rewrite path columns in the mapcat
-database from absolute paths to paths relative to the corresponding
-MAPCAT_*_PARENT directory (e.g. MAPCAT_DEPTH_ONE_PARENT for depth-1
-maps). Paths that are already relative are left untouched.
+database from absolute paths to relative ones. Paths that are already
+relative are left untouched.
+
+By default, each table's paths are relativized against its
+corresponding MAPCAT_*_PARENT setting (e.g. MAPCAT_DEPTH_ONE_PARENT
+for depth-1 maps). Use --parent-path to instead relativize every
+selected table's paths against an explicit directory -- this is
+useful when the paths stored in the database were written on another
+machine (e.g. under /global/cfs/...) and don't match this machine's
+MAPCAT_*_PARENT settings at all.
 
 By default, all four map/coadd tables are processed. Use --table to
 restrict to a subset. Use --dry-run to preview the changes that would
@@ -37,13 +45,19 @@ USAGE = """Examples:
 
     mapcatrelativize --dry-run
 
-  Relativize every path column in every table:
+  Relativize every path column in every table, against each table's
+  MAPCAT_*_PARENT setting:
 
     mapcatrelativize
 
   Only relativize depth-1 map paths:
 
     mapcatrelativize --table depth_one_map
+
+  Strip a known prefix that doesn't match any MAPCAT_*_PARENT setting
+  on this machine (e.g. paths recorded on another cluster):
+
+    mapcatrelativize --parent-path /global/cfs/cdirs/sobs/lat-iso/phase2/depth1/20260919
 
   Relativize paths even if they fall outside the configured parent
   directory (using '..' segments):
@@ -153,7 +167,11 @@ def core(session: sessionmaker, args: ap.Namespace):
     with session() as cur_session:
         for table_name in args.table:
             table_cls, parent_attr, columns = TABLE_PATH_COLUMNS[table_name]
-            parent = getattr(settings, parent_attr)
+            parent = (
+                args.parent_path
+                if args.parent_path is not None
+                else getattr(settings, parent_attr)
+            )
 
             rows = cur_session.execute(select(table_cls)).scalars().all()
 
@@ -207,6 +225,19 @@ def main():
         choices=list(TABLE_PATH_COLUMNS),
         default=list(TABLE_PATH_COLUMNS),
         help="Which table(s) to relativize paths for. Defaults to all of them.",
+    )
+
+    parser.add_argument(
+        "-p",
+        "--parent-path",
+        type=Path,
+        default=None,
+        help=(
+            "Relativize every selected table's paths against this directory "
+            "instead of its MAPCAT_*_PARENT setting. Useful when the paths "
+            "stored in the database were written on another machine and "
+            "don't match any MAPCAT_*_PARENT configured here."
+        ),
     )
 
     parser.add_argument(

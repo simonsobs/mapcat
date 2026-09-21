@@ -157,7 +157,7 @@ def test_core_relativizes_depth_one_map(database_sessionmaker, parents):
         database_sessionmaker, "relativize_map", 1755000000.0, abs_map_path
     )
 
-    args = argparse.Namespace(table=["depth_one_map"], dry_run=False, force=False)
+    args = argparse.Namespace(table=["depth_one_map"], dry_run=False, force=False, parent_path=None)
     core(session=database_sessionmaker, args=args)
 
     dmap = _get_map(database_sessionmaker, map_id)
@@ -172,7 +172,7 @@ def test_core_dry_run_does_not_write(database_sessionmaker, parents):
         database_sessionmaker, "relativize_dryrun", 1755100000.0, abs_map_path
     )
 
-    args = argparse.Namespace(table=["depth_one_map"], dry_run=True, force=False)
+    args = argparse.Namespace(table=["depth_one_map"], dry_run=True, force=False, parent_path=None)
     core(session=database_sessionmaker, args=args)
 
     dmap = _get_map(database_sessionmaker, map_id)
@@ -187,7 +187,7 @@ def test_core_already_relative_untouched(database_sessionmaker, parents):
         "already/relative.fits",
     )
 
-    args = argparse.Namespace(table=["depth_one_map"], dry_run=False, force=False)
+    args = argparse.Namespace(table=["depth_one_map"], dry_run=False, force=False, parent_path=None)
     core(session=database_sessionmaker, args=args)
 
     dmap = _get_map(database_sessionmaker, map_id)
@@ -200,11 +200,33 @@ def test_core_skips_path_outside_parent_without_force(database_sessionmaker, par
         database_sessionmaker, "relativize_outside", 1755300000.0, outside_path
     )
 
-    args = argparse.Namespace(table=["depth_one_map"], dry_run=False, force=False)
+    args = argparse.Namespace(table=["depth_one_map"], dry_run=False, force=False, parent_path=None)
     core(session=database_sessionmaker, args=args)
 
     dmap = _get_map(database_sessionmaker, map_id)
     assert dmap.map_path == outside_path
+
+
+def test_core_parent_path_overrides_settings(database_sessionmaker, parents, tmp_path):
+    """Paths recorded on another machine, unrelated to any configured
+    MAPCAT_*_PARENT, are still relativized when --parent-path is given."""
+    foreign_root = tmp_path / "global" / "cfs" / "cdirs" / "sobs"
+    abs_map_path = str(foreign_root / "17569" / "map.fits")
+
+    map_id = _make_map(
+        database_sessionmaker, "relativize_parent_override", 1755350000.0, abs_map_path
+    )
+
+    args = argparse.Namespace(
+        table=["depth_one_map"],
+        dry_run=False,
+        force=False,
+        parent_path=foreign_root,
+    )
+    core(session=database_sessionmaker, args=args)
+
+    dmap = _get_map(database_sessionmaker, map_id)
+    assert dmap.map_path == "17569/map.fits"
 
 
 def test_core_relativizes_depth_one_coadd(database_sessionmaker, parents):
@@ -215,7 +237,7 @@ def test_core_relativizes_depth_one_coadd(database_sessionmaker, parents):
         database_sessionmaker, "relativize_coadd", 1755400000.0, abs_map_path
     )
 
-    args = argparse.Namespace(table=["depth_one_coadd"], dry_run=False, force=False)
+    args = argparse.Namespace(table=["depth_one_coadd"], dry_run=False, force=False, parent_path=None)
     core(session=database_sessionmaker, args=args)
 
     coadd = _get_coadd(database_sessionmaker, coadd_id)
@@ -230,7 +252,7 @@ def test_core_relativizes_atomic_map(database_sessionmaker, parents):
         database_sessionmaker, "obs_relativize", 1755500000.0, abs_map_path
     )
 
-    args = argparse.Namespace(table=["atomic_map"], dry_run=False, force=False)
+    args = argparse.Namespace(table=["atomic_map"], dry_run=False, force=False, parent_path=None)
     core(session=database_sessionmaker, args=args)
 
     amap = _get_atomic(database_sessionmaker, atomic_map_id)
@@ -256,7 +278,7 @@ def test_core_table_filter_leaves_other_tables_untouched(
         str(depth_one_coadd_parent / "filter" / "map.fits"),
     )
 
-    args = argparse.Namespace(table=["depth_one_map"], dry_run=False, force=False)
+    args = argparse.Namespace(table=["depth_one_map"], dry_run=False, force=False, parent_path=None)
     core(session=database_sessionmaker, args=args)
 
     dmap = _get_map(database_sessionmaker, map_id)

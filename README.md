@@ -66,6 +66,12 @@ ingestion pipeline), they can be rewritten in place with:
 mapcatrelativize --dry-run   # preview the changes
 mapcatrelativize             # apply them
 ```
+If the paths were recorded on a different machine and don't match any
+`MAPCAT_*_PARENT` configured here (e.g. `/global/cfs/...` from
+another cluster), pass the prefix to strip explicitly:
+```
+mapcatrelativize --parent-path /global/cfs/cdirs/sobs/lat-iso/phase2/depth1/20260919
+```
 More information is available through `mapcatrelativize -h`.
 
 Registering new Maps

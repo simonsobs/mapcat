@@ -59,7 +59,27 @@ class PlanetMap(SQLModel):
     proc: dict[str, Any] | list[Any] | None = None
     detnum: list[int] | None = None
     detid: list[str] | None = None
-
+    # Main beam fit result
+    amplitude: float | None
+    peak: float | None
+    xo: float | None
+    yo: float | None
+    sigmax: float | None
+    sigmay: float | None
+    theta: float | None
+    redchit: float | None
+    # Leakage beam fit result
+    mq: float | None
+    d0q: float | None
+    d1q: float | None
+    sigmaq: float | None
+    redchiq: float | None
+    mu: float | None
+    d0u: float | None
+    d1u: float | None
+    sigmau: float | None
+    redchiu: float | None
+    
 
 class PlanetMapTable(SQLModel, table=True):
     __tablename__ = "planet_map"
@@ -119,7 +139,27 @@ class PlanetMapTable(SQLModel, table=True):
         default=None,
         sa_column=Column(JSON, nullable=True),
     )
-   
+    # Main beam fit result
+    peak: float | None = Field()
+    amplitude: float | None = Field()
+    xo: float | None = Field()
+    yo: float | None = Field()
+    sigmax: float | None = Field()
+    sigmay: float | None = Field()
+    theta: float | None = Field()
+    redchit: float | None = Field()
+    # Leakage beam fit result
+    mq: float | None = Field()
+    d0q: float | None = Field()
+    d1q: float | None = Field()
+    sigmaq: float | None = Field()
+    redchiq: float | None = Field()
+    mu: float | None = Field()
+    d0u: float | None = Field()
+    d1u: float | None = Field()
+    sigmau: float | None = Field()
+    redchiu: float | None = Field()
+
 
 
     def to_model(self) -> PlanetMap:
@@ -173,4 +213,22 @@ class PlanetMapTable(SQLModel, table=True):
             proc=self.proc,
             detnum=self.detnum,
             detid=self.detid,
+            peak=self.peak,
+            amplitude=self.amplitude,
+            xo=self.xo,
+            yo=self.yo,
+            sigmax=self.sigmax,
+            sigmay=self.sigmay,
+            theta=self.theta,
+            redchit=self.redchit,
+            mq=self.mq,
+            d0q=self.d0q,
+            d1q=self.d1q,
+            sigmaq=self.sigmaq,
+            redchiq=self.redchiq,
+            mu=self.mu,
+            d0u=self.d0u,
+            d1u=self.d1u,
+            sigmau=self.sigmau,
+            redchiu=self.redchiu,
         )

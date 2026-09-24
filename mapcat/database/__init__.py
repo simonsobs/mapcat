@@ -11,6 +11,8 @@ from .pointing_residual import PointingResidualTable
 from .sky_coverage import SkyCoverageTable
 from .time_domain_processing import TimeDomainProcessingTable
 from .tod import TODDepthOneTable
+from .planet_map import PlanetMapTable
+from .planet_todfit import PlanetTodFitTable
 
 __all__ = [
     "AtomicMapCoaddTable",
@@ -22,6 +24,8 @@ __all__ = [
     "SkyCoverageTable",
     "TODDepthOneTable",
     "TimeDomainProcessingTable",
+    "PlanetMapTable",
+    "PlanetTodFitTable",
 ]
 
 ALL_TABLES = [
@@ -34,4 +38,6 @@ ALL_TABLES = [
     TODDepthOneTable,
     PipelineInformationTable,
     SkyCoverageTable,
+    PlanetMapTable,
+    PlanetTodFitTable,
 ]

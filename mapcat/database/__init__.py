@@ -7,6 +7,8 @@ from .atomic_map import AtomicMapTable
 from .depth_one_coadd import DepthOneCoaddTable
 from .depth_one_map import DepthOneMapTable
 from .pipeline_information import PipelineInformationTable
+from .planet_map import PlanetMapTable
+from .planet_todfit import PlanetTodFitTable
 from .pointing_residual import PointingResidualTable
 from .sky_coverage import SkyCoverageTable
 from .time_domain_processing import TimeDomainProcessingTable
@@ -18,6 +20,8 @@ __all__ = [
     "DepthOneCoaddTable",
     "DepthOneMapTable",
     "PipelineInformationTable",
+    "PlanetMapTable",
+    "PlanetTodFitTable",
     "PointingResidualTable",
     "SkyCoverageTable",
     "TODDepthOneTable",
@@ -34,4 +38,6 @@ ALL_TABLES = [
     TODDepthOneTable,
     PipelineInformationTable,
     SkyCoverageTable,
+    PlanetMapTable,
+    PlanetTodFitTable,
 ]

@@ -1,0 +1,234 @@
+"""
+Table for planet maps.
+"""
+
+from datetime import datetime
+from typing import Any
+
+from astropy.time import Time
+from astropydantic import AstroPydanticTime
+from sqlalchemy import JSON, Column
+from sqlmodel import Field, SQLModel
+
+
+class PlanetMap(SQLModel):
+    obs_id: str
+    telescope: str
+    freq_channel: str
+    wafer: str
+    ctime: AstroPydanticTime
+    dtime: datetime
+    source: str
+
+    hit_path: str | None
+    map_path: str | None
+    weight_path: str | None
+    weighted_map_path: str | None
+
+    azimuth: float | None
+    elevation: float | None    
+    duration: float| None
+    pwv: float | None
+    pwv_std: float | None
+    pwv_p2p: float | None
+    pwv_apex: float | None
+    pwv_apex_std: float | None
+    pwv_apex_p2p: float | None
+
+    f_hwp: float | None
+    roll_angle: float | None
+    scan_speed: float | None
+    scan_acc: float | None
+    sun_distance: float | None
+    moon_distance: float | None
+    wind_speed: float | None
+    wind_direction: float | None
+    ambient_temperature: float | None
+    uv: float | None
+
+    detnum_before_fitselection: int | None
+    total_detnum: int | None
+    recenter: bool | None
+    yc: float | None
+    xc: float | None
+
+    Tmap_variance: float | None
+    Qmap_variance: float | None
+    Umap_variance: float | None
+
+    proc: dict[str, Any] | list[Any] | None = None
+    detnum: list[int] | None = None
+    detid: list[str] | None = None
+    # Main beam fit result
+    amplitude: float | None
+    peak: float | None
+    xo: float | None
+    yo: float | None
+    sigmax: float | None
+    sigmay: float | None
+    theta: float | None
+    redchit: float | None
+    # Leakage beam fit result
+    mq: float | None
+    d0q: float | None
+    d1q: float | None
+    sigmaq: float | None
+    redchiq: float | None
+    mu: float | None
+    d0u: float | None
+    d1u: float | None
+    sigmau: float | None
+    redchiu: float | None
+    
+
+class PlanetMapTable(SQLModel, table=True):
+    __tablename__ = "planet_map"
+
+    obs_id: str = Field(primary_key=True)
+    telescope: str = Field(primary_key=True)
+    freq_channel: str = Field(primary_key=True)
+    wafer: str = Field(primary_key=True)
+    ctime: float = Field(nullable=False, primary_key=True)
+    source: str = Field(primary_key=True)
+    dtime: datetime = Field()
+
+    hit_path: str | None = Field()
+    map_path: str | None = Field()
+    weight_path: str | None = Field()
+    weighted_map_path: str | None = Field()
+
+    elevation: float | None = Field()
+    duration: float | None = Field()
+    azimuth: float | None = Field()
+    pwv: float | None = Field()
+    pwv_std: float | None = Field()
+    pwv_p2p: float | None = Field()
+    pwv_apex: float | None = Field()
+    pwv_apex_std: float | None = Field()
+    pwv_apex_p2p: float | None = Field()
+    f_hwp: float | None = Field()
+    roll_angle: float | None = Field()
+    scan_speed: float | None = Field()
+    scan_acc: float | None = Field()
+    sun_distance: float | None = Field()
+    moon_distance: float | None = Field()
+    wind_speed: float | None = Field()
+    wind_direction: float | None = Field()
+    ambient_temperature: float | None = Field()
+    uv: float | None = Field()
+
+    detnum_before_fitselection: int | None = Field()
+    total_detnum: int | None = Field()
+    recenter: bool | None = Field()
+    yc: float | None = Field()
+    xc: float | None = Field()
+
+    Tmap_variance: float | None = Field()
+    Qmap_variance: float | None = Field()
+    Umap_variance: float | None = Field()
+
+    proc: dict[str, Any] | list[Any] | None = Field(
+        default=None,
+        sa_column=Column(JSON, nullable=True),
+    )
+    detnum: list[int] | None = Field(
+        default=None,
+        sa_column=Column(JSON, nullable=True),
+    )
+    detid: list[str] | None = Field(
+        default=None,
+        sa_column=Column(JSON, nullable=True),
+    )
+    # Main beam fit result
+    peak: float | None = Field()
+    amplitude: float | None = Field()
+    xo: float | None = Field()
+    yo: float | None = Field()
+    sigmax: float | None = Field()
+    sigmay: float | None = Field()
+    theta: float | None = Field()
+    redchit: float | None = Field()
+    # Leakage beam fit result
+    mq: float | None = Field()
+    d0q: float | None = Field()
+    d1q: float | None = Field()
+    sigmaq: float | None = Field()
+    redchiq: float | None = Field()
+    mu: float | None = Field()
+    d0u: float | None = Field()
+    d1u: float | None = Field()
+    sigmau: float | None = Field()
+    redchiu: float | None = Field()
+
+
+
+    def to_model(self) -> PlanetMap:
+        """
+        Return an PlanetMap model from this table entry.
+
+        Returns
+        -------
+        PlanetMap : PlanetMap
+            The PlanetMap model corresponding to this table entry.
+        """
+        return PlanetMap(
+            obs_id=self.obs_id,
+            telescope=self.telescope,
+            freq_channel=self.freq_channel,
+            wafer=self.wafer,
+            ctime=Time(self.ctime, format="unix", scale="utc"),
+            dtime=self.dtime,
+            source=self.source,
+            hit_path=self.hit_path,
+            map_path=self.map_path,
+            weight_path=self.weight_path,
+            weighted_map_path=self.weight_map_path,
+            azimuth=self.azimuth,
+            elevation=self.elevation,
+            duration=self.duration,
+            pwv=self.pwv,
+            pwv_std=self.pwv_std,
+            pwv_p2p=self.pwv_p2p,
+            pwv_apex=self.pwv_apex,
+            pwv_apex_std=self.pwv_apex_std,
+            pwv_apex_p2p=self.pwv_apex_p2p,
+            f_hwp=self.f_hwp,
+            roll_angle=self.roll_angle,
+            scan_speed=self.scan_speed,
+            scan_acc=self.scan_acc,
+            sun_distance=self.sun_distance,
+            moon_distance=self.moon_distance,
+            wind_speed=self.wind_speed,
+            wind_direction=self.wind_direction,
+            ambient_temperature=self.ambient_temperature,
+            uv=self.uv,
+            detnum_before_fitselection=self.detnum_before_fitselection,
+            total_detnum=self.total_detnum,
+            recenter=self.recenter,
+            yc=self.yc,
+            xc=self.xc,
+            Tmap_variance=self.Tmap_variance,
+            Qmap_variance=self.Qmap_variance,
+            Umap_variance=self.Umap_variance,
+            proc=self.proc,
+            detnum=self.detnum,
+            detid=self.detid,
+            peak=self.peak,
+            amplitude=self.amplitude,
+            xo=self.xo,
+            yo=self.yo,
+            sigmax=self.sigmax,
+            sigmay=self.sigmay,
+            theta=self.theta,
+            redchit=self.redchit,
+            mq=self.mq,
+            d0q=self.d0q,
+            d1q=self.d1q,
+            sigmaq=self.sigmaq,
+            redchiq=self.redchiq,
+            mu=self.mu,
+            d0u=self.d0u,
+            d1u=self.d1u,
+            sigmau=self.sigmau,
+            redchiu=self.redchiu,
+        )

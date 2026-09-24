@@ -3,12 +3,11 @@ Table for planet maps.
 """
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
-import json
+from typing import Any
 
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, SQLModel
 from sqlalchemy import Column, JSON
 
 class PlanetMap(SQLModel):

@@ -7,8 +7,9 @@ from typing import Any
 
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
+from sqlalchemy import JSON, Column
 from sqlmodel import Field, SQLModel
-from sqlalchemy import Column, JSON
+
 
 class PlanetMap(SQLModel):
     obs_id: str

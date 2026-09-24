@@ -8,6 +8,7 @@ from astropy.time import Time
 from astropydantic import AstroPydanticTime
 from sqlmodel import Field, SQLModel
 
+
 class PlanetTodFit(SQLModel):
     obs_id: str
     telescope: str

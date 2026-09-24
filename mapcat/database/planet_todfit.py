@@ -3,12 +3,10 @@ Table for planet todfit.
 """
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Any
-import json
 
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, SQLModel
 
 class PlanetTodFit(SQLModel):
     obs_id: str

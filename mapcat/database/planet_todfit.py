@@ -42,6 +42,68 @@ class PlanetTodFit(SQLModel):
 
 
 class PlanetTodFitTable(SQLModel, table=True):
+    """
+        Table for a todfit result of planet observation.
+    Attributes
+    ----------
+    obs_id : str
+        observation id
+    telescope : str
+        Telescope 
+    freq_channel : str
+        Frequency band
+    wafer : str
+        Wafer slot
+    source : str
+        source. eg jupiter
+    detid : str
+        detector id
+    ctime : datetime
+        start unix time of map
+    amplitude : float
+        amplitude of planet signal normalized by solid angle with an unit of degree
+    xo : float
+        x offset of planet signal. Unit in degree
+    yo : float
+        y offset of planet signal. Unit in degree
+    sigmax : float
+        sigma of planet signal in x direction. Unit in degree
+    sigmay : float
+        sigma of planet signal in y direction. Unit in degree
+    theta : float
+        angle of elliptical gaussian. Unit in degree
+    defla : float
+        deflection amplitude. Unit in radian
+    deflp : float
+        deflection phase. Unit in radian
+    amplitude_err : float
+        error of amplitude
+    xo_err : float
+        error of xo
+    yo_err : float
+        error of yo
+    sigmax_err : float
+        error of sigmax
+    sigmay_err : float
+        error of sigmay
+    theta_err : float
+        error of theta
+    defla_err : float
+        error of defla
+    deflp_err : float
+        error of deflp
+    chisq : float
+        chi square
+    dof : int
+        degree of freedom
+    xi : float
+        detector xi position in focal plane coordinate. Unit in radian
+    eta : float
+        detector eta position in focal plane coordinate. Unit in radian
+    gamma : float
+        detector gamma angle in focal plane coordinate. Unit in radian
+    
+    """
     __tablename__ = "planet_todfit"
 
     obs_id: str = Field(primary_key=True)

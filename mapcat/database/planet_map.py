@@ -3,12 +3,12 @@ Table for planet maps.
 """
 
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional
 
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
-from sqlalchemy import JSON, Column
-from sqlmodel import Field, SQLModel
+from sqlalchemy import JSON, Column, ForeignKeyConstraint, UniqueConstraint
+from sqlmodel import Field, SQLModel, Relationship
 
 
 class PlanetMap(SQLModel):
@@ -17,7 +17,6 @@ class PlanetMap(SQLModel):
     freq_channel: str
     wafer: str
     ctime: AstroPydanticTime
-    dtime: datetime
     source: str
 
     hit_path: str | None
@@ -82,16 +81,100 @@ class PlanetMap(SQLModel):
     
 
 class PlanetMapTable(SQLModel, table=True):
+    """
+    A planet map.
+
+    Attributes
+    ----------
+    obs_id : str
+        observation id
+    telescope : str
+        Telescope 
+    freq_channel : str
+        frequency channel of map
+    wafer : str
+        wafer slot
+    source : str
+        source. eg jupiter
+    ctime : datetime
+        unix time of map
+    hit_path : str
+        path of hit map
+    map_path : str
+        path of map
+    weight_path : str
+        path of weight
+    weighted_map_path : str
+        path of weighted_map
+    elevation : float
+        elevation of telescope
+    azimuth : float
+        azimuth of telescope
+    pwv: float
+        mean of precipitable water vapor
+    pwv_std: float
+        standard deviation of pwv
+    pwv_p2p: float
+        peak-to-peak of pwv
+    pwv_apex: float
+        mean of pwv taken by apex
+    pwv_apex_std: float
+        standard deviation of pwv apex
+    pwv_apex_p2p: float
+        peak-to-peak of pwv apex
+    f_hwp: float
+        hwp rotation frequency
+    roll_angle: float
+        roll angle
+    scan_speed: float
+        scan speed in deg/s
+    scan_acc: float
+        scan acceleration in deg/s^2
+    sun_distance: float
+        distance to sun
+    moon_distance: float
+        distance to moon
+    wind_speed: float
+        wind speed
+    wind_direction: float
+        wind direction
+    ambient_temperature: float
+        ambient temperature
+    uv: float
+        uv index
+    detnum_before_fitselection: int
+        number of detectors before fit selection
+    total_detnum: int
+        total number of detectors
+    recenter: bool
+        recenter flag
+    yc: float
+        center of map in y direction
+    xc: float
+        center of map in x direction
+    Tmap_variance: float
+        variance of T map in pW
+    Qmap_variance: float
+        variance of Q map in pW
+    Umap_variance: float
+        variance of U map in pW
+    proc: dict
+        preprocessing names
+    detnum: list
+        list of detector numbers on each proc
+    detid: list
+        list of detector ids
+    """
+    
     __tablename__ = "planet_map"
 
     obs_id: str = Field(primary_key=True)
     telescope: str = Field(primary_key=True)
     freq_channel: str = Field(primary_key=True)
     wafer: str = Field(primary_key=True)
-    ctime: float = Field(nullable=False, primary_key=True)
     source: str = Field(primary_key=True)
-    dtime: datetime = Field()
 
+    ctime: datetime = Field(nullable=False)
     hit_path: str | None = Field()
     map_path: str | None = Field()
     weight_path: str | None = Field()
@@ -139,28 +222,14 @@ class PlanetMapTable(SQLModel, table=True):
         default=None,
         sa_column=Column(JSON, nullable=True),
     )
-    # Main beam fit result
-    peak: float | None = Field()
-    amplitude: float | None = Field()
-    xo: float | None = Field()
-    yo: float | None = Field()
-    sigmax: float | None = Field()
-    sigmay: float | None = Field()
-    theta: float | None = Field()
-    redchit: float | None = Field()
-    # Leakage beam fit result
-    mq: float | None = Field()
-    d0q: float | None = Field()
-    d1q: float | None = Field()
-    sigmaq: float | None = Field()
-    redchiq: float | None = Field()
-    mu: float | None = Field()
-    d0u: float | None = Field()
-    d1u: float | None = Field()
-    sigmau: float | None = Field()
-    redchiu: float | None = Field()
 
-
+    fit: Optional["PlanetMapFitTable"] = Relationship(
+        back_populates="map",
+        cascade_delete=True,
+        sa_relationship_kwargs={
+        "uselist": False,
+        },
+    )
 
     def to_model(self) -> PlanetMap:
         """
@@ -177,12 +246,11 @@ class PlanetMapTable(SQLModel, table=True):
             freq_channel=self.freq_channel,
             wafer=self.wafer,
             ctime=Time(self.ctime, format="unix", scale="utc"),
-            dtime=self.dtime,
             source=self.source,
             hit_path=self.hit_path,
             map_path=self.map_path,
             weight_path=self.weight_path,
-            weighted_map_path=self.weight_map_path,
+            weighted_map_path=self.weighted_map_path,
             azimuth=self.azimuth,
             elevation=self.elevation,
             duration=self.duration,
@@ -213,22 +281,91 @@ class PlanetMapTable(SQLModel, table=True):
             proc=self.proc,
             detnum=self.detnum,
             detid=self.detid,
-            peak=self.peak,
-            amplitude=self.amplitude,
-            xo=self.xo,
-            yo=self.yo,
-            sigmax=self.sigmax,
-            sigmay=self.sigmay,
-            theta=self.theta,
-            redchit=self.redchit,
-            mq=self.mq,
-            d0q=self.d0q,
-            d1q=self.d1q,
-            sigmaq=self.sigmaq,
-            redchiq=self.redchiq,
-            mu=self.mu,
-            d0u=self.d0u,
-            d1u=self.d1u,
-            sigmau=self.sigmau,
-            redchiu=self.redchiu,
+            amplitude=self.fit.amplitude,
+            xo=self.fit.xo,
+            yo=self.fit.yo,
+            sigmax=self.fit.sigmax,
+            sigmay=self.fit.sigmay,
+            theta=self.fit.theta,
+            redchit=self.fit.redchit,
+            mq=self.fit.mq,
+            d0q=self.fit.d0q,
+            d1q=self.fit.d0u,
+            sigmaq=self.fit.sigmaq,
+            redchiq=self.fit.redchiq,
+            mu=self.fit.mu,
+            d0u=self.fit.d0u,
+            d1u=self.fit.d1u,
+            sigmau=self.fit.sigmau,
+            redchiu=self.fit.redchiu
         )
+
+class PlanetMapFitTable(SQLModel, table=True):
+    """
+    Table for Main-beam and leakage-beam fit results for a planet map.
+
+    Attributes
+    ----------
+    map_id : int
+        Internal ID of the depth one map
+    residual_model: ConstantPointingModel | PolynomialPointingModel
+        The pointing model to actually store in the database.
+    residual_stats: PointingModelStats
+        Statistics about the pointing residuals, such as mean and stddev of RA and Dec offsets
+    """
+
+    __tablename__ = "planet_map_fits"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            [
+                "obs_id",
+                "telescope",
+                "freq_channel",
+                "wafer",
+                "source",
+            ],
+            [
+                "planet_map.obs_id",
+                "planet_map.telescope",
+                "planet_map.freq_channel",
+                "planet_map.wafer",
+                "planet_map.source",
+            ],
+            ondelete="CASCADE",
+        ),
+    )
+
+    # Same primary key as PlanetMapTable 
+    obs_id: str = Field(primary_key=True)
+    telescope: str = Field(primary_key=True)
+    freq_channel: str = Field(primary_key=True)
+    wafer: str = Field(primary_key=True)
+    source: str = Field(primary_key=True)
+    
+    # Main-beam fit result (T map)
+    peak: float | None = Field()
+    amplitude: float | None = Field()
+    xo: float | None = Field()
+    yo: float | None = Field()
+    sigmax: float | None = Field()
+    sigmay: float | None = Field()
+    theta: float | None = Field()
+    redchit: float | None = Field()
+
+    # Leakage-beam fit result (Q map)
+    mq: float | None = Field()
+    d0q: float | None = Field()
+    d1q: float | None = Field()
+    sigmaq: float | None = Field()
+    redchiq: float | None = Field()
+
+    # Leakage-beam fit result (U map)
+    mu: float | None = Field()
+    d0u: float | None = Field()
+    d1u: float | None = Field()
+    sigmau: float | None = Field()
+    redchiu: float | None = Field()
+
+    map: "PlanetMapTable" = Relationship(
+        back_populates="fit",
+    )

@@ -15,7 +15,6 @@ class PlanetTodFit(SQLModel):
     freq_channel: str
     wafer: str
     ctime: AstroPydanticTime
-    dtime: datetime
     source: str
     detid: str
 
@@ -49,11 +48,10 @@ class PlanetTodFitTable(SQLModel, table=True):
     telescope: str = Field(primary_key=True)
     freq_channel: str = Field(primary_key=True)
     wafer: str = Field(primary_key=True)
-    ctime: float = Field(nullable=False, primary_key=True)
     source: str = Field(primary_key=True)
     detid: str = Field(primary_key=True)
-    dtime: datetime = Field()
 
+    ctime: datetime = Field(nullable=False)
     amplitude: float | None = Field()
     xo: float | None = Field()
     yo: float | None = Field()
@@ -92,7 +90,6 @@ class PlanetTodFitTable(SQLModel, table=True):
             freq_channel=self.freq_channel,
             wafer=self.wafer,
             ctime=Time(self.ctime, format="unix", scale="utc"),
-            dtime=self.dtime,
             source=self.source,
             detid=self.detid,
             amplitude=self.amplitude,

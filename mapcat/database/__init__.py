@@ -7,7 +7,7 @@ from .atomic_map import AtomicMapTable
 from .depth_one_coadd import DepthOneCoaddTable
 from .depth_one_map import DepthOneMapTable
 from .pipeline_information import PipelineInformationTable
-from .planet_map import PlanetMapTable
+from .planet_map import PlanetMapTable, PlanetMapFitTable
 from .planet_todfit import PlanetTodFitTable
 from .pointing_residual import PointingResidualTable
 from .sky_coverage import SkyCoverageTable
@@ -21,6 +21,7 @@ __all__ = [
     "DepthOneMapTable",
     "PipelineInformationTable",
     "PlanetMapTable",
+    "PlanetMapFitTable",
     "PlanetTodFitTable",
     "PointingResidualTable",
     "SkyCoverageTable",
@@ -39,5 +40,6 @@ ALL_TABLES = [
     PipelineInformationTable,
     SkyCoverageTable,
     PlanetMapTable,
+    PlanetMapFitTable,
     PlanetTodFitTable,
 ]

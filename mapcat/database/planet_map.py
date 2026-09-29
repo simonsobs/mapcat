@@ -7,7 +7,7 @@ from typing import Any, Optional
 
 from astropy.time import Time
 from astropydantic import AstroPydanticTime
-from sqlalchemy import JSON, Column, ForeignKeyConstraint, UniqueConstraint
+from sqlalchemy import JSON, Column, ForeignKeyConstraint
 from sqlmodel import Field, SQLModel, Relationship
 
 

@@ -58,26 +58,6 @@ class PlanetMap(SQLModel):
     proc: dict[str, Any] | list[Any] | None = None
     detnum: list[int] | None = None
     detid: list[str] | None = None
-    # Main beam fit result
-    amplitude: float | None
-    peak: float | None
-    xo: float | None
-    yo: float | None
-    sigmax: float | None
-    sigmay: float | None
-    theta: float | None
-    redchit: float | None
-    # Leakage beam fit result
-    mq: float | None
-    d0q: float | None
-    d1q: float | None
-    sigmaq: float | None
-    redchiq: float | None
-    mu: float | None
-    d0u: float | None
-    d1u: float | None
-    sigmau: float | None
-    redchiu: float | None
     
 
 class PlanetMapTable(SQLModel, table=True):
@@ -281,23 +261,6 @@ class PlanetMapTable(SQLModel, table=True):
             proc=self.proc,
             detnum=self.detnum,
             detid=self.detid,
-            amplitude=self.fit.amplitude,
-            xo=self.fit.xo,
-            yo=self.fit.yo,
-            sigmax=self.fit.sigmax,
-            sigmay=self.fit.sigmay,
-            theta=self.fit.theta,
-            redchit=self.fit.redchit,
-            mq=self.fit.mq,
-            d0q=self.fit.d0q,
-            d1q=self.fit.d0u,
-            sigmaq=self.fit.sigmaq,
-            redchiq=self.fit.redchiq,
-            mu=self.fit.mu,
-            d0u=self.fit.d0u,
-            d1u=self.fit.d1u,
-            sigmau=self.fit.sigmau,
-            redchiu=self.fit.redchiu
         )
 
 class PlanetMapFitTable(SQLModel, table=True):

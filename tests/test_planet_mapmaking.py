@@ -83,7 +83,6 @@ def test_build_obslists(database_sessionmaker):
         session.refresh(data2)
 
         obsid1 = data1.obs_id
-        obsid2 = data2.obs_id
 
     # Get depth one map back
     with database_sessionmaker() as session:
@@ -129,7 +128,3 @@ def test_build_obslists(database_sessionmaker):
         y1 = session.get(PlanetTodFitTable, obsid1)
         session.delete(y1)
         session.commit()
-
-if __name__ == "__main__":
-    from sotodlib.database import database_sessionmaker
-    test_build_obslists(database_sessionmaker)

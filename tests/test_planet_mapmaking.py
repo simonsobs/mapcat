@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from mapcat.database import PlanetMapTable, PlanetMapFitTable, PlanetTodFitTable
+from mapcat.database import PlanetMapFitTable, PlanetMapTable, PlanetTodFitTable
 
 
 def test_build_obslists(database_sessionmaker):

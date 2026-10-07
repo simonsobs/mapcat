@@ -168,19 +168,9 @@ def test_build_obslists(database_sessionmaker):
             "source": todfit1.source,
             "detid": todfit1.detid,
         }
-        key_tod2 = {
-            "obs_id": todfit2.obs_id,
-            "telescope": todfit2.telescope,
-            "freq_channel": todfit2.freq_channel,
-            "wafer": todfit2.wafer,
-            "source": todfit2.source,
-            "detid": todfit2.detid,
-        }
         
-
     with database_sessionmaker() as session:
         y1 = session.get(PlanetTodFitTable, key_tod1)
-        y2 = session.get(PlanetTodFitTable, key_tod2)
 
     with database_sessionmaker() as session:
         y1 = session.get(PlanetTodFitTable, key_tod1)

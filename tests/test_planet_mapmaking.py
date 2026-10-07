@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 
-from mapcat.database import PlanetMapTable, PlanetMapFitTable, PlanetTodFitTable
-from mapcat.toolkit.mapmaking import build_obslists
+from mapcat.database import PlanetMapFitTable, PlanetMapTable, PlanetTodFitTable
 
 
 def test_build_obslists(database_sessionmaker):
@@ -83,18 +82,31 @@ def test_build_obslists(database_sessionmaker):
         session.commit()
         session.refresh(data2)
 
-        obsid1 = data1.obs_id
-        obsid2 = data2.obs_id
+        key1 = {
+            "obs_id": data1.obs_id,
+            "telescope": data1.telescope,
+            "freq_channel": data1.freq_channel,
+            "wafer": data1.wafer,
+            "source": data1.source,
+        }
 
+        key2 = {
+            "obs_id": data2.obs_id,
+            "telescope": data2.telescope,
+            "freq_channel": data2.freq_channel,
+            "wafer": data2.wafer,
+            "source": data2.source,
+        }
     # Get depth one map back
     with database_sessionmaker() as session:
-        data1 = session.get(PlanetMapTable, data1.obs_id,)
-        data2 = session.get(PlanetMapTable, data2.obs_id,)
+        data1 = session.get(PlanetMapTable, key1)
+        data2 = session.get(PlanetMapTable, key2)
 
     with database_sessionmaker() as session:
-        x1 = session.get(PlanetMapTable, obsid1)
+        x1 = session.get(PlanetMapTable, key1)
         session.delete(x1)
         session.commit()
+        assert x1 is not None
 
 
     with database_sessionmaker() as session:
@@ -103,8 +115,20 @@ def test_build_obslists(database_sessionmaker):
             telescope="satp3",
             freq_channel="f150",
             wafer="ws0",
-            source='jupiter',
-            ctime=datetime.fromtimestamp(1755787524.0, tz=timezone.utc),
+            source="jupiter",
+            detid="det1",
+            ctime=datetime.fromtimestamp(
+                1755787524.0,
+                tz=timezone.utc,
+            ),
+            amplitude=1.0,
+            xo=0.0,
+            yo=0.0,
+            sigmax=1.0,
+            sigmay=1.0,
+            theta=0.0,
+            chisq=1.0,
+            dof=100,
         )
 
         todfit2 = PlanetTodFitTable(
@@ -112,8 +136,20 @@ def test_build_obslists(database_sessionmaker):
             telescope="satp1",
             freq_channel="f090",
             wafer="ws1",
-            source='saturn',
-            ctime=datetime.fromtimestamp(1755787526.0, tz=timezone.utc),
+            source="saturn",
+            detid="det12",
+            ctime=datetime.fromtimestamp(
+                1755787526.0,
+                tz=timezone.utc,
+            ),
+            amplitude=1.1,
+            xo=0.1,
+            yo=0.1,
+            sigmax=1.1,
+            sigmay=1.1,
+            theta=0.1,
+            chisq=1.1,
+            dof=101,
         )
 
         session.add(todfit1)
@@ -124,9 +160,30 @@ def test_build_obslists(database_sessionmaker):
         session.commit()
         session.refresh(todfit2)
 
-        obsid1 = todfit1.obs_id
+        key_tod1 = {
+            "obs_id": todfit1.obs_id,
+            "telescope": todfit1.telescope,
+            "freq_channel": todfit1.freq_channel,
+            "wafer": todfit1.wafer,
+            "source": todfit1.source,
+            "detid": todfit1.detid,
+        }
+        key_tod2 = {
+            "obs_id": todfit2.obs_id,
+            "telescope": todfit2.telescope,
+            "freq_channel": todfit2.freq_channel,
+            "wafer": todfit2.wafer,
+            "source": todfit2.source,
+            "detid": todfit2.detid,
+        }
+        
 
     with database_sessionmaker() as session:
-        y1 = session.get(PlanetTodFitTable, obsid1)
+        y1 = session.get(PlanetTodFitTable, key_tod1)
+        y2 = session.get(PlanetTodFitTable, key_tod2)
+
+    with database_sessionmaker() as session:
+        y1 = session.get(PlanetTodFitTable, key_tod1)
         session.delete(y1)
         session.commit()
+        assert y1 is not None

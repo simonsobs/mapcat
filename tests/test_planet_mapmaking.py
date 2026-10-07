@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 
-from mapcat.database import PlanetMapFitTable, PlanetMapTable, PlanetTodFitTable
+from mapcat.database import PlanetMapTable, PlanetMapFitTable, PlanetTodFitTable
+from mapcat.toolkit.mapmaking import build_obslists
 
 
 def test_build_obslists(database_sessionmaker):
@@ -83,6 +84,7 @@ def test_build_obslists(database_sessionmaker):
         session.refresh(data2)
 
         obsid1 = data1.obs_id
+        obsid2 = data2.obs_id
 
     # Get depth one map back
     with database_sessionmaker() as session:

@@ -16,19 +16,17 @@ from mapcat.core import get_maps_by_coverage
 from mapcat.database import DepthOneMapTable
 from mapcat.toolkit import act, update_sky_coverage
 
+BASE_URL = "https://object-arbutus.alliancecan.ca/f620008d8888477e9fc9e5dca514fbc3:sodacan-public/maps/act/15056"
+INFO_BASE_URL = "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056"
+
+# The public bucket supplies FITS maps, but not the ingestion metadata HDFs.
 DATA_URLS = [
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505603190_pa4_f150_info.hdf",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505603190_pa4_f150_ivar.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505603190_pa4_f150_kappa.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505603190_pa4_f150_map.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505603190_pa4_f150_rho.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505603190_pa4_f150_time.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505646390_pa6_f150_info.hdf",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505646390_pa6_f150_ivar.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505646390_pa6_f150_kappa.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505646390_pa6_f150_map.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505646390_pa6_f150_rho.fits",
-    "https://g-0a470a.6b7bd8.0ec8.data.globus.org/act_dr6/dr6.02/depth1/depth1_maps/15056/depth1_1505646390_pa6_f150_time.fits",
+    f"{INFO_BASE_URL}/depth1_1505603190_pa4_f150_info.hdf",
+    f"{BASE_URL}/depth1_1505603190_pa4_f150_map.fits",
+    f"{BASE_URL}/depth1_1505603190_pa4_f150_time.fits",
+    f"{INFO_BASE_URL}/depth1_1505646390_pa6_f150_info.hdf",
+    f"{BASE_URL}/depth1_1505646390_pa6_f150_map.fits",
+    f"{BASE_URL}/depth1_1505646390_pa6_f150_time.fits",
 ]
 
 cov_mapping = {
@@ -115,6 +113,12 @@ cov_mapping = {
     "1505646390.0": [(22, 3), (22, 4), (22, 5), (23, 3), (23, 4), (23, 5)],
 }
 
+# The historical expectations used RA + 180 degrees; use celestial RA.
+cov_mapping = {
+    ctime: sorted(((x + 18) % 36, y) for x, y in tiles)
+    for ctime, tiles in cov_mapping.items()
+}
+
 
 def run_migration(database_path: str):
     """
@@ -131,7 +135,7 @@ def run_migration(database_path: str):
     command.upgrade(alembic_cfg, "head")
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(autouse=True)
 def database_sessionmaker(tmp_path_factory):
     """
     Create a temporary SQLite database for testing.
@@ -150,12 +154,14 @@ def database_sessionmaker(tmp_path_factory):
 
     yield sessionmaker(bind=engine, expire_on_commit=False)
 
+    engine.dispose()
+
     # Clean up the database (don't do this in case we want to inspect)
     database_path.unlink()
 
 
 @pytest.fixture(scope="session")
-def downloaded_data_file(request):
+def downloaded_data_file(request, pytestconfig):
     """
     Fixture to download depth 1 maps for testing.
 
@@ -169,37 +175,39 @@ def downloaded_data_file(request):
         Path to the downloaded file
     """
 
+    cache_dir = Path(pytestconfig.cache._cachedir) / "d1maps"
     for url in DATA_URLS:
-        cache_dir = Path("../.pytest_cache/d1maps")
         filename = os.path.basename(url)
         subdir = os.path.basename(os.path.dirname(url))
         file_path = cache_dir / subdir / filename
 
-        # Check to see if each file is already downloaded in the cache, if so skip downloading it again
-        cached_file = request.config.cache.get(
-            "downloaded_file_" + os.path.basename(url), None
-        )
-        if cached_file and os.path.exists(cached_file):
+        # The directory is the source of truth; cached strings may point to
+        # a previous working directory after moving or restoring the cache.
+        if file_path.is_file():
             continue
 
         # Download the file
-        response = requests.get(url)
-        response.raise_for_status()
-
         # To match the expected directory strcutre, e.g. 15060/ contains depth 1 maps
         # starting at 15060, make the intermediate directory
         if not file_path.parent.exists():
             file_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(file_path, "wb") as f:
-            f.write(response.content)
+        partial_path = file_path.with_suffix(file_path.suffix + ".part")
+        try:
+            with requests.get(url, stream=True, timeout=(30, 120)) as response:
+                response.raise_for_status()
+                with partial_path.open("wb") as f:
+                    f.writelines(response.iter_content(1024 * 1024))
+            partial_path.replace(file_path)
+        finally:
+            partial_path.unlink(missing_ok=True)
 
         # Set the location of the file in the cache
         request.config.cache.set(
             "downloaded_file_" + os.path.basename(url), str(file_path)
         )
 
-    return cache_dir
+    return cache_dir.resolve()
 
 
 def test_act(database_sessionmaker, downloaded_data_file):
@@ -240,7 +248,9 @@ def test_sky_coverage(database_sessionmaker, downloaded_data_file):
     )
     act.core(session=database_sessionmaker, args=args)
 
-    update_sky_coverage.core(session=database_sessionmaker, convention="ACT")
+    update_sky_coverage.core(
+        session=database_sessionmaker, relative_to=args.relative_to
+    )
     with database_sessionmaker() as session:
         d1maps = session.query(DepthOneMapTable).all()
         for d1map in d1maps:
@@ -276,22 +286,22 @@ def test_sky_coverage_2(database_sessionmaker, downloaded_data_file):
     )
     act.core(session=database_sessionmaker, args=args)
 
-    update_sky_coverage.core(session=database_sessionmaker, convention="ACT")
+    update_sky_coverage.core(
+        session=database_sessionmaker, relative_to=args.relative_to
+    )
 
     d1maps = act.glob(args.glob, args.relative_to, args.telescope)
     with database_sessionmaker() as session:
         for d1map in d1maps:
             cur_map = enmap.read_map(str(downloaded_data_file) + "/" + d1map.map_path)
             nonzero_radec = cur_map.pix2sky(np.where(cur_map[0] != 0))
-            idx = np.linspace(0, len(nonzero_radec) - 1, 1000)
+            idx = np.linspace(0, nonzero_radec.shape[1] - 1, 1000)
             idx = np.round(idx).astype(int)
             nonzero_radec = nonzero_radec.T[
                 idx
             ]  # Only test a subset of the nonzero pixels to speed up the test
             for pix in nonzero_radec:
-                coord = ICRS(
-                    (pix[1] + np.pi) * u.rad, pix[0] * u.rad
-                )  # Convert from pixel standard to normal RA convention
+                coord = ICRS(pix[1] * u.rad, pix[0] * u.rad)
                 return_d1map = get_maps_by_coverage(coord, session)
                 assert d1map.map_name in [m.map_name for m in return_d1map]
 
@@ -301,7 +311,7 @@ def test_sky_coverage_2(database_sessionmaker, downloaded_data_file):
         assert len(return_d1map) == 0
 
         coord2 = ICRS(
-            180 * u.rad, 0 * u.rad
+            180 * u.deg, 0 * u.deg
         )  # Test a point on the opposite side of the sky
         return_d1map_list = get_maps_by_coverage([coord, coord2], session)
         assert len(return_d1map_list) == 2
@@ -315,7 +325,7 @@ def test_sky_coverage_2(database_sessionmaker, downloaded_data_file):
         session.commit()
 
 
-def test_ra_to_index_pixell():
-    assert update_sky_coverage._ra_to_index_pixell(-180) == 0
-    assert update_sky_coverage._ra_to_index_pixell(170) == 35
-    assert update_sky_coverage._ra_to_index_pixell(0) == 18
+def test_ra_to_index():
+    assert update_sky_coverage.ra_to_index(-180) == 18
+    assert update_sky_coverage.ra_to_index(170) == 17
+    assert update_sky_coverage.ra_to_index(0) == 0

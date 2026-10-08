@@ -10,7 +10,7 @@ from mapcat.database.sky_coverage import SkyCoverageTable
 from mapcat.helper import settings
 
 
-def resolve_tmap(d1table: DepthOneMapTable) -> Path:
+def resolve_tmap(d1table: DepthOneMapTable, *, relative_to: Path | None = None) -> Path:
     """
     Resolve the local path to a tmap from a d1 table.
 
@@ -18,6 +18,9 @@ def resolve_tmap(d1table: DepthOneMapTable) -> Path:
     ----------
     d1table : DepthOneMapTable
         The depth one map table to resolve the tmap for
+    relative_to : Path, optional
+        Base directory used when ingesting the map. Defaults to the configured
+        depth_one_parent.
 
     Returns
     -------
@@ -31,7 +34,8 @@ def resolve_tmap(d1table: DepthOneMapTable) -> Path:
     """
     if d1table.mean_time_path is None:
         raise ValueError(f"No mean time map available for {d1table.map_name}")
-    return settings.depth_one_parent / d1table.mean_time_path
+    parent = settings.depth_one_parent if relative_to is None else Path(relative_to)
+    return parent / d1table.mean_time_path
 
 
 def index_to_skybox(ra_idx: int, dec_idx: int) -> np.ndarray:
@@ -256,21 +260,26 @@ def get_sky_coverage(tmap: enmap.ndmap) -> list[tuple[int, int]]:
     return tiles
 
 
-def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
+def coverage_from_depthone(
+    d1table: DepthOneMapTable, *, relative_to: Path | None = None
+) -> list[SkyCoverageTable]:
     """
     Get the list of sky coverage tiles that cover a given depth one map
 
     Parameters
     ----------
-    d1map : DepthOneMapTable
+    d1table : DepthOneMapTable
         The depth one map to get the sky coverage for
+    relative_to : Path, optional
+        Base directory used when ingesting the map. Defaults to the configured
+        depth_one_parent.
 
     Returns
     -------
     tiles : list[SkyCoverageTable]
         A list of sky coverage tiles that cover the map
     """
-    tmap_path = resolve_tmap(d1table)
+    tmap_path = resolve_tmap(d1table, relative_to=relative_to)
     tmap = enmap.read_map(str(tmap_path))
 
     coverage_tiles = get_sky_coverage(tmap)
@@ -281,7 +290,7 @@ def coverage_from_depthone(d1table: DepthOneMapTable) -> list[SkyCoverageTable]:
     ]
 
 
-def core(session, *, replace: bool = False):
+def core(session, *, replace: bool = False, relative_to: Path | None = None):
     """
     Core function for updating the sky coverage table. For each depth one map that does not have any associated sky coverage tiles, compute the sky coverage tiles and add them to the database.
 
@@ -291,6 +300,9 @@ def core(session, *, replace: bool = False):
         A SQLAlchemy sessionmaker to use for database access.
     replace : bool, optional
         Recompute existing coverage as well, replacing it in one transaction.
+    relative_to : Path, optional
+        Base directory used when ingesting the maps. Defaults to the configured
+        depth_one_parent.
     """
     with session() as cur_session:
         query = cur_session.query(DepthOneMapTable)
@@ -299,7 +311,7 @@ def core(session, *, replace: bool = False):
                 SkyCoverageTable, SkyCoverageTable.map_id == DepthOneMapTable.map_id
             ).filter(SkyCoverageTable.map_id.is_(None))
         for d1map in query.all():
-            SkyCov = coverage_from_depthone(d1map)
+            SkyCov = coverage_from_depthone(d1map, relative_to=relative_to)
             if replace:
                 cur_session.query(SkyCoverageTable).filter_by(
                     map_id=d1map.map_id
@@ -316,5 +328,8 @@ def main():
     parser.add_argument(
         "--replace", action="store_true", help="Recompute and replace existing coverage"
     )
+    parser.add_argument(
+        "--relative-to", type=Path, help="Base directory used for ACT ingestion"
+    )
     args = parser.parse_args()
-    core(session=settings.session, replace=args.replace)
+    core(session=settings.session, replace=args.replace, relative_to=args.relative_to)

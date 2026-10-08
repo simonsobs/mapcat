@@ -61,7 +61,8 @@ More information on the parameters is available through `actingest -h`.
 ### Sky coverage
 
 After ingestion, generate the 10-degree coverage tiles with `updatesky`.
-The time maps must be available below `MAPCAT_DEPTH_ONE_PARENT`. A tile is
+Use the same `--relative-to` directory as `actingest`, or configure
+`MAPCAT_DEPTH_ONE_PARENT` as the map root. A tile is
 covered when it contains a finite, nonzero pixel center. RA wraps into
 0–360 degrees; tile indices are 0–35 in RA and 0–17 in declination.
 Signed RA in ACT FITS files represents the same celestial longitude as

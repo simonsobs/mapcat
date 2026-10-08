@@ -5,6 +5,7 @@ from pathlib import Path
 import numpy as np
 from pixell import enmap
 
+from tqdm import tqdm
 from mapcat.database.depth_one_map import DepthOneMapTable
 from mapcat.database.sky_coverage import SkyCoverageTable
 from mapcat.helper import settings
@@ -290,7 +291,8 @@ def coverage_from_depthone(
     ]
 
 
-def core(session, *, replace: bool = False, relative_to: Path | None = None):
+
+def core(session, *, replace: bool = False, relative_to: Path | None = None, progress: bool = False):
     """
     Core function for updating the sky coverage table. For each depth one map that does not have any associated sky coverage tiles, compute the sky coverage tiles and add them to the database.
 
@@ -303,6 +305,8 @@ def core(session, *, replace: bool = False, relative_to: Path | None = None):
     relative_to : Path, optional
         Base directory used when ingesting the maps. Defaults to the configured
         depth_one_parent.
+    progress : bool, optional
+        Show a progress bar for processing maps.
     """
     with session() as cur_session:
         query = cur_session.query(DepthOneMapTable)
@@ -310,7 +314,7 @@ def core(session, *, replace: bool = False, relative_to: Path | None = None):
             query = query.outerjoin(
                 SkyCoverageTable, SkyCoverageTable.map_id == DepthOneMapTable.map_id
             ).filter(SkyCoverageTable.map_id.is_(None))
-        for d1map in query.all():
+        for d1map in tqdm(query.all(), disable=not progress, desc="Updating sky coverage"):
             SkyCov = coverage_from_depthone(d1map, relative_to=relative_to)
             if replace:
                 cur_session.query(SkyCoverageTable).filter_by(
@@ -331,5 +335,8 @@ def main():
     parser.add_argument(
         "--relative-to", type=Path, help="Base directory used for ACT ingestion"
     )
+    parser.add_argument(
+        "--progress", action="store_true", help="Show progress bar for processing maps"
+    )
     args = parser.parse_args()
-    core(session=settings.session, replace=args.replace, relative_to=args.relative_to)
+    core(session=settings.session, replace=args.replace, relative_to=args.relative_to, progress=args.progress)

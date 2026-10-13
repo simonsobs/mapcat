@@ -4,8 +4,8 @@ from pathlib import Path
 
 import numpy as np
 from pixell import enmap
-
 from tqdm import tqdm
+
 from mapcat.database.depth_one_map import DepthOneMapTable
 from mapcat.database.sky_coverage import SkyCoverageTable
 from mapcat.helper import settings
@@ -291,8 +291,13 @@ def coverage_from_depthone(
     ]
 
 
-
-def core(session, *, replace: bool = False, relative_to: Path | None = None, progress: bool = False):
+def core(
+    session,
+    *,
+    replace: bool = False,
+    relative_to: Path | None = None,
+    progress: bool = False,
+):
     """
     Core function for updating the sky coverage table. For each depth one map that does not have any associated sky coverage tiles, compute the sky coverage tiles and add them to the database.
 
@@ -314,13 +319,22 @@ def core(session, *, replace: bool = False, relative_to: Path | None = None, pro
             query = query.outerjoin(
                 SkyCoverageTable, SkyCoverageTable.map_id == DepthOneMapTable.map_id
             ).filter(SkyCoverageTable.map_id.is_(None))
-        for d1map in tqdm(query.all(), disable=not progress, desc="Updating sky coverage"):
+
+        since_not_committed = 0
+        for d1map in tqdm(
+            query.all(), disable=not progress, desc="Updating sky coverage"
+        ):
             SkyCov = coverage_from_depthone(d1map, relative_to=relative_to)
             if replace:
                 cur_session.query(SkyCoverageTable).filter_by(
                     map_id=d1map.map_id
                 ).delete(synchronize_session=False)
             cur_session.add_all(SkyCov)
+            since_not_committed += 1
+
+            if since_not_committed >= 100:
+                cur_session.commit()
+                since_not_committed = 0
 
         cur_session.commit()
 
@@ -339,4 +353,9 @@ def main():
         "--progress", action="store_true", help="Show progress bar for processing maps"
     )
     args = parser.parse_args()
-    core(session=settings.session, replace=args.replace, relative_to=args.relative_to, progress=args.progress)
+    core(
+        session=settings.session,
+        replace=args.replace,
+        relative_to=args.relative_to,
+        progress=args.progress,
+    )

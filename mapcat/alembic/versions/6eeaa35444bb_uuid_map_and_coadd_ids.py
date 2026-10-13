@@ -38,7 +38,7 @@ depends_on: str | Sequence[str] | None = None
 
 def _backfill(bind, table: str, id_column: str, mapping: dict) -> None:
     """UPDATE `table` SET `id_column`_new = <uuid> WHERE `id_column` = <old id>,
-    for every (old id -> new uuid) pair in `mapping`. 
+    for every (old id -> new uuid) pair in `mapping`.
     Writes the 32-char hex form (no dashes), matching the string SQLAlchemy's
     sa.Uuid() bind processor produces for SQLite -- writing str(new_uuid)
     (36-char, dashed) here would silently desync from any UUID value bound
@@ -53,8 +53,8 @@ def _backfill(bind, table: str, id_column: str, mapping: dict) -> None:
                 f"UPDATE {table} SET {new_column} = :new_uuid "
                 f"WHERE {id_column} = :old_id"
             ),
-                {"new_uuid": new_uuid.hex, "old_id": old_id},
-            )
+            {"new_uuid": new_uuid.hex, "old_id": old_id},
+        )
 
 
 def _recreate_table(bind, table: str, create_sql: str, insert_sql: str) -> None:
@@ -82,7 +82,9 @@ def upgrade() -> None:
     with op.batch_alter_table("time_domain_processing") as batch_op:
         batch_op.add_column(sa.Column("map_id_new", sa.Uuid(), nullable=True))
         batch_op.add_column(sa.Column("coadd_id", sa.Uuid(), nullable=True))
-        batch_op.add_column(sa.Column("processing_status_id_new", sa.Uuid(), nullable=True))
+        batch_op.add_column(
+            sa.Column("processing_status_id_new", sa.Uuid(), nullable=True)
+        )
     with op.batch_alter_table("depth_one_pointing_residuals") as batch_op:
         batch_op.add_column(sa.Column("map_id_new", sa.Uuid(), nullable=True))
     with op.batch_alter_table("depth_one_sky_coverage") as batch_op:
@@ -105,7 +107,7 @@ def upgrade() -> None:
 
     proc_rows = bind.execute(
         sa.text("SELECT processing_status_id FROM time_domain_processing")
-        ).fetchall()
+    ).fetchall()
     proc_id_mapping = {row.processing_status_id: uuid7.create() for row in proc_rows}
     _backfill(bind, "time_domain_processing", "processing_status_id", proc_id_mapping)
 

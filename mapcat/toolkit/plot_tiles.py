@@ -1,99 +1,104 @@
 import argparse as ap
+from itertools import pairwise
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 from pixell import enmap
 
-from mapcat.toolkit.update_sky_coverage import get_sky_coverage
-
-parser = ap.ArgumentParser()
-parser.add_argument("--imap_path", type=str)
-parser.add_argument("--d1map_path", type=str)
-parser.add_argument("--opath", type=str)
-
-args = parser.parse_args()
-imap_path = args.imap_path
-d1map_path = args.d1map_path
-opath = args.opath
-
-imap = enmap.read_map(str(imap_path))
-
-box = imap.box()
-
-dec_min, ra_max = np.rad2deg(box[0])
-dec_max, ra_min = np.rad2deg(box[1])
-
-pad_low = int((90 + dec_min) * 6 * 2)
-pad_high = int((90 - dec_max) * 6 * 2)
-
-imap = imap[0][::10, ::10]
-
-pad_map = np.pad(
-    imap, ((pad_low, pad_high), (0, 0)), mode="constant", constant_values=0
-)
-del imap
-
-left_limit = pad_map.shape[1]
-right_limit = 0
-top_limit = pad_map.shape[0]
-bottom_limit = 0
-extent = [left_limit, right_limit, bottom_limit, top_limit]
+from mapcat.toolkit.update_sky_coverage import _separable_car_axes, get_sky_coverage
 
 
-plt.imshow(pad_map, vmin=-300, vmax=300, origin="lower", extent=extent)
-plt.vlines(
-    np.arange(0, 360 * 6 * 2, 10 * 6 * 2), ymin=0, ymax=180 * 6 * 2, color="black", lw=1
-)
-plt.hlines(
-    np.arange(0, 180 * 6 * 2, 10 * 6 * 2), xmin=0, xmax=360 * 6 * 2, color="black", lw=1
-)
-plt.xticks(np.arange(0, 360 * 6 * 2, 20 * 6 * 2), labels=np.arange(0, 360, 20))
-plt.yticks(np.arange(0, 180 * 6 * 2, 10 * 6 * 2), labels=np.arange(-90, 90, 10))
-plt.xlabel("RA (degrees)")
-plt.ylabel("Dec (degrees)")
+def _show_map(map_data, step=10, **kwargs):
+    """Display sampled CAR pixels in celestial coordinates, splitting at RA=0.
 
-d1map = enmap.read_map(str(d1map_path))
-coverage_tiles = get_sky_coverage(d1map, convention="ACT")
+    Raises
+    ------
+    ValueError
+        If the map is not an unrotated equatorial CAR map.
+    """
+    axes = _separable_car_axes(map_data)
+    if axes is None:
+        raise ValueError("plot_tiles requires an unrotated equatorial CAR map")
+    dec, ra = axes
+    # Use the original pixel centers: striding an enmap changes its WCS centers.
+    dec, ra = dec[::step], ra[::step] % 360
+    pixels = np.asarray(map_data.preflat[0])[::step, ::step]
+    matrix = map_data.wcs.wcs.get_pc()
+    dra, ddec = map_data.wcs.wcs.cdelt * np.diag(matrix) * step
+    boundaries = np.r_[0, np.flatnonzero(np.abs(np.diff(ra)) > 180) + 1, len(ra)]
+    for start, stop in pairwise(boundaries):
+        extent = [
+            ra[start] - dra / 2,
+            ra[stop - 1] + dra / 2,
+            dec[0] - ddec / 2,
+            dec[-1] + ddec / 2,
+        ]
+        plt.imshow(pixels[:, start:stop], origin="lower", extent=extent, **kwargs)
+        # A pixel footprint straddling RA=0 also appears at the other sky edge.
+        for shift in ([360] if min(extent[:2]) < 0 else []) + (
+            [-360] if max(extent[:2]) > 360 else []
+        ):
+            plt.imshow(
+                pixels[:, start:stop],
+                origin="lower",
+                extent=[extent[0] + shift, extent[1] + shift, *extent[2:]],
+                **kwargs,
+            )
 
-d1box = d1map.box()
 
-d1dec_min, d1ra_max = np.rad2deg(d1box[0])
-d1dec_max, d1ra_min = np.rad2deg(d1box[1])
+def main():
+    parser = ap.ArgumentParser()
+    parser.add_argument("--imap_path", type=str, required=True)
+    parser.add_argument("--d1map_path", type=str, required=True)
+    parser.add_argument("--opath", type=str, required=True)
+    args = parser.parse_args()
 
-d1pad_low_dec = int((90 + d1dec_min) * 6 * 2)
-d1pad_high_dec = int((90 - d1dec_max) * 6 * 2)
+    # Preserve the existing palette and optional notebook style.
+    try:
+        import socolors  # noqa: F401
+    except ImportError:
+        pass
+    if "notebook" in plt.style.available:
+        plt.style.use("notebook")
 
-d1pad_low_ra = int((180 + d1ra_min) * 6 * 2)
-d1pad_high_ra = int((180 - d1ra_max) * 6 * 2)
+    imap = enmap.read_map(str(args.imap_path), preflat=True, sel=0)
+    _show_map(imap, vmin=-200, vmax=200, zorder=-1000, cmap="grey")
+    del imap
 
-d1map = d1map[0][::10, ::10]
-d1pad_map = np.pad(
-    d1map,
-    ((d1pad_low_dec, d1pad_high_dec), (d1pad_high_ra, d1pad_low_ra)),
-    mode="constant",
-    constant_values=0,
-)
+    plt.vlines(np.arange(0, 360, 10), ymin=-90, ymax=90, color="black", lw=1)
+    plt.hlines(np.arange(-90, 90, 10), xmin=0, xmax=360, color="black", lw=1)
+    plt.xticks(np.arange(0, 360, 20), labels=np.arange(0, 360, 20))
+    plt.yticks(np.arange(-90, 90, 10), labels=np.arange(-90, 90, 10))
+    plt.xlabel("RA (degrees)")
+    plt.ylabel("Dec (degrees)")
 
-plt.imshow(
-    d1pad_map,
-    vmin=-300,
-    vmax=300,
-    origin="lower",
-    alpha=0.5,
-    cmap="seismic",
-    extent=extent,
-)
+    d1map = enmap.read_map(str(args.d1map_path))
+    coverage_tiles = get_sky_coverage(d1map)
+    sampled = np.asarray(d1map.preflat[0])[::10, ::10]
+    observed = sampled[np.isfinite(sampled) & (sampled != 0)]
+    vmin, vmax = np.percentile(observed, (1, 99)) if observed.size else (0, 1)
+    _show_map(d1map, vmin=vmin, vmax=vmax, alpha=0.9, cmap="twilight_shifted")
 
-for tile in coverage_tiles:
-    plt.gca().add_patch(
-        plt.Rectangle(
-            (tile[0] * 10 * 6 * 2, tile[1] * 10 * 6 * 2),
-            10 * 6 * 2,
-            10 * 6 * 2,
-            fill=False,
-            edgecolor="red",
-            lw=2,
+    for tile in coverage_tiles:
+        plt.gca().add_patch(
+            plt.Rectangle(
+                (tile[0] * 10, tile[1] * 10 - 90),
+                10,
+                10,
+                fill=False,
+                edgecolor="C0",
+                lw=2,
+            )
         )
-    )
 
-plt.savefig(opath + "act_coverage.png", dpi=300)
+    plt.xlim(360, 0)
+    plt.ylim(-90, 90)
+    opath = Path(args.opath)
+    opath.mkdir(parents=True, exist_ok=True)
+    plt.savefig(opath / "act_coverage.png", dpi=300)
+    plt.close()
+
+
+if __name__ == "__main__":
+    main()

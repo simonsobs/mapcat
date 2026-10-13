@@ -58,6 +58,23 @@ actingest --relative-to=/path/to/maps --glob=*/*_map.fits --telescope=act
 ```
 More information on the parameters is available through `actingest -h`.
 
+### Sky coverage
+
+After ingestion, generate the 10-degree coverage tiles with `updatesky`.
+Use the same `--relative-to` directory as `actingest`, or configure
+`MAPCAT_DEPTH_ONE_PARENT` as the map root. A tile is
+covered when it contains a finite, nonzero pixel center. RA wraps into
+0–360 degrees; tile indices are 0–35 in RA and 0–17 in declination.
+Signed RA in ACT FITS files represents the same celestial longitude as
+unsigned RA. 
+
+Coverage can be regenerated using the following command:
+```
+updatesky --replace
+```
+This recomputes all catalog maps and replaces their coverage in one
+transaction. Without `--replace`, maps with existing coverage are skipped.
+
 Registering new Maps
 --------------------
 

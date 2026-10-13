@@ -13,7 +13,7 @@ from .depth_one_map import DepthOneMapTable
 class SkyCoverageTable(SQLModel, table=True):
     """
     Table for tracking sky coverage patches with non-zero overlap with a given depth one map.
-    x and y are 0->36 and 0-18 respectively for CAR patches with 10x10 degrees each.
+    x and y are 0..35 and 0..17 respectively for CAR patches with 10x10 degrees each.
 
     Attributes
     ----------

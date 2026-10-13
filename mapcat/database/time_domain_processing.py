@@ -90,6 +90,7 @@ class TimeDomainProcessingTable(SQLModel, table=True):
             name="ck_time_domain_processing_exactly_one_target",
         ),
     )
+
     def to_model(self) -> TimeDomainProcessing:
         """
         Return a TimeDomainProcessing model from this table entry

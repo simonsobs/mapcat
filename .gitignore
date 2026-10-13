@@ -6,4 +6,8 @@ dist/*
 *.egg-info
 *.fits
 *.hdf
+*.png
 .coverage
+validation/*
+*.DS_Store
+*.swp

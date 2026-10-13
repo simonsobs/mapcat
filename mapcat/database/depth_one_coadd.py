@@ -46,7 +46,9 @@ class DepthOneCoaddTable(SQLModel, table=True):
 
     __tablename__ = "depth_one_coadds"
 
-    coadd_id: UUID7 = Field(default_factory=uuid7_create, primary_key=True, sa_type=Uuid)
+    coadd_id: UUID7 = Field(
+        default_factory=uuid7_create, primary_key=True, sa_type=Uuid
+    )
     coadd_name: str = Field(nullable=False)
     coadd_type: str = Field(nullable=False)
 

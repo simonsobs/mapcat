@@ -18,7 +18,8 @@ dependencies = [
     "pydantic_settings",
     "pixell",
     "h5py",
-    "uuid7-standard"
+    "uuid7-standard",
+    "tqdm"
 ]
 
 [project.scripts]
